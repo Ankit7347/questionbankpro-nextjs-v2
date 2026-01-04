@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
-import { cookies } from "next/headers";
+import { cookies,headers } from "next/headers";
 import "./globals.css";
 
 import SessionProvider from "@/components/SessionProvider";
@@ -80,13 +80,15 @@ export default async function RootLayout({
 }) {
   // ✅ SERVER decides theme
   const cookieStore = await cookies();
+  const headerStore = await headers();
   const theme = cookieStore.get("theme")?.value;
 
-  const isDark = theme === "dark";
+  const isDark = theme === "dark"||(theme === "system" && headerStore.get("sec-ch-prefers-color-scheme") === "dark");
+
   return (
     <html
-      lang="en"
-      className={`${isDark ? "dark" : ""} ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
+    lang="en"
+    className={`${isDark ? "dark" : ""} ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
     >
       <head>
         {/* Google Tag Manager */}
@@ -148,27 +150,30 @@ export default async function RootLayout({
         />
 
         {/* Early theme hydration fix (safe) */}
+
         <Script
-          id="theme-init"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
                 try {
-                  var match = document.cookie.match(/(?:^|; )theme=([^;]+)/);
-                  var theme = match && match[1];
+                  var theme = document.cookie.match(/(?:^|; )theme=([^;]+)/)?.[1];
+                  if (!theme) return;
 
-                  if (
-                    theme === 'dark' ||
-                    (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-                  ) {
+                  if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
+                  } else if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                  } else if (theme === 'system') {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                      document.documentElement.classList.add('dark');
+                    }
                   }
-                } catch (e) {}
+                } catch (_) {}
               })();
             `,
           }}
         />
+
 
 
 

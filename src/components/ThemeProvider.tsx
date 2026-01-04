@@ -70,21 +70,24 @@ function applyTheme(theme: Theme): void {
   const root = document.documentElement;
 
   if (theme === "system") {
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    root.classList.toggle("dark", prefersDark);
+    root.classList.toggle(
+      "dark",
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    );
+  } else if (theme === "dark") {
+    root.classList.add("dark");
   } else {
-    root.classList.toggle("dark", theme === "dark");
+    root.classList.remove("dark");
   }
 }
+
 
 function readTheme(): Theme {
   const match = document.cookie.match(/(?:^|; )theme=([^;]+)/);
   const value = match?.[1];
   return value === "light" || value === "dark" || value === "system"
     ? value
-    : "system";
+    : "light";
 }
 
 // function writeTheme(theme: Theme): void {
@@ -100,14 +103,19 @@ interface ThemeProviderProps {
 }
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>("light");
   const [spinning, setSpinning] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
 
   // Initial theme (after hydration)
   useEffect(() => {
     const saved = readTheme();
     setTheme(saved);
-    applyTheme(saved);
+    requestAnimationFrame(() => {
+      applyTheme(saved);
+    });
+
+    setMounted(true);
   }, []);
 
   // System theme listener
@@ -149,6 +157,9 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       setSpinning(false);
     }, 350);
   };
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return (
     <>
