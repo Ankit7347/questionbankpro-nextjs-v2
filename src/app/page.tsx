@@ -1,10 +1,10 @@
 // src/app/page.tsx
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-// import TopperTestimonials from "@/components/home/TopperTestimonials";
-// import EducationSections from "@/components/home/EducationSections";
-// import ContactForm from "@/components/home/ContactForm";
-// import QuickRevisionNotes from "@/components/home/QuickRevisionNotes";
+import QuickRevisionNotes from "@/components/home/QuickRevisionNotes";
+import TopperTestimonials from "@/components/home/TopperTestimonials";
+import EducationSections from "@/components/home/EducationSections";
+import ContactForm from "@/components/home/ContactForm";
 
 import Link from "next/link";
 import dbConnect from "@/lib/mongodb";
@@ -34,7 +34,7 @@ export default async function HomePage() {
   return (
     <>
       <Navbar />
-      {/* <QuickRevisionNotes /> */}
+      <QuickRevisionNotes />
 
       <div className="p-4">
         <div
@@ -99,9 +99,9 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* <EducationSections />
+      <EducationSections />
       <TopperTestimonials />
-      <ContactForm /> */}
+      <ContactForm />
       <Footer />
     </>
   );

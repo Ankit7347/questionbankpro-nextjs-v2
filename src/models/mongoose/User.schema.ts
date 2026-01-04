@@ -1,5 +1,4 @@
 // src/models/mongoose/User.schema.ts
-
 import { Schema, model, models } from "mongoose";
 import {
   BaseSchemaFields,
@@ -40,6 +39,15 @@ const UserSchema = new Schema(
       type: String,
       enum: ["student", "contentadmin", "superadmin"],
       default: "student",
+    },
+
+    /**
+     * ✅ NEW FIELD — UI MODE PREFERENCE
+     */
+    uiMode: {
+      type: String,
+      enum: ["light", "dark"],
+      default: "light",
     },
 
     className: {

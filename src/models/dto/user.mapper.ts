@@ -9,6 +9,7 @@ export const mapUser = (doc: any) => ({
   email: doc.email,
   phone: doc.phone,
   role: doc.role,
+  uiMode: doc.uiMode,
   className: doc.className,
   competition: doc.competition,
   stateId: doc.stateId?.toString(),
