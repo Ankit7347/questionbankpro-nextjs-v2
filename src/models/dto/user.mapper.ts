@@ -1,4 +1,5 @@
-// dto/user.mapper.ts
+// src/models/dto/user.mapper.ts
+
 import { mapBaseFields } from "./base.mapper";
 
 export const mapUser = (doc: any) => ({
@@ -7,9 +8,10 @@ export const mapUser = (doc: any) => ({
   name: doc.name,
   email: doc.email,
   phone: doc.phone,
-  state: doc.state,
-  district: doc.district,
-  className: doc.className,
   role: doc.role,
+  className: doc.className,
   competition: doc.competition,
+  stateId: doc.stateId?.toString(),
+  districtId: doc.districtId?.toString(),
+  isActive: doc.isActive,
 });

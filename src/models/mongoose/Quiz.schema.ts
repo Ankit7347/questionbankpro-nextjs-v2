@@ -1,10 +1,16 @@
-// Quiz.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const QuizSchema = new Schema(
   {
-    title: { type: String, required: true },
+    title: {
+      type: String,
+      required: true,
+    },
+
     quizType: {
       type: String,
       enum: [
@@ -16,13 +22,23 @@ const QuizSchema = new Schema(
       ],
       required: true,
     },
+
     linkedEntityId: {
       type: Schema.Types.ObjectId,
       required: true,
       index: true,
     },
-    totalQuestions: { type: Number, required: true },
-    durationMinutes: { type: Number, required: true },
+
+    totalQuestions: {
+      type: Number,
+      required: true,
+    },
+
+    durationMinutes: {
+      type: Number,
+      required: true,
+    },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions

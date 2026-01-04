@@ -1,6 +1,8 @@
-// Subject.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const SubjectSchema = new Schema(
   {
@@ -10,10 +12,26 @@ const SubjectSchema = new Schema(
       required: true,
       index: true,
     },
-    name: { type: String, required: true },
-    code: { type: String },
-    order: { type: Number, required: true },
-    isActive: { type: Boolean, default: true },
+
+    name: {
+      type: String,
+      required: true,
+    },
+
+    code: {
+      type: String,
+    },
+
+    order: {
+      type: Number,
+      required: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions

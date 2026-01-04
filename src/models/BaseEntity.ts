@@ -1,11 +1,12 @@
-// models/BaseEntity.ts
+// src/models/BaseEntity.ts
+
 export interface BaseEntity {
-  id: string;
+  id: string; // mapped from MongoDB _id
 
   isDeleted: boolean;
 
   createdAt: Date;
   updatedAt: Date;
 
-  updatedBy?: string; // user UUID
+  updatedBy?: string; // UUID of admin/user
 }

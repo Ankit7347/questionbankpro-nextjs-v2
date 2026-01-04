@@ -1,10 +1,24 @@
-// mongoose/GeolocationState.schema.ts
+// src/models/mongoose/GeolocationState.schema.ts
+
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const GeolocationStateSchema = new Schema(
   {
-    stateName: { type: String, required: true },
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    code: {
+      type: String, // optional: UP, MH, etc
+    },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions

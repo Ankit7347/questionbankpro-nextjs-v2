@@ -1,6 +1,8 @@
-// Course.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const CourseSchema = new Schema(
   {
@@ -10,10 +12,25 @@ const CourseSchema = new Schema(
       required: true,
       index: true,
     },
-    name: { type: String, required: true },
-    stream: { type: String },
-    durationYears: { type: Number },
-    isActive: { type: Boolean, default: true },
+
+    name: {
+      type: String,
+      required: true,
+    },
+
+    stream: {
+      type: String,
+    },
+
+    durationYears: {
+      type: Number,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions

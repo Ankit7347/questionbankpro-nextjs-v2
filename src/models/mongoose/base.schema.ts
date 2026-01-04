@@ -1,4 +1,5 @@
 // src/models/mongoose/base.schema.ts
+
 import { Schema } from "mongoose";
 
 export const BaseSchemaFields = {
@@ -7,11 +8,12 @@ export const BaseSchemaFields = {
     default: false,
     index: true,
   },
+
   updatedBy: {
     type: String, // UUID
   },
 };
 
 export const BaseSchemaOptions = {
-  timestamps: true, // createdAt, updatedAt
+  timestamps: true, // adds createdAt & updatedAt
 };

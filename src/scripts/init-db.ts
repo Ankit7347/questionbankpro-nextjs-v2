@@ -1,10 +1,9 @@
 // src/scripts/init-db.ts
 
 import mongoose from "mongoose";
-import { dbConnect } from "../lib/mongodb";
+import dbConnect from "../lib/mongodb";
 
-
-// Force-load schemas
+// ---- FORCE SCHEMA REGISTRATION ----
 import "../models/mongoose/EducationLevel.schema";
 import "../models/mongoose/Course.schema";
 import "../models/mongoose/Exam.schema";
@@ -22,6 +21,7 @@ import "../models/mongoose/GeolocationState.schema";
 import "../models/mongoose/GeolocationDistrict.schema";
 import "../models/mongoose/ResetToken.schema";
 import "../models/mongoose/User.schema";
+// ----------------------------------
 
 async function initDb() {
   try {
@@ -33,20 +33,28 @@ async function initDb() {
       throw new Error("MongoDB connection not available");
     }
 
-    const collections = await db.collections();
-    const existingNames = collections.map(
-      (c) => c.collectionName
-    );
+    console.log("📦 Ensuring collections & indexes...");
 
+    // Iterate over all registered mongoose models
     for (const modelName of Object.keys(mongoose.models)) {
-      const collectionName = modelName.toLowerCase();
+      const model = mongoose.models[modelName];
+      const collectionName = model.collection.name;
 
-      if (!existingNames.includes(collectionName)) {
+      // 1️⃣ Ensure collection exists
+      const collections = await db
+        .listCollections({ name: collectionName })
+        .toArray();
+
+      if (collections.length === 0) {
         await db.createCollection(collectionName);
-        console.log(`✅ Created collection: ${collectionName}`);
+        console.log(`✅ Collection created: ${collectionName}`);
       } else {
-        console.log(`ℹ️ Collection already exists: ${collectionName}`);
+        console.log(`ℹ️ Collection exists: ${collectionName}`);
       }
+
+      // 2️⃣ Ensure indexes are created (THIS IS CRITICAL)
+      await model.init();
+      console.log(`📑 Indexes ensured for: ${collectionName}`);
     }
 
     console.log("🎉 Database initialization complete.");
@@ -61,4 +69,7 @@ initDb();
 
 
 //export MONGODB_URI="mongodb://root:root@localhost:27017/questionbankpro?authSource=admin"
-//npx ts-node --project tsconfig.scripts.json src/scripts/init-db.ts
+//npx tsx src/scripts/init-db.ts 
+// npx tsx src/scripts/seed/geolocation.seed.ts
+// npx tsx src/scripts/seed/education.seed.ts
+// npx tsx src/scripts/seed/syllabus.seed.ts

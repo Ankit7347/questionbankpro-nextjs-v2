@@ -1,6 +1,8 @@
-// Chapter.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const ChapterSchema = new Schema(
   {
@@ -10,10 +12,27 @@ const ChapterSchema = new Schema(
       required: true,
       index: true,
     },
-    chapterNumber: { type: Number, required: true },
-    name: { type: String, required: true },
-    order: { type: Number, required: true },
-    isActive: { type: Boolean, default: true },
+
+    chapterNumber: {
+      type: Number,
+      required: true,
+    },
+
+    name: {
+      type: String,
+      required: true,
+    },
+
+    order: {
+      type: Number,
+      required: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions

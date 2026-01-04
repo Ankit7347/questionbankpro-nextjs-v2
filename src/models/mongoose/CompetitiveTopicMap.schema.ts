@@ -1,6 +1,8 @@
-// CompetitiveTopicMap.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const CompetitiveTopicMapSchema = new Schema(
   {
@@ -10,22 +12,29 @@ const CompetitiveTopicMapSchema = new Schema(
       required: true,
       index: true,
     },
+
     topicId: {
       type: Schema.Types.ObjectId,
       ref: "Topic",
       required: true,
       index: true,
     },
-    weightage: { type: Number },
+
+    weightage: {
+      type: Number,
+    },
+
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
     },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
 
+// Prevent duplicate mappings
 CompetitiveTopicMapSchema.index(
   { examId: 1, topicId: 1 },
   { unique: true }

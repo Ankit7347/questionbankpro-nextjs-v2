@@ -1,4 +1,5 @@
-// dto/bestBook.mapper.ts
+// src/models/dto/bestBook.mapper.ts
+
 import { mapBaseFields } from "./base.mapper";
 
 export const mapBestBook = (doc: any) => ({

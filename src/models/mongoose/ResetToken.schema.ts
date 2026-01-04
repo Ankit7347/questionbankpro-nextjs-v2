@@ -1,13 +1,25 @@
-// mongoose/ResetToken.schema.ts
+// src/models/mongoose/ResetToken.schema.ts
+
 import { Schema, model, models } from "mongoose";
 
 const ResetTokenSchema = new Schema({
-  email: { type: String, required: true, unique: true },
-  token: { type: String, required: true },
+  email: {
+    type: String,
+    required: true,
+    lowercase: true,
+    index: true,
+  },
+
+  token: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 1800, // 30 minutes
+    expires: 60 * 30, // 30 minutes
   },
 });
 

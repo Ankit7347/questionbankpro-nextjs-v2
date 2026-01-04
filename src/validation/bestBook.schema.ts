@@ -1,4 +1,5 @@
-// validation/bestBook.schema.ts
+// src/validation/bestBook.schema.ts
+
 import { z } from "zod";
 
 export const createBestBookSchema = z.object({
@@ -8,7 +9,10 @@ export const createBestBookSchema = z.object({
   className: z.string(),
   board: z.string(),
   competitive: z.boolean().optional(),
-  imageUrl: z.string().url(),
-  description: z.string(),
+  imageUrl: z.string().url().optional(),
+  description: z.string().optional(),
   tags: z.array(z.string()).optional(),
 });
+
+export const updateBestBookSchema =
+  createBestBookSchema.partial();

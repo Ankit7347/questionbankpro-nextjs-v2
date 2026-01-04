@@ -54,5 +54,18 @@
 # : > src/validation/geolocation.schema.ts
 # : > src/validation/user.schema.ts
 
+# mkdir -p src/services
+# : > src/services/educationLevel.service.ts
+# : > src/services/course.service.ts
+# : > src/services/exam.service.ts
+# : > src/services/syllabus.service.ts
+# : > src/services/subject.service.ts
+# : > src/services/chapter.service.ts
+# : > src/services/topic.service.ts
+# : > src/services/question.service.ts
+# : > src/services/quiz.service.ts
+# : > src/services/bestBook.service.ts
+# : > src/services/contactUs.service.ts
+# : > src/services/user.service.ts
 
 echo "✔ All 10 model files cleared and ready in src/models"

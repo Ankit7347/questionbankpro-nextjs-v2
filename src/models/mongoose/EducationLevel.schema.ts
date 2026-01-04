@@ -1,6 +1,8 @@
-// EducationLevel.schema.ts
 import { Schema, model, models } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const EducationLevelSchema = new Schema(
   {
@@ -9,19 +11,23 @@ const EducationLevelSchema = new Schema(
       enum: ["school", "graduation", "postgraduation", "competitive"],
       required: true,
     },
+
     name: {
       type: String,
       required: true,
       trim: true,
     },
+
     order: {
       type: Number,
       required: true,
     },
+
     isActive: {
       type: Boolean,
       default: true,
     },
+
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
