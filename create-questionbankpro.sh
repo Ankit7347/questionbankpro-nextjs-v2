@@ -91,3 +91,42 @@ echo ""
 echo "✅ Setup complete"
 echo "🚀 Next.js 15 + React 19 + Auth.js v5 Ready"
 echo "▶ cd $PROJECT_NAME && yarn dev"
+
+yarn add react-icons
+yarn add @vercel/analytics
+yarn add class-variance-authority clsx tailwind-merge
+# Buttons
+npx shadcn@latest add button
+
+# Cards
+npx shadcn@latest add card
+
+# Input fields
+npx shadcn@latest add input
+
+# Avatars
+npx shadcn@latest add avatar
+
+# Dialogs
+npx shadcn@latest add dialog
+
+# Dropdown Menu
+npx shadcn@latest add dropdown-menu
+
+# Menubar
+npx shadcn@latest add menubar
+
+# Navigation Menu
+npx shadcn@latest add navigation-menu
+
+# Select
+npx shadcn@latest add select
+
+# Tabs
+npx shadcn@latest add tabs
+
+# Toast (notifications)
+npx shadcn@latest add sonner
+
+# Tooltip
+npx shadcn@latest add tooltip

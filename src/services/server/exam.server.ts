@@ -1,8 +1,12 @@
 // src/services/exam.service.ts
-
 import { ExamModel } from "@/models/mongoose/Exam.schema";
 import { mapExam } from "@/models/dto/exam.mapper";
 import { notDeleted, toObjectId } from "./helpers";
+
+/**
+ * SERVER-ONLY
+ * Used by API routes or server actions
+ */
 
 export async function createExam(payload: any, updatedBy?: string) {
   const doc = await ExamModel.create({ ...payload, updatedBy });
@@ -24,5 +28,6 @@ export async function updateExam(
     { $set: { ...payload, updatedBy } },
     { new: true }
   );
+
   return doc ? mapExam(doc) : null;
 }
