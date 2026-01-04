@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
-
+import { cookies } from "next/headers";
 import "./globals.css";
 
 import SessionProvider from "@/components/SessionProvider";
@@ -73,15 +73,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // ✅ SERVER decides theme
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
+
+  const isDark = theme === "dark";
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
+      className={`${isDark ? "dark" : ""} ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
     >
       <head>
         {/* Google Tag Manager */}
@@ -143,6 +148,27 @@ export default function RootLayout({
         />
 
         {/* Early theme hydration fix (safe) */}
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var match = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+                  var theme = match && match[1];
+
+                  if (
+                    theme === 'dark' ||
+                    (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+                  ) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
 
 
 
