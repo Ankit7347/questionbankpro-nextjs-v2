@@ -75,8 +75,6 @@ yarn add \
 yarn add -D \
   @types/node \
   @types/react \
-  @types/bcryptjs \
-  @types/uuid \
   @types/nodemailer \
   eslint-plugin-react-hooks \
   @next/eslint-plugin-next
