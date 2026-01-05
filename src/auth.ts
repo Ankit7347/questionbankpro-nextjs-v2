@@ -83,6 +83,7 @@ export const {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
         token.role = user.role;
         token.uiMode = user.uiMode;
       }
@@ -96,6 +97,7 @@ export const {
       }
 
       session.user.id = token.id;
+      session.user.name = token.name;
       session.user.role = token.role;
       session.user.uiMode = token.uiMode;
 

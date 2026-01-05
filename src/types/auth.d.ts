@@ -1,4 +1,6 @@
-import "next-auth";
+// src/types/next-auth.d.ts
+
+import NextAuth, { DefaultSession } from "next-auth";
 import "next-auth/jwt";
 
 declare module "next-auth/jwt" {
@@ -15,10 +17,11 @@ declare module "next-auth" {
       id: string;
       role: string;
       uiMode: "light" | "dark";
-    };
+    } & DefaultSession["user"];
   }
 
   interface User {
+    id: string;
     role: string;
     uiMode: "light" | "dark";
   }
