@@ -5,6 +5,7 @@ import User from "@/models/mongoose/User.schema";
 import ResetToken from "@/models/mongoose/ResetToken.schema";
 import { sendMail } from "@/lib/sendMail";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 /* ---------------------------------- */
 /* Forgot Password                    */
@@ -20,10 +21,10 @@ export async function handleForgotPassword(
     isDeleted: false,
   }).lean();
 
-//   if (!user) {
+  if (!user) {
     // Silent success (security best practice)
-//     return;
-//   }
+    return;
+  }
 
   const otp = crypto.randomInt(100000, 999999).toString();
 
@@ -42,3 +43,53 @@ export async function handleForgotPassword(
     emailType: "forgot",
   });
 }
+
+export async function validateResetToken(
+  email: string,
+  otp: string
+): Promise<boolean> {
+  await dbConnect();
+
+  const token = await ResetToken.findOne({
+    email,
+    token: otp,
+  }).lean();
+  console.log(token,email,otp)
+
+  return Boolean(token);
+}
+
+export async function confirmPasswordReset(
+  email: string,
+  otp: string,
+  newPassword: string
+): Promise<void> {
+  await dbConnect();
+
+  // 1. Validate reset token
+  const token = await ResetToken.findOne({
+    email,
+    token: otp, // IMPORTANT: field name
+  });
+
+  if (!token) {
+    throw new Error("Invalid or expired reset token");
+  }
+
+  // 2. Hash new password
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  // 3. Update user password
+  const result = await User.updateOne(
+    { email, isDeleted: false },
+    { $set: { passwordHash } }
+  );
+
+  if (result.matchedCount === 0) {
+    throw new Error("User not found");
+  }
+
+  // 4. Invalidate token (one-time use)
+  await ResetToken.deleteOne({ _id: token._id });
+}
+
