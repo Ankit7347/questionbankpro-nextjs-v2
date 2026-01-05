@@ -1,21 +1,10 @@
+// src/auth.ts
+
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import mongoose, { Model } from "mongoose";
 import dbConnect from "@/lib/mongodb";
-
-// Register schema
-import "@/models/mongoose/User.schema";
-
-interface DbUser {
-  uuid: string;
-  name: string;
-  email: string;
-  role: string;
-  uiMode: "light" | "dark";
-  passwordHash: string;
-  isDeleted: boolean;
-}
+import User from "@/models/mongoose/User.schema";
 
 export const {
   handlers,
@@ -50,14 +39,14 @@ export const {
 
         await dbConnect();
 
-        const UserModel = mongoose.model<DbUser>(
-          "User"
-        ) as Model<DbUser>;
-
-        const user = await UserModel.findOne({
+        const user = await User.findOne({
           email,
           isDeleted: false,
-        }).lean<DbUser | null>();
+        })
+          .select(
+            "uuid name email role uiMode passwordHash"
+          )
+          .lean();
 
         if (!user) return null;
 
@@ -92,17 +81,15 @@ export const {
 
     async session({ session, token }) {
       if (!token.id || !token.role || !token.uiMode) {
-        // This should never happen for a valid, logged-in session
         throw new Error("Invalid session token");
       }
 
       session.user.id = token.id;
-      session.user.name = token.name;
+      session.user.name = token.name ?? "";
       session.user.role = token.role;
       session.user.uiMode = token.uiMode;
 
       return session;
-    }
-
+    },
   },
 });

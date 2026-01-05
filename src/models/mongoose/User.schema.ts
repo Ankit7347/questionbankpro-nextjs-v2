@@ -78,5 +78,7 @@ const UserSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const UserModel =
+const User =
   models.User || model("User", UserSchema);
+
+export default User;
