@@ -2,7 +2,21 @@
 
 import { Types } from "mongoose";
 
-export function mapBaseFields(doc: any) {
+export interface BaseDTO {
+  id: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  updatedBy?: string;
+}
+
+export function mapBaseFields(doc: {
+  _id: Types.ObjectId | string;
+  isDeleted?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  updatedBy?: string;
+}): BaseDTO {
   return {
     id:
       doc._id instanceof Types.ObjectId
@@ -10,10 +24,8 @@ export function mapBaseFields(doc: any) {
         : String(doc._id),
 
     isDeleted: doc.isDeleted ?? false,
-
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
-
     updatedBy: doc.updatedBy,
   };
 }

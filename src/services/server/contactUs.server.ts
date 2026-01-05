@@ -1,9 +1,32 @@
 // src/services/contactUs.service.ts
 
-import { ContactUsModel } from "@/models/mongoose/ContactUs.schema";
-import { mapContactUs } from "@/models/dto/contactUs.mapper";
+import mongoose, { Model } from "mongoose";
+import dbConnect from "@/lib/mongodb";
+import "@/models/mongoose/ContactUs.schema";
+import { CreateContactRequestDTO } from "@/dto/contact.dto";
 
-export async function submitContact(payload: any) {
-  const doc = await ContactUsModel.create(payload);
-  return mapContactUs(doc);
+interface ContactDbModel {
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  isDeleted: boolean;
+}
+
+export async function createContact(
+  payload: CreateContactRequestDTO
+): Promise<void> {
+  await dbConnect();
+
+  const ContactModel = mongoose.model<ContactDbModel>(
+    "ContactUs"
+  ) as Model<ContactDbModel>;
+
+  await ContactModel.create({
+    name: payload.name,
+    phone: payload.phone,
+    email: payload.email,
+    message: payload.message,
+    isDeleted: false,
+  });
 }

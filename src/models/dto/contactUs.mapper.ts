@@ -1,11 +1,35 @@
 // src/models/dto/contactUs.mapper.ts
+import { ContactUsDTO } from "./contactUs.dto";
+import { BaseDTO } from "./base.dto";
 
-import { mapBaseFields } from "./base.mapper";
+interface ContactUsDocument {
+  _id: string;
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  updatedBy?: string;
+}
 
-export const mapContactUs = (doc: any) => ({
-  ...mapBaseFields(doc),
-  name: doc.name,
-  email: doc.email,
-  phone: doc.phone,
-  message: doc.message,
-});
+export function mapContactUs(
+  doc: ContactUsDocument
+): ContactUsDTO {
+  const base: BaseDTO = {
+    id: doc._id,
+    isDeleted: doc.isDeleted,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+    updatedBy: doc.updatedBy,
+  };
+
+  return {
+    ...base,
+    name: doc.name,
+    phone: doc.phone,
+    email: doc.email,
+    message: doc.message,
+  };
+}

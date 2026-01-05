@@ -7,7 +7,7 @@ export default function ContactForm() {
     name: "",
     phone: "",
     email: "",
-    text: "",
+    message: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function ContactForm() {
       const data = await res.json();
       if (res.ok) {
         setMessage("Message sent successfully!");
-        setFormData({ name: "", phone: "", email: "", text: "" });
+        setFormData({ name: "", phone: "", email: "", message: "" });
       } else {
         setMessage(data.message || "Something went wrong");
       }
@@ -45,14 +45,30 @@ export default function ContactForm() {
   };
 
   return (
-    <form
-      className="space-y-6 max-w-[70%] mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-300 dark:border-gray-700"
-      onSubmit={handleSubmit}
-    >
+      <form
+        className="
+          w-[95%]
+          sm:w-[90%]
+          md:w-[80%]
+          lg:w-[70%]
+          xl:w-[60%]
+          mx-auto
+          p-6
+          bg-white
+          dark:bg-gray-900
+          rounded-lg
+          shadow-md
+          border
+          border-gray-300
+          dark:border-gray-700
+        "
+        onSubmit={handleSubmit}
+      >
+
       <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">Contact Us</h2>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Name</label>
+        <label htmlFor="name" className="py-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">Name</label>
         <input
           type="text"
           id="name"
@@ -66,7 +82,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Phone</label>
+        <label htmlFor="phone" className="py-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">Phone</label>
         <input
           type="text"
           id="phone"
@@ -80,7 +96,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
+        <label htmlFor="email" className="py-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
         <input
           type="email"
           id="email"
@@ -94,16 +110,16 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="text" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Your Message</label>
+        <label htmlFor="text" className="py-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">Your Concern</label>
         <textarea
-          id="text"
-          name="text"
+          id="message"
+          name="message"
           rows={6}
-          value={formData.text}
+          value={formData.message}
           onChange={handleChange}
           required
           className="w-full mt-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="Write your message"
+          placeholder="Write your concern"
         />
       </div>
 
