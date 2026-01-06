@@ -1,3 +1,4 @@
+// src/models/mongoose/EducationLevel.schema.ts
 import { Schema, model, models } from "mongoose";
 import {
   BaseSchemaFields,
@@ -6,17 +7,25 @@ import {
 
 const EducationLevelSchema = new Schema(
   {
-    type: {
-      type: String,
-      enum: ["school", "graduation", "postgraduation", "competitive"],
-      required: true,
+    name: {
+      en: { type: String, required: true, trim: true },
+      hi: { type: String, trim: true },
     },
 
-    name: {
+    slug: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
       trim: true,
     },
+
+    description: {
+      en: { type: String },
+      hi: { type: String },
+    },
+
+    icon: { type: String },
 
     order: {
       type: Number,
@@ -33,6 +42,5 @@ const EducationLevelSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const EducationLevelModel =
-  models.EducationLevel ||
+export default models.EducationLevel ||
   model("EducationLevel", EducationLevelSchema);

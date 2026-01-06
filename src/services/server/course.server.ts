@@ -1,16 +1,16 @@
 // src/services/course.service.ts
 
-import { CourseModel } from "@/models/mongoose/Course.schema";
+import Course from "@/models/mongoose/Course.schema";
 import { mapCourse } from "@/models/dto/course.mapper";
 import { notDeleted, toObjectId } from "./helpers";
 
 export async function createCourse(payload: any, updatedBy?: string) {
-  const doc = await CourseModel.create({ ...payload, updatedBy });
+  const doc = await Course.create({ ...payload, updatedBy });
   return mapCourse(doc);
 }
 
 export async function listCoursesByLevel(educationLevelId: string) {
-  const docs = await CourseModel.find({
+  const docs = await Course.find({
     educationLevelId: toObjectId(educationLevelId),
     ...notDeleted,
   });
@@ -18,7 +18,7 @@ export async function listCoursesByLevel(educationLevelId: string) {
 }
 
 export async function deleteCourse(id: string, updatedBy?: string) {
-  await CourseModel.updateOne(
+  await Course.updateOne(
     { _id: toObjectId(id) },
     { $set: { isDeleted: true, updatedBy } }
   );

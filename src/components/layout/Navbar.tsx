@@ -1,38 +1,56 @@
+// src/components/layout/Navbar.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { FaBars, FaSearch, FaHome, FaUserCircle } from "react-icons/fa";
+import { FaBars, FaHome, FaUserCircle } from "react-icons/fa";
 import { FiLogIn, FiLogOut } from "react-icons/fi";
-import { fetchPublicExams , ExamDTO} from "@/services/client/exam.client";
 
+import { ExamLandingDTO } from "@/models/dto/exam.dto";
+import { fetchExamLanding } from "@/services/client/exam.client";
 
-function toKebabCase(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+function toKebabCase(value?: string) {
+  return value
+    ? value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    : "";
 }
 
+
 export default function Navbar() {
-  const [exams, setExams] = useState<ExamDTO[]>([]);
+  const [exams, setExams] = useState<ExamLandingDTO[]>([]);
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { data: session } = useSession();
-  const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchPublicExams()
-      .then(setExams)
+    fetchExamLanding()
+      .then((res) => setExams(res.data))
       .catch(() => setExams([]));
   }, []);
 
   const filtered = search
-    ? exams.filter((e) =>
-        e.name.toLowerCase().includes(search.toLowerCase())
-      )
-    : [];
+  ? exams.filter((exam) => {
+      const q = search.toLowerCase();
+
+      const examMatch =
+        typeof exam.examName === "string" &&
+        exam.examName.toLowerCase().includes(q);
+
+      const courseMatch = Array.isArray(exam.courses) &&
+        exam.courses.some(
+          (c) =>
+            typeof c.name === "string" &&
+            c.name.toLowerCase().includes(q)
+        );
+
+      return examMatch || courseMatch;
+    })
+  : [];
+
+
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
@@ -41,7 +59,6 @@ export default function Navbar() {
           <FaHome /> Exam Preparation
         </Link>
 
-        {/* Search */}
         <div ref={searchRef} className="relative w-64 hidden sm:block">
           <input
             value={search}
@@ -55,18 +72,17 @@ export default function Navbar() {
               {filtered.map((exam) => (
                 <Link
                   key={exam.id}
-                  href={`/exam-details/${toKebabCase(exam.category)}/all`}
+                  href={`/exam-details/${toKebabCase(exam.examName)}/all`}
                   onClick={() => setSearch("")}
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  {exam.name}
+                  {exam.examName}
                 </Link>
               ))}
             </div>
           )}
         </div>
 
-        {/* User */}
         <button onClick={() => setMenuOpen((s) => !s)}>
           {session ? <FaUserCircle size={28} /> : <FaBars size={24} />}
         </button>

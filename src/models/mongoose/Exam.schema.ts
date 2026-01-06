@@ -1,3 +1,4 @@
+// src/models/mongoose/Exam.schema.ts
 import { Schema, model, models } from "mongoose";
 import {
   BaseSchemaFields,
@@ -7,19 +8,40 @@ import {
 const ExamSchema = new Schema(
   {
     name: {
+      en: { type: String, required: true, trim: true },
+      hi: { type: String, trim: true },
+    },
+
+    shortName: {
+      en: { type: String, trim: true },
+      hi: { type: String, trim: true },
+    },
+
+    slug: {
       type: String,
       required: true,
+      lowercase: true,
       trim: true,
     },
 
-    examType: {
-      type: String,
-      enum: ["board", "competitive", "university"],
+    educationLevelId: {
+      type: Schema.Types.ObjectId,
+      ref: "EducationLevel",
       required: true,
+      index: true,
     },
 
-    conductedBy: {
-      type: String,
+    description: {
+      en: { type: String },
+      hi: { type: String },
+    },
+
+    icon: { type: String },
+    bannerImage: { type: String },
+
+    order: {
+      type: Number,
+      required: true,
     },
 
     isActive: {
@@ -32,5 +54,9 @@ const ExamSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const ExamModel =
-  models.Exam || model("Exam", ExamSchema);
+ExamSchema.index(
+  { educationLevelId: 1, slug: 1 },
+  { unique: true }
+);
+
+export default models.Exam || model("Exam", ExamSchema);

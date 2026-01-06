@@ -1,3 +1,4 @@
+// src/models/mongoose/Course.schema.ts
 import { Schema, model, models } from "mongoose";
 import {
   BaseSchemaFields,
@@ -6,24 +7,50 @@ import {
 
 const CourseSchema = new Schema(
   {
-    educationLevelId: {
+    name: {
+      en: { type: String, required: true, trim: true },
+      hi: { type: String, trim: true },
+    },
+
+    slug: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    examId: {
       type: Schema.Types.ObjectId,
-      ref: "EducationLevel",
+      ref: "Exam",
       required: true,
       index: true,
     },
 
-    name: {
-      type: String,
+    description: {
+      en: { type: String },
+      hi: { type: String },
+    },
+
+    durationYears: { type: Number },
+    totalSemesters: { type: Number },
+    classRange: { type: String },
+    stream: { type: String },
+
+    icon: { type: String },
+
+    badge: {
+      en: { type: String },
+      hi: { type: String },
+    },
+
+    order: {
+      type: Number,
       required: true,
     },
 
-    stream: {
-      type: String,
-    },
-
-    durationYears: {
-      type: Number,
+    isVisibleOnCard: {
+      type: Boolean,
+      default: true,
     },
 
     isActive: {
@@ -36,5 +63,9 @@ const CourseSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const CourseModel =
-  models.Course || model("Course", CourseSchema);
+CourseSchema.index(
+  { examId: 1, slug: 1 },
+  { unique: true }
+);
+
+export default models.Course || model("Course", CourseSchema);

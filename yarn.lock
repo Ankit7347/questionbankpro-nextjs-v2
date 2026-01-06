@@ -945,6 +945,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-free@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "@fortawesome/fontawesome-free@npm:7.1.0"
+  checksum: 10c0/3bcaf2c18f3b2ece0fb5640681f13051cb787d686ab444437b3605ba3dca9dce4c7c1f844d94b7ad011482ac20b2b387f3a4c33c2739b50c4425fe529ab7b050
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -5829,6 +5836,7 @@ __metadata:
   resolution: "questionbankpro-dev@workspace:."
   dependencies:
     "@auth/mongodb-adapter": "npm:^3.11.1"
+    "@fortawesome/fontawesome-free": "npm:^7.1.0"
     "@next/eslint-plugin-next": "npm:^16.1.1"
     "@radix-ui/react-avatar": "npm:^1.1.11"
     "@radix-ui/react-dialog": "npm:^1.1.15"

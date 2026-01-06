@@ -128,3 +128,5 @@ npx shadcn@latest add sonner
 
 # Tooltip
 npx shadcn@latest add tooltip
+
+yarn add @fortawesome/fontawesome-free
