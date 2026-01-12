@@ -1,0 +1,1 @@
+// app/api/exams/[examSlug]/route.ts fix this

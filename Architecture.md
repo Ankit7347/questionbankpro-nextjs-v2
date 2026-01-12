@@ -124,3 +124,24 @@ UI
 ### Example
 ```ts
 // src/services/server/exam.server.ts
+```
+
+```bash
+src/app/exams/
+├── page.tsx
+└── [examSlug]/
+    ├── page.tsx
+    └── syllabus/
+        └── [syllabusSlug]/
+            ├── page.tsx
+            └── subject/
+                └── [subjectSlug]/
+                    ├── page.tsx
+                    └── chapter/
+                        └── [chapterSlug]/
+                            ├── page.tsx
+                            └── topic/
+                                └── [topicSlug]/
+                                    └── page.tsx
+
+```

@@ -1,10 +1,11 @@
 // src/services/client/exam.client.ts
-import { EducationLevelGroup } from "@/types/exam";
-import { ExamLandingDTO } from "@/models/dto/exam.dto";
 
+import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
+import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
+import { ExamCatalogUI } from "@/dto/examCatalog.ui.dto";
 export async function fetchExamCatalog(
   lang: "en" | "hi"
-): Promise<{ success: true; data: EducationLevelGroup[] }> {
+): Promise<{ success: true; data: ExamCatalogUI[] }> {
   const res = await fetch("/api/exams/catalog", {
     headers: { "x-lang": lang },
   });
@@ -15,38 +16,18 @@ export async function fetchExamCatalog(
 
   return res.json();
 }
-
-export async function fetchExamLanding(): Promise<{
-  success: true;
-  data: ExamLandingDTO[];
-}> {
+export async function fetchExamLanding(): Promise<
+  ApiResponseUI<ExamLandingUI[]>
+> {
   const res = await fetch("/api/exams/landing");
 
   if (!res.ok) {
-    throw new Error("Failed to fetch exam landing");
-  }
-
-  return res.json();
-}
-
-export async function fetchExamLandingBySlug(
-  educationSlug: string,
-  examSlug: string,
-  lang: "en" | "hi" = "en"
-) {
-  if (!educationSlug || !examSlug) {
-    throw new Error("educationSlug or examSlug missing");
-  }
-
-  const res = await fetch(
-    `/api/exams/${educationSlug}/${examSlug}`,
-    {
-      headers: { "x-lang": lang },
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch exam landing");
+    return {
+      success: false,
+      data: null,
+      error: "Failed to fetch exam landing",
+      statusCode: res.status,
+    };
   }
 
   return res.json();
