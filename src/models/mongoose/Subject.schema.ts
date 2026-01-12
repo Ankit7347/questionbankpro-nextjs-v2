@@ -37,5 +37,4 @@ const SubjectSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const SubjectModel =
-  models.Subject || model("Subject", SubjectSchema);
+export default models.Subject || model("Subject", SubjectSchema);

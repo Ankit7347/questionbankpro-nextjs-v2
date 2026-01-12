@@ -6,7 +6,7 @@ import TopperTestimonials from "@/components/home/TopperTestimonials";
 import EducationSections from "@/components/home/EducationSections";
 import ContactForm from "@/components/home/ContactForm";
 
-import ExamCatalog from "@/components/exam/ExamCatalog";
+import ExamLandingList from "@/components/exams/landing/ExamLandingList";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ export default async function HomePage() {
 
         {/* Exam catalog section */}
         <section className="max-w-screen-xl mx-auto px-4">
-          <ExamCatalog lang="en" />
+          <ExamLandingList lang="en" />
         </section>
 
         <EducationSections />

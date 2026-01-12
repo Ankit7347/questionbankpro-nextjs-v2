@@ -82,7 +82,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const headerStore = await headers();
   const theme = cookieStore.get("theme")?.value;
-  console.log("here")
+
   const isDark = theme === "dark"||(theme === "system" && headerStore.get("sec-ch-prefers-color-scheme") === "dark");
 
   return (
