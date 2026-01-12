@@ -1,20 +1,23 @@
 // src/app/api/exams/[examSlug]/[courseSlug]/route.ts
 
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getExamCourseOverview } from "@/services/server/examCourse.server";
 
 export async function GET(
-  req: Request,
-  {
-    params,
-  }: {
-    params: { examSlug: string; courseSlug: string };
+  req: NextRequest,
+  context: {
+    params: Promise<{
+      examSlug: string;
+      courseSlug: string;
+    }>;
   }
 ) {
+  // ✅ IMPORTANT: params is a Promise in Next.js 14/15
+  const { examSlug, courseSlug } = await context.params;
+
   const lang =
     req.headers.get("x-lang") === "hi" ? "hi" : "en";
-
-  const { examSlug, courseSlug } = params;
 
   const data = await getExamCourseOverview(
     examSlug,
