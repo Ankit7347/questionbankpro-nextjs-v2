@@ -145,3 +145,18 @@ src/app/exams/
                                     └── page.tsx
 
 ```
+
+```
+src/app/layout.tsx               ← global (if any)
+└── src/app/exams/layout.tsx     ← Navbar + Footer
+    └── /exams
+    └── /exams/[examSlug]
+    └── src/app/exams/[examSlug]/[courseSlug]/layout.tsx
+        ├── ExamSidebar  ← persists
+        └── main         ← changes
+            ├── page.tsx
+            ├── subject/[subjectSlug]/page.tsx
+            ├── chapter/[chapterSlug]/page.tsx
+            └── topic/[topicSlug]/page.tsx
+
+```
