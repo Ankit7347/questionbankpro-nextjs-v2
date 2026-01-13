@@ -7,18 +7,11 @@ import Link from "next/link";
 import { FaBars, FaHome, FaUserCircle } from "react-icons/fa";
 import { FiLogIn, FiLogOut } from "react-icons/fi";
 
-import { ExamLandingDTO } from "@/models/dto/exam.dto";
+import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
 import { fetchExamLanding } from "@/services/client/exam.client";
 
-function toKebabCase(value?: string) {
-  return value
-    ? value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-    : "";
-}
-
-
 export default function Navbar() {
-  const [exams, setExams] = useState<ExamLandingDTO[]>([]);
+  const [exams, setExams] = useState<ExamLandingUI[]>([]);
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -27,62 +20,69 @@ export default function Navbar() {
 
   useEffect(() => {
     fetchExamLanding()
-      .then((res) => setExams(res.data))
+      .then((res) => {
+        if (res.success && res.data) {
+          setExams(res.data);
+        } else {
+          setExams([]);
+        }
+      })
       .catch(() => setExams([]));
   }, []);
 
   const filtered = search
-  ? exams.filter((exam) => {
-      const q = search.toLowerCase();
+    ? exams.filter((exam) => {
+        const q = search.toLowerCase();
 
-      const examMatch =
-        typeof exam.examName === "string" &&
-        exam.examName.toLowerCase().includes(q);
+        const examMatch =
+          exam.examName.toLowerCase().includes(q);
 
-      const courseMatch = Array.isArray(exam.courses) &&
-        exam.courses.some(
-          (c) =>
-            typeof c.name === "string" &&
+        const courseMatch =
+          Array.isArray(exam.courses) &&
+          exam.courses.some((c) =>
             c.name.toLowerCase().includes(q)
-        );
+          );
 
-      return examMatch || courseMatch;
-    })
-  : [];
-
-
+        return examMatch || courseMatch;
+      })
+    : [];
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold">
           <FaHome /> Exam Preparation
         </Link>
 
+        {/* Search */}
         <div ref={searchRef} className="relative w-64 hidden sm:block">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search exams…"
+            placeholder="Search exams or courses…"
             className="w-full px-4 py-2 rounded-full border dark:bg-gray-700"
           />
 
           {search && filtered.length > 0 && (
             <div className="absolute mt-1 w-full bg-white dark:bg-gray-800 border rounded shadow">
-              {filtered.map((exam) => (
-                <Link
-                  key={exam.id}
-                  href={`/exam-details/${toKebabCase(exam.examName)}/all`}
-                  onClick={() => setSearch("")}
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  {exam.examName}
-                </Link>
-              ))}
+              {filtered.map((exam) =>
+                exam.courses.map((course) => (
+                  <Link
+                    key={`${exam.examSlug}-${course.slug}`}
+                    href={`/exams/${exam.examSlug}/${course.slug}`}
+                    onClick={() => setSearch("")}
+                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+                  >
+                    {exam.examName} — {course.name}
+                  </Link>
+                ))
+              )}
             </div>
           )}
         </div>
 
+        {/* User / Menu */}
         <button onClick={() => setMenuOpen((s) => !s)}>
           {session ? <FaUserCircle size={28} /> : <FaBars size={24} />}
         </button>
