@@ -5,12 +5,12 @@ import { mapSubject } from "@/models/dto/subject.mapper";
 import { notDeleted, toObjectId } from "./helpers";
 
 export async function createSubject(payload: any, updatedBy?: string) {
-  const doc = await SubjectModel.create({ ...payload, updatedBy });
+  const doc = await Subject.create({ ...payload, updatedBy });
   return mapSubject(doc);
 }
 
 export async function listSubjects(syllabusId: string) {
-  const docs = await SubjectModel.find({
+  const docs = await Subject.find({
     syllabusId: toObjectId(syllabusId),
     ...notDeleted,
   }).sort({ order: 1 });
