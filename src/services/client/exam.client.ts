@@ -2,20 +2,37 @@
 
 import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
 import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
-import { ExamCatalogUI } from "@/dto/examCatalog.ui.dto";
+import { EducationLevelGroup } from "@/dto/examCatalog.ui.dto";
+
+/**
+ * /exams page
+ * ONE API call
+ * Grouped by education level
+ */
 export async function fetchExamCatalog(
   lang: "en" | "hi"
-): Promise<{ success: true; data: ExamCatalogUI[] }> {
+): Promise<ApiResponseUI<EducationLevelGroup[]>> {
   const res = await fetch("/api/exams/catalog", {
     headers: { "x-lang": lang },
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch exam catalog");
+    return {
+      success: false,
+      data: null,
+      error: "Failed to fetch exam catalog",
+      statusCode: res.status,
+    };
   }
 
   return res.json();
 }
+
+/**
+ * Home page
+ * ONE API call
+ * Flat list
+ */
 export async function fetchExamLanding(): Promise<
   ApiResponseUI<ExamLandingUI[]>
 > {
