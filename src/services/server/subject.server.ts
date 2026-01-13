@@ -1,6 +1,6 @@
 // src/services/subject.service.ts
 
-import { SubjectModel } from "@/models/mongoose/Subject.schema";
+import Subject from "@/models/mongoose/Subject.schema";
 import { mapSubject } from "@/models/dto/subject.mapper";
 import { notDeleted, toObjectId } from "./helpers";
 
