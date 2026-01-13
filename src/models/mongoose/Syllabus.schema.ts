@@ -1,38 +1,47 @@
-import { Schema, model, models } from "mongoose";
-import {
-  BaseSchemaFields,
-  BaseSchemaOptions,
-} from "./base.schema";
+// src/models/mongoose/Syllabus.schema.ts
+
+import { Schema, model, models, Types } from "mongoose";
+import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const SyllabusSchema = new Schema(
   {
+    ...BaseSchemaFields,
+
     examId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Exam",
       required: true,
       index: true,
     },
 
     courseId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Course",
       required: true,
       index: true,
     },
 
-    academicYear: {
-      type: String,
+    year: {
+      type: Number,
+      required: true,
+      index: true,
     },
 
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
-
-    ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
 
-export const SyllabusModel =
-  models.Syllabus || model("Syllabus", SyllabusSchema);
+/**
+ * One syllabus per exam + course + year
+ */
+SyllabusSchema.index(
+  { examId: 1, courseId: 1, year: 1 },
+  { unique: true }
+);
+
+export default models.Syllabus || model("Syllabus", SyllabusSchema);

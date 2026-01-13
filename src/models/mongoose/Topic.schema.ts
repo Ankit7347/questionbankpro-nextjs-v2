@@ -1,37 +1,47 @@
-import { Schema, model, models } from "mongoose";
-import {
-  BaseSchemaFields,
-  BaseSchemaOptions,
-} from "./base.schema";
+// src/models/mongoose/Topic.schema.ts
+
+import { Schema, model, models, Types } from "mongoose";
+import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const TopicSchema = new Schema(
   {
+    ...BaseSchemaFields,
+
+    syllabusId: {
+      type: Types.ObjectId,
+      ref: "Syllabus",
+      required: true,
+      index: true,
+    },
+
     chapterId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Chapter",
       required: true,
       index: true,
     },
 
-    name: {
+    slug: {
       type: String,
       required: true,
     },
 
-    difficulty: {
-      type: String,
-      enum: ["easy", "medium", "hard"],
+    name: {
+      en: { type: String, required: true },
+      hi: { type: String },
     },
 
-    isCoreTopic: {
-      type: Boolean,
-      default: false,
+    order: {
+      type: Number,
+      default: 0,
     },
-
-    ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
 
-export const TopicModel =
-  models.Topic || model("Topic", TopicSchema);
+TopicSchema.index(
+  { syllabusId: 1, chapterId: 1, slug: 1 },
+  { unique: true }
+);
+
+export default models.Topic || model("Topic", TopicSchema);

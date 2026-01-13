@@ -7,10 +7,16 @@ export interface ExamSidebarServerDto {
     slug: string;
     name: string;
   };
+
   course: {
     slug: string;
     name: string;
   };
+
+  syllabus: {
+    year: number;
+  };
+
   subjects: {
     slug: string;
     name: string;
@@ -19,4 +25,6 @@ export interface ExamSidebarServerDto {
       name: string;
     }[];
   }[];
+
+  lang: string;
 }

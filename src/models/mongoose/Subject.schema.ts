@@ -1,40 +1,40 @@
-import { Schema, model, models } from "mongoose";
-import {
-  BaseSchemaFields,
-  BaseSchemaOptions,
-} from "./base.schema";
+// src/models/mongoose/Subject.schema.ts
+
+import { Schema, model, models, Types } from "mongoose";
+import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const SubjectSchema = new Schema(
   {
+    ...BaseSchemaFields,
+
     syllabusId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Syllabus",
       required: true,
       index: true,
     },
 
-    name: {
+    slug: {
       type: String,
       required: true,
     },
 
-    code: {
-      type: String,
+    name: {
+      en: { type: String, required: true },
+      hi: { type: String },
     },
 
     order: {
       type: Number,
-      required: true,
+      default: 0,
     },
-
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-
-    ...BaseSchemaFields,
   },
   BaseSchemaOptions
+);
+
+SubjectSchema.index(
+  { syllabusId: 1, slug: 1 },
+  { unique: true }
 );
 
 export default models.Subject || model("Subject", SubjectSchema);
