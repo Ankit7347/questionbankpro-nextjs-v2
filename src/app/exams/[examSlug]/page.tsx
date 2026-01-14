@@ -43,11 +43,11 @@ export default function ExamOverviewPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors selection:bg-blue-100">
+    <div className=" max-w-screen-xl mx-auto  bg-white dark:bg-gray-950 transition-colors selection:bg-blue-100">
       
       {/* 1. HERO HEADER - Fluid Spacing */}
       <header className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-900/30 backdrop-blur-md">
-        <div className="max-w-[80rem] mx-auto px-[5%] py-[4rem] lg:py-[6rem]">
+        <div className="px-[5%] py-[4rem] lg:py-[6rem]">
           <div className="flex items-center gap-[0.75rem] text-blue-600 dark:text-blue-400 font-bold text-[0.75rem] uppercase tracking-[0.15em] mb-[1.5rem]">
             <span className="w-[2rem] h-[2px] bg-blue-600"></span> 
             Exam Portal
@@ -62,7 +62,7 @@ export default function ExamOverviewPage() {
       </header>
 
       {/* 2. FLOATING DASHBOARD - REM based grid */}
-      <section className="max-w-[80rem] mx-auto px-[5%] -mt-[3.5rem] relative z-10">
+      <section className="px-[5%] -mt-[3.5rem] relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[1.5rem]">
           {[
             { Icon: FileText, label: "Question Bank", desc: "2,500+ Solved Questions", color: "text-blue-600", bg: "bg-blue-50" },
@@ -81,7 +81,7 @@ export default function ExamOverviewPage() {
       </section>
 
       {/* 3. SYLLABUS SECTION */}
-      <section className="max-w-[80rem] mx-auto px-[5%] py-[5rem]">
+      <section className="px-[5%] py-[5rem]">
         <div className="flex items-center gap-[1.5rem] mb-[3rem]">
             <h2 className="text-[1.75rem] font-[900] text-gray-900 dark:text-white shrink-0">
               Pick Your Syllabus
@@ -113,7 +113,7 @@ export default function ExamOverviewPage() {
       </section>
 
       {/* 4. SUBJECT GRID - Fluid aspect ratios */}
-      <section className="max-w-[80rem] mx-auto px-[5%] pb-[6rem]">
+      <section className="px-[5%] pb-[6rem]">
         <div className="flex items-center gap-[1.5rem] mb-[3rem]">
             <h2 className="text-[1.75rem] font-[900] text-gray-900 dark:text-white shrink-0">
               Subject Explorer
