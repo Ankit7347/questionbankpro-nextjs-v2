@@ -23,10 +23,22 @@ export async function GET(
     const yearParam = request.nextUrl.searchParams.get("year");
     const year = yearParam ? Number(yearParam) : undefined;
 
-    const data = await getExamSidebarServer(examSlug, courseSlug, year);
+    const data = await getExamSidebarServer(
+      examSlug,
+      courseSlug,
+      year
+    );
 
-    return Response.json(ok(data));
+    const response = ok(data);
+
+    return Response.json(response, {
+      status: response.statusCode,
+    });
   } catch (error) {
-    return Response.json(fail(error));
+    const response = fail(error);
+
+    return Response.json(response, {
+      status: response.statusCode,
+    });
   }
 }

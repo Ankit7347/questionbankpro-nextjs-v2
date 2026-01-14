@@ -1,6 +1,5 @@
 // src/app/exams/[examSlug]/[courseSlug]/page.tsx
 "use client";
-
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -32,15 +31,31 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/exams/${examSlug}/${courseSlug}`)
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success) {
-          setData(res.data);
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [examSlug, courseSlug]);
+  const load = async () => {
+    try {
+      const res = await fetch(`/api/exams/${examSlug}/${courseSlug}`);
+
+      if (res.status === 404) {
+        setData(null);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to load course");
+      }
+
+      const json = await res.json();
+      setData(json.data);
+    } catch {
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  load();
+}, [examSlug, courseSlug]);
+
 
   if (loading) {
     return (

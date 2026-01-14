@@ -17,8 +17,9 @@ export async function getExamSidebarServer(
   year?: number
 ) {
   const lang = getCurrentLang();
+  const effectiveYear = year ?? new Date().getFullYear();
 
-  /** 1. Exam */
+  /** 1. Exam (MANDATORY) */
   const exam = await Exam.findOne({
     slug: examSlug,
     isDeleted: false,
@@ -26,7 +27,7 @@ export async function getExamSidebarServer(
 
   if (!exam) throw NotFound("Exam not found");
 
-  /** 2. Course */
+  /** 2. Course (MANDATORY) */
   const course = await Course.findOne({
     slug: courseSlug,
     examId: exam._id,
@@ -35,18 +36,33 @@ export async function getExamSidebarServer(
 
   if (!course) throw NotFound("Course not found");
 
-  /** 3. Active syllabus (year-aware) */
+  /** 3. Syllabus (OPTIONAL) */
   const syllabus = await Syllabus.findOne({
     examId: exam._id,
     courseId: course._id,
-    ...(year ? { year } : {}),
     isActive: true,
     isDeleted: false,
-  }).lean();
+    validFrom: { $lte: effectiveYear },
+    $or: [
+      { validTo: null },
+      { validTo: { $gte: effectiveYear } },
+    ],
+  })
+    .sort({ validFrom: -1 })
+    .lean();
 
-  if (!syllabus) throw NotFound("Syllabus not found");
+  // If syllabus missing → return empty sidebar
+  if (!syllabus) {
+    return mapExamSidebar({
+      exam,
+      course,
+      syllabus: null,
+      subjects: [],
+      lang,
+    });
+  }
 
-  /** 4. Subjects (syllabus scoped) */
+  /** 4. Subjects (OPTIONAL) */
   const subjects = await Subject.find({
     syllabusId: syllabus._id,
     isDeleted: false,
@@ -65,7 +81,7 @@ export async function getExamSidebarServer(
     });
   }
 
-  /** 5. Chapters (syllabus + subject scoped) */
+  /** 5. Chapters (OPTIONAL) */
   const subjectIds = subjects.map((s) => s._id);
 
   const chapters = await Chapter.find({
@@ -77,11 +93,12 @@ export async function getExamSidebarServer(
     .sort({ order: 1 })
     .lean();
 
-  /** 6. Attach chapters to subjects */
+  /** 6. Attach chapters safely */
   const subjectMap = subjects.map((subject) => ({
     ...subject,
     chapters: chapters.filter(
-      (chapter) => chapter.subjectId.toString() === subject._id.toString()
+      (chapter) =>
+        chapter.subjectId.toString() === subject._id.toString()
     ),
   }));
 
