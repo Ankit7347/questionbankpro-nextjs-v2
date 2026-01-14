@@ -38,9 +38,8 @@ export async function getExamSidebarServer(
 
   /** 3. Syllabus (OPTIONAL) */
   const syllabus = await Syllabus.findOne({
-    examId: exam._id,
     courseId: course._id,
-    isActive: true,
+    // isActive: true,
     isDeleted: false,
     validFrom: { $lte: effectiveYear },
     $or: [

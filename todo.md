@@ -125,3 +125,6 @@ When you resume next time, start from **one** of these:
 * Course page server-side refactor
 
 This is the **final, correct conclusion** for this thread.
+
+
+~/snap/code/217/.local/share/Trash/files$ 
