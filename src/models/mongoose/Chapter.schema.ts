@@ -1,24 +1,23 @@
 // src/models/mongoose/Chapter.schema.ts
 
-import { Schema, model, models, Types } from "mongoose";
-import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
+import { Schema, model, models } from "mongoose";
+import {
+  BaseSchemaFields,
+  BaseSchemaOptions,
+} from "./base.schema";
 
 const ChapterSchema = new Schema(
   {
-    ...BaseSchemaFields,
-
-    syllabusId: {
-      type: Types.ObjectId,
-      ref: "Syllabus",
+    subjectId: {
+      type: Schema.Types.ObjectId,
+      ref: "Subject",
       required: true,
       index: true,
     },
 
-    subjectId: {
-      type: Types.ObjectId,
-      ref: "Subject",
+    name: {
+      type: String,
       required: true,
-      index: true,
     },
 
     slug: {
@@ -26,22 +25,24 @@ const ChapterSchema = new Schema(
       required: true,
     },
 
-    name: {
-      en: { type: String, required: true },
-      hi: { type: String },
-    },
-
     order: {
       type: Number,
       default: 0,
     },
+
+    validFrom: {
+      type: Number,
+      required: true,
+    },
+
+    validTo: {
+      type: Number,
+      default: null,
+    },
+
+    ...BaseSchemaFields,
   },
   BaseSchemaOptions
-);
-
-ChapterSchema.index(
-  { syllabusId: 1, subjectId: 1, slug: 1 },
-  { unique: true }
 );
 
 export default models.Chapter || model("Chapter", ChapterSchema);

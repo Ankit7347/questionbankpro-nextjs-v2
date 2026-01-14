@@ -1,11 +1,19 @@
-// src/models/dto/syllabus.mapper.ts
+// src/models/dto/syllabus.dto.ts
 
+import { BaseDTO } from "./base.dto";
 import { mapBaseFields } from "./base.mapper";
 
-export const mapSyllabus = (doc: any) => ({
-  ...mapBaseFields(doc),
-  examId: doc.examId?.toString(),
-  courseId: doc.courseId?.toString(),
-  academicYear: doc.academicYear,
-  isActive: doc.isActive,
-});
+export interface SyllabusDTO extends BaseDTO {
+  courseId: string;
+  validFrom: number;
+  validTo: number | null;
+}
+
+export function mapSyllabus(doc: any): SyllabusDTO {
+  return {
+    ...mapBaseFields(doc),
+    courseId: doc.courseId.toString(),
+    validFrom: doc.validFrom,
+    validTo: doc.validTo,
+  };
+}

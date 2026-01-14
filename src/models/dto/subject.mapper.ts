@@ -1,12 +1,25 @@
-// src/models/dto/subject.mapper.ts
+// src/models/dto/subject.dto.ts
 
+import { BaseDTO } from "./base.dto";
 import { mapBaseFields } from "./base.mapper";
 
-export const mapSubject = (doc: any) => ({
-  ...mapBaseFields(doc),
-  syllabusId: doc.syllabusId?.toString(),
-  name: doc.name,
-  code: doc.code,
-  order: doc.order,
-  isActive: doc.isActive,
-});
+export interface SubjectDTO extends BaseDTO {
+  syllabusId: string;
+  name: string;
+  slug: string;
+  order: number;
+  validFrom: number;
+  validTo: number | null;
+}
+
+export function mapSubject(doc: any): SubjectDTO {
+  return {
+    ...mapBaseFields(doc),
+    syllabusId: doc.syllabusId.toString(),
+    name: doc.name,
+    slug: doc.slug,
+    order: doc.order,
+    validFrom: doc.validFrom,
+    validTo: doc.validTo,
+  };
+}
