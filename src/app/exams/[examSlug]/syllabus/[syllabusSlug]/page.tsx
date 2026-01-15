@@ -27,7 +27,7 @@ export default function SyllabusPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="max-w-screen-xl mx-auto bg-white dark:bg-gray-900">
 
       {/* HEADER */}
       <div className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60">

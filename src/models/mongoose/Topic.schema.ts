@@ -8,50 +8,28 @@ import {
 
 const TopicSchema = new Schema(
   {
-    chapterId: {
-      type: Schema.Types.ObjectId,
-      ref: "Chapter",
-      required: true,
-      index: true,
-    },
-
     name: {
       type: String,
       required: true,
+      trim: true,
     },
 
     slug: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
 
-    order: {
-      type: Number,
-      default: 0,
+    description: {
+      type: String,
+      default: "",
     },
 
-    /** NEW FIELDS **/
     difficulty: {
       type: String,
       enum: ["easy", "medium", "hard"],
-      required: true,
-      index: true,
-    },
-
-    isCoreTopic: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
-
-    validFrom: {
-      type: Number,
-      required: true,
-    },
-
-    validTo: {
-      type: Number,
-      default: null,
+      default: "medium",
     },
 
     ...BaseSchemaFields,

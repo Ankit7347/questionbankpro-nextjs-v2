@@ -1,25 +1,19 @@
-// src/models/dto/chapter.dto.ts
+// src/models/dto/chapter.mapper.ts
 
 import { BaseDTO } from "./base.dto";
 import { mapBaseFields } from "./base.mapper";
 
 export interface ChapterDTO extends BaseDTO {
-  subjectId: string;
   name: string;
   slug: string;
-  order: number;
-  validFrom: number;
-  validTo: number | null;
+  description: string;
 }
 
 export function mapChapter(doc: any): ChapterDTO {
   return {
     ...mapBaseFields(doc),
-    subjectId: doc.subjectId.toString(),
     name: doc.name,
     slug: doc.slug,
-    order: doc.order,
-    validFrom: doc.validFrom,
-    validTo: doc.validTo,
+    description: doc.description ?? "",
   };
 }

@@ -13,7 +13,7 @@ import { getCurrentLang } from "@/lib/i18n";
 
 export async function getExamSidebarServer(
   examSlug: string,
-  courseSlug: string,
+  courseSlug?: string,
   year?: number
 ) {
   const lang = getCurrentLang();

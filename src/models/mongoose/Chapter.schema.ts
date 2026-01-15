@@ -8,36 +8,22 @@ import {
 
 const ChapterSchema = new Schema(
   {
-    subjectId: {
-      type: Schema.Types.ObjectId,
-      ref: "Subject",
-      required: true,
-      index: true,
-    },
-
     name: {
       type: String,
       required: true,
+      trim: true,
     },
 
     slug: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
 
-    order: {
-      type: Number,
-      default: 0,
-    },
-
-    validFrom: {
-      type: Number,
-      required: true,
-    },
-
-    validTo: {
-      type: Number,
-      default: null,
+    description: {
+      type: String,
+      default: "",
     },
 
     ...BaseSchemaFields,

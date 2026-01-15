@@ -1,4 +1,4 @@
-// src/models/mongoose/Syllabus.schema.ts
+// src/models/mongoose/TopicMap.schema.ts
 
 import { Schema, model, models, Types } from "mongoose";
 import {
@@ -6,24 +6,34 @@ import {
   BaseSchemaOptions,
 } from "./base.schema";
 
-const SyllabusSchema = new Schema(
+const TopicMapSchema = new Schema(
   {
-    courseId: {
+    chapterMapId: {
       type: Types.ObjectId,
-      ref: "Course",
+      ref: "ChapterMap",
       required: true,
       index: true,
     },
 
-    year: {
-      type: Number,
+    topicId: {
+      type: Types.ObjectId,
+      ref: "Topic",
       required: true,
-      index: true,
     },
 
-    version: {
+    order: {
       type: Number,
-      default: 1,
+      required: true,
+    },
+
+    isOptional: {
+      type: Boolean,
+      default: false,
+    },
+
+    isRemoved: {
+      type: Boolean,
+      default: false,
     },
 
     validFrom: {
@@ -36,15 +46,9 @@ const SyllabusSchema = new Schema(
       default: null,
     },
 
-    isActive: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
-
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
 
-export default models.Syllabus || model("Syllabus", SyllabusSchema);
+export default models.TopicMap || model("TopicMap", TopicMapSchema);
