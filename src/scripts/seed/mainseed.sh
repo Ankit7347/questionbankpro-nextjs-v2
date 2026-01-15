@@ -1,4 +1,5 @@
-##  export MONGODB_URI=" "
+export MONGODB_URI="mongodb://root:root@localhost:27017/questionbankpro?authSource=admin"
+
 npx tsx educationLevel.seed.ts 
 npx tsx exam.seed.ts 
 npx tsx course.seed.ts 
