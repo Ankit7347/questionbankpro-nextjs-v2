@@ -5,14 +5,27 @@
  */
 
 import { getExamSidebarServer } from "./examSidebar.server";
+import { ApiError } from "@/lib/apiError";
 
-export async function loadExamSidebar(
-  examSlug: string,
-  courseSlug: string
-) {
-//   if (!examSlug || !courseSlug) {
-//     throw new Error("Missing examSlug or courseSlug in layout params");
-//   }
+export async function loadExamSidebar(examSlug: string) {
+  if (!examSlug) {
+    throw new Error("Missing examSlug in layout params");
+  }
 
-  return getExamSidebarServer(examSlug, courseSlug);
+  try {
+    return await getExamSidebarServer(examSlug);
+  } catch (error) {
+    // ⛔ NEVER crash a layout
+    if (error instanceof ApiError) {
+      return {
+        exam: null,
+        course: null,
+        syllabus: null,
+        subjects: [],
+        lang: "en",
+      };
+    }
+    console.log(error);
+    throw error;
+  }
 }

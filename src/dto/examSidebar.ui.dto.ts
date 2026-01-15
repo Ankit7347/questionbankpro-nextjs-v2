@@ -6,17 +6,21 @@ export interface ExamSidebarDto {
   exam: {
     slug: string;
     name: string;
-  };
+  } | null;
+
   course: {
     slug: string;
     name: string;
-  };
+  } | null;
+
   subjects: {
     slug: string;
     name: string;
+    order: number;
     chapters: {
       slug: string;
       name: string;
+      order: number;
     }[];
   }[];
 }

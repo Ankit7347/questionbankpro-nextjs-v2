@@ -5,15 +5,15 @@
 import { BaseDTO } from "./base.dto";
 
 export interface ExamSidebarServerDto {
-  exam: {
+  exam: ({
     slug: string;
     name: string;
-  } & BaseDTO;
+  } & BaseDTO) | null;
 
-  course: {
+  course: ({
     slug: string;
     name: string;
-  } & BaseDTO;
+  } & BaseDTO) | null;
 
   syllabus: ({
     validFrom: number;
@@ -24,9 +24,11 @@ export interface ExamSidebarServerDto {
   subjects: ({
     slug: string;
     name: string;
+    order: number;
     chapters: {
       slug: string;
       name: string;
+      order: number;
     }[];
   } & BaseDTO)[];
 

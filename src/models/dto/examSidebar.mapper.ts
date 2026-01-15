@@ -21,6 +21,16 @@ export function mapExamSidebar({
   subjects,
   lang,
 }: MapExamSidebarInput): ExamSidebarServerDto {
+  if (!exam || !course) {
+    return {
+      exam: null,
+      course: null,
+      syllabus: null,
+      subjects: [],
+      lang,
+    };
+  }
+
   return {
     exam: {
       ...mapBaseFields(exam),
@@ -47,9 +57,11 @@ export function mapExamSidebar({
       ...mapBaseFields(subject),
       slug: subject.slug,
       name: resolveI18nField(subject.name, lang),
+      order: subject.order, // ✅ from SubjectMap
       chapters: (subject.chapters || []).map((chapter: any) => ({
         slug: chapter.slug,
         name: resolveI18nField(chapter.name, lang),
+        order: chapter.order, // ✅ from ChapterMap
       })),
     })),
 
