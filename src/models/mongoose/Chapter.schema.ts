@@ -9,9 +9,8 @@ import {
 const ChapterSchema = new Schema(
   {
     name: {
-      type: String,
-      required: true,
-      trim: true,
+      en: { type: String, required: true, trim: true },
+      hi: { type: String, trim: true },
     },
 
     slug: {

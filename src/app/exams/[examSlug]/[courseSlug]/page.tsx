@@ -1,122 +1,114 @@
 // src/app/exams/[examSlug]/[courseSlug]/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ChevronRight, BookOpen, AlertCircle, ArrowLeft, RefreshCcw } from "lucide-react";
 
-interface Subject {
-  name: string;
-  slug: string;
-}
-
-interface CourseOverview {
-  exam: {
-    name: string;
-    slug: string;
-  };
-  course: {
-    name: string;
-    slug: string;
-  };
-  subjects: Subject[];
-}
+import { ExamCourseOverviewDTO } from "@/dto/examCourse.dto";
+import { fetchCourseOverview } from "@/services/client/course.client";
+import CourseSubjectSection from "@/components/exams/course/CourseSubjectSection";
 
 export default function CoursePage() {
-  const { examSlug, courseSlug } = useParams<{
-    examSlug: string;
-    courseSlug: string;
-  }>();
+  const { examSlug, courseSlug } = useParams<{ examSlug: string; courseSlug: string }>();
 
-  const [data, setData] = useState<CourseOverview | null>(null);
+  const [data, setData] = useState<ExamCourseOverviewDTO | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-  const load = async () => {
-    try {
-      const res = await fetch(`/api/exams/${examSlug}/${courseSlug}`);
-
-      if (res.status === 404) {
-        setData(null);
-        return;
+    const loadData = async () => {
+      setLoading(true);
+      const response = await fetchCourseOverview(examSlug, courseSlug);
+      
+      if (response.success && response.data) {
+        setData(response.data);
+      } else {
+        setError(response.error || "Course not found");
       }
-
-      if (!res.ok) {
-        throw new Error("Failed to load course");
-      }
-
-      const json = await res.json();
-      setData(json.data);
-    } catch {
-      setData(null);
-    } finally {
       setLoading(false);
-    }
-  };
+    };
 
-  load();
-}, [examSlug, courseSlug]);
-
+    loadData();
+  }, [examSlug, courseSlug]);
 
   if (loading) {
     return (
-      <div className="py-16 text-center text-gray-500">
-        Loading course…
+      <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
+        <RefreshCcw className="w-8 h-8 text-blue-600 animate-spin" />
+        <p className="text-gray-500 font-medium">Loading Course Content...</p>
       </div>
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
-      <div className="py-16 text-center text-red-500">
-        Course not found
-      </div>
+      <main className="flex flex-col items-center justify-center px-6 text-center py-20">
+        <div className="p-6 rounded-full bg-red-50 dark:bg-red-900/10 mb-6 border border-red-100 dark:border-red-900/30">
+          <AlertCircle className="w-16 h-16 text-red-600 dark:text-red-500" />
+        </div>
+        <h1 className="text-4xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+          Course Not Found
+        </h1>
+        <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-md text-lg leading-relaxed">
+          The course <span className="text-red-600 font-bold italic">"{courseSlug.replace(/-/g, " ")}" </span> 
+          does not exist or has been moved. If you think this is a mistake, please check back later.
+        </p>
+        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <Link 
+            href="/exams" 
+            className="flex items-center justify-center gap-2 px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-xl font-bold transition-all hover:scale-105"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Browse Other Exams
+          </Link>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-8 py-3 border-2 border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-900"
+          >
+            Try Again
+          </button>
+        </div>
+      </main>
     );
   }
 
   return (
-    <main className="max-w-screen-xl mx-auto px-4 py-10 space-y-8">
+    <main className="max-w-screen-xl mx-auto px-6 py-10 space-y-10 min-h-screen">
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500">
-        <Link href="/exams" className="hover:underline">
-          Exams
-        </Link>
-        <span className="mx-2">/</span>
-        <span>{data.exam.name}</span>
-        <span className="mx-2">/</span>
-        <span className="text-gray-900 dark:text-white">
-          {data.course.name}
-        </span>
+      <nav className="flex items-center gap-2 text-sm font-semibold text-gray-500">
+        <Link href="/exams" className="hover:text-blue-600">Exams</Link>
+        <ChevronRight className="w-4 h-4" />
+        <Link href={`/exams/${data.exam.slug}`} className="hover:text-blue-600">{data.exam.name}</Link>
+        <ChevronRight className="w-4 h-4" />
+        <span className="text-gray-900 dark:text-white">{data.course.name}</span>
       </nav>
 
       {/* Header */}
-      <header>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <header className="relative p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
           {data.course.name}
         </h1>
-        <p className="mt-2 text-gray-500 dark:text-gray-400">
-          {data.exam.name}
-        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-bold uppercase">
+            {data.exam.name}
+          </span>
+        </div>
       </header>
 
-      {/* Subjects */}
-      <section>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Subjects
+      {/* Grid Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+          <BookOpen className="w-6 h-6 text-blue-600" />
+          Select Subject
         </h2>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {data.subjects.map((subject) => (
-            <Link
-              key={subject.slug}
-              href={`/exams/${examSlug}/${courseSlug}/subject/${subject.slug}`}
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:shadow-md transition"
-            >
-              <h3 className="font-medium text-gray-900 dark:text-gray-100">
-                {subject.name}
-              </h3>
-            </Link>
-          ))}
-        </div>
+        
+        <CourseSubjectSection 
+          subjects={data.subjects} 
+          examSlug={examSlug} 
+          courseSlug={courseSlug} 
+        />
       </section>
     </main>
   );

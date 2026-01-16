@@ -16,15 +16,12 @@ export async function GET(
   // ✅ IMPORTANT: params is a Promise in Next.js 14/15
   const { examSlug, courseSlug } = await context.params;
 
-  const lang =
-    req.headers.get("x-lang") === "hi" ? "hi" : "en";
 
   const data = await getExamCourseOverview(
     examSlug,
-    courseSlug,
-    lang
+    courseSlug
   );
-
+  
   if (!data) {
     return NextResponse.json(
       {

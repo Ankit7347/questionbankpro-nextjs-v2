@@ -1,35 +1,18 @@
-// src/models/dto/examCourse.mapper.ts
+// src/models/dto/examCourse.dto.ts
 
-import { mapBaseFields } from "./base.mapper";
+import { BaseDTO } from "./base.dto";
 
-type Lang = "en" | "hi";
-
-function resolveText(
-  text: { en: string; hi?: string },
-  lang: Lang
-): string {
-  return text[lang] ?? text.en;
-}
-
-export function mapExamCourseOverviewDTO(
-  exam: any,
-  course: any,
-  subjects: any[],
-  lang: Lang
-) {
-  return {
-    exam: {
-      name: resolveText(exam.name, lang),
-      slug: exam.slug,
-    },
-    course: {
-      name: resolveText(course.name, lang),
-      slug: course.slug,
-    },
-    subjects: subjects.map((s) => ({
-      ...mapBaseFields(s),
-      name: resolveText(s.name, lang),
-      slug: s.slug,
-    })),
-  };
+export interface ExamCourseOverviewDTO {
+  exam: {
+    name: string;
+    slug: string;
+  } & BaseDTO;
+  course: {
+    name: string;
+    slug: string;
+  } & BaseDTO;
+  subjects: Array<{
+    name: string;
+    slug: string;
+  } & BaseDTO>;
 }
