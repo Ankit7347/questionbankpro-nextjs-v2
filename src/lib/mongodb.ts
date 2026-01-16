@@ -2,35 +2,46 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
-if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in environment variables");
-}
-
-type MongooseCache = {
+// Define a type for the cached connection
+interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
-};
-
-declare global {
-  var mongooseCache: MongooseCache | undefined;
 }
 
-const globalCache = global.mongooseCache || {
-  conn: null,
-  promise: null,
-};
+// Ensure the global variable is correctly typed
+declare global {
+  var mongoose: MongooseCache | undefined;
+}
+
+// Use existing global cache or initialize a new one
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 export default async function dbConnect() {
-  if (globalCache.conn) return globalCache.conn;
+  if (cached!.conn) {
+    return cached!.conn;
+  }
 
-  if (!globalCache.promise) {
-    globalCache.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
+  if (!cached!.promise) {
+    const opts = {
+      bufferCommands: false, // Critical: Fail fast if connection is down
+      maxPoolSize: 10,       // Recommended for serverless environments
+    };
+
+    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
     });
   }
 
-  globalCache.conn = await globalCache.promise;
-  global.mongooseCache = globalCache;
+  try {
+    cached!.conn = await cached!.promise;
+  } catch (e) {
+    cached!.promise = null; // Reset promise on failure
+    throw e;
+  }
 
-  return globalCache.conn;
+  return cached!.conn;
 }

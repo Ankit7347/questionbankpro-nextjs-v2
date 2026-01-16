@@ -148,6 +148,18 @@ const EXAMS = [
         bannerImage: "sample.png",
         order: 4,
       },
+      {
+        name: { en: "GATE", hi: "गेट (GATE)" },
+        shortName: { en: "GATE", hi: "गेट" },
+        slug: "gate-exam",
+        description: {
+          en: "Graduate Aptitude Test in Engineering for PG admissions and PSU recruitment.",
+          hi: "पीजी प्रवेश और पीएसयू भर्ती के लिए इंजीनियरिंग में स्नातक योग्यता परीक्षा।",
+        },
+        icon: "fa-solid fa-microchip", // Appropriate for Engineering/Tech
+        bannerImage: "sample.png",
+        order: 5, // Continuing from your Olympiads (order: 4)
+      },
     ],
   },
 

@@ -13,10 +13,11 @@ import ChapterMap from "@/models/mongoose/ChapterMap.schema";
 import { NotFound } from "@/lib/apiError";
 import { mapExamSidebar } from "@/models/dto/examSidebar.mapper";
 import { getCurrentLang } from "@/lib/i18n";
+import dbConnect from "@/lib/mongodb";
 
 export async function getExamSidebarServer(examSlug: string) {
   const lang = getCurrentLang();
-
+  await dbConnect();
   /** 1️⃣ Exam (MANDATORY) */
   const exam = await Exam.findOne({
     slug: examSlug,
