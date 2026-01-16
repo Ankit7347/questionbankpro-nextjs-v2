@@ -124,3 +124,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* This targets both the sidebar and the main content */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* The "Shine" style scrollbar thumb */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e5e7eb; /* Subtle gray */
+    border-radius: 10px;
+    border: 2px solid transparent; /* Gives it padding look */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+
+  /* Support for Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #e5e7eb transparent;
+  }
+  /* Dark mode scrollbar thumb */
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155; /* Slate-700 for dark mode */
+  }
+}

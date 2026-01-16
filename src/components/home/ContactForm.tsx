@@ -45,6 +45,7 @@ export default function ContactForm() {
   };
 
   return (
+    <div className="mb-4">
       <form
         className="
           w-[95%]
@@ -135,5 +136,6 @@ export default function ContactForm() {
 
       {message && <p className="text-center text-sm text-green-600 dark:text-green-400">{message}</p>}
     </form>
+  </div>
   );
 }

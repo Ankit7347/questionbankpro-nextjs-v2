@@ -14,7 +14,6 @@ export default function Footer() {
     <footer
       className="
         w-full
-        mt-8
         px-4 sm:px-6
         py-8
         bg-white dark:bg-gray-900
