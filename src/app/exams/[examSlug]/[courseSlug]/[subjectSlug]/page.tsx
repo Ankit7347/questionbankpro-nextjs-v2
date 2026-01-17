@@ -1,10 +1,9 @@
 // src/app/exams/[examSlug]/[courseSlug]/[subjectSlug]/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
 import { 
-  BookOpen, 
   CheckCircle2, 
   Clock, 
   ListChecks, 
@@ -14,30 +13,22 @@ import {
   FileText
 } from "lucide-react";
 
-const getSubjectData = (slug: string) => {
-  const safeSlug = slug || "subject";
-  const displayName = safeSlug.replace(/-/g, " ").toUpperCase();
+// Import the centralized data
+import { EXAMS_DATA } from "@/data/mockData";
 
-  return {
-    name: displayName,
-    syllabus: [
-      { unit: "Unit 1", title: "Fundamental Theory", details: "History, evolution, and core principles of the domain." },
-      { unit: "Unit 2", title: "Technical Application", details: "Practical implementation and framework standards." },
-      { unit: "Unit 3", title: "Advanced Analysis", details: "Performance optimization and system debugging." },
-    ],
-    chapters: [
-      { id: 1, title: "Getting Started", slug: "intro", status: "completed", topics: 4 },
-      { id: 2, title: "Core Frameworks", slug: "core", status: "current", topics: 7 },
-      { id: 3, title: "Advanced Patterns", slug: "advanced", status: "upcoming", topics: 5 },
-      { id: 4, title: "Deployment & Scaling", slug: "final", status: "upcoming", topics: 3 },
-    ],
-  };
-};
-
-export default function SubjectPage({ params }: { params: any }) {
+export default function SubjectPage({ params }: { params: Promise<{ examSlug: string; courseSlug: string; subjectSlug: string }> }) {
+  const { examSlug, courseSlug, subjectSlug } = use(params);
   const [activeTab, setActiveTab] = useState<"path" | "syllabus">("path");
-  // In Next.js 15, params is a Promise. For simpler dummy code:
-  const data = getSubjectData("Mathematics"); 
+
+  // Fetch the specific data from our centralized store
+  const exam = EXAMS_DATA[examSlug as keyof typeof EXAMS_DATA];
+  const course = exam?.courses[courseSlug as keyof typeof exam.courses];
+  const data = course?.subjects[subjectSlug as keyof typeof course.subjects];
+
+  // Fallback if data doesn't exist for the slug
+  if (!data) {
+    return <div className="p-8">Subject data not found for {subjectSlug}</div>;
+  }
 
   return (
     <div className="p-4 lg:p-8">
@@ -72,12 +63,10 @@ export default function SubjectPage({ params }: { params: any }) {
         <div className="relative space-y-0">
           {data.chapters.map((chapter, index) => (
             <div key={chapter.id} className="relative flex gap-6 pb-10 last:pb-0">
-              {/* Vertical Line Connector */}
               {index !== data.chapters.length - 1 && (
                 <div className="absolute left-[23px] top-10 w-0.5 h-full bg-gray-200 dark:bg-slate-800" />
               )}
 
-              {/* Status Marker */}
               <div className="relative z-10 flex-shrink-0 mt-1">
                 {chapter.status === "completed" ? (
                   <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center border-4 border-white dark:border-slate-950">
@@ -94,9 +83,8 @@ export default function SubjectPage({ params }: { params: any }) {
                 )}
               </div>
 
-              {/* Chapter Card */}
               <Link
-                href={`#`} // Update with actual path logic
+                href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapter.slug}`}
                 className={`flex-1 group p-5 rounded-2xl border transition-all ${
                   chapter.status === "current"
                     ? "bg-white dark:bg-slate-900 border-blue-500 shadow-lg shadow-blue-500/10"
@@ -111,7 +99,7 @@ export default function SubjectPage({ params }: { params: any }) {
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
                       {chapter.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1">{chapter.topics} Detailed Topics</p>
+                    <p className="text-sm text-gray-500 mt-1">{chapter.topicsCount} Detailed Topics</p>
                   </div>
                   <ArrowRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${
                     chapter.status === "upcoming" ? "text-gray-300" : "text-blue-500"
@@ -123,7 +111,7 @@ export default function SubjectPage({ params }: { params: any }) {
         </div>
       )}
 
-      {/* 3. TAB CONTENT: SYLLABUS (Non-link version) */}
+      {/* 3. TAB CONTENT: SYLLABUS */}
       {activeTab === "syllabus" && (
         <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden">
           <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
