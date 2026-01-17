@@ -76,6 +76,13 @@ const COURSES = [
       { name: "SBI PO", slug: "sbi-po", order: 2 },
     ],
   },
+  {
+    examSlug: "gate-exam",
+    courses: [
+      { name: "GATE 2026 Computer Science & Information Technology", slug: "gate-2026-cs-it", order: 1 },
+      { name: "GATE 2026 Mechanical Engineering", slug: "gate-2026-me", order: 2 },
+    ],
+  },
 ];
 
 async function seedCourses() {
@@ -94,6 +101,13 @@ async function seedCourses() {
     }
 
     for (const course of block.courses as ICourseSeed[])  {
+      // 1. Check if Course with this slug already exists
+      const existingCourse = await Course.findOne({ slug: course.slug });
+
+      if (existingCourse) {
+        console.log(`⏭️ Skipping: Course "${course.slug}" already exists.`);
+        continue;
+      }
       await Course.create({
         name: { en: course.name },
         slug: course.slug,

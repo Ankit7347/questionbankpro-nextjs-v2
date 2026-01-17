@@ -240,6 +240,15 @@ async function seedExams() {
     }
 
     for (const exam of block.exams) {
+      // 1. Check if exam with this slug already exists
+      const existingExam = await Exam.findOne({ slug: exam.slug });
+
+      if (existingExam) {
+        console.log(`⏭️ Skipping: Exam "${exam.slug}" already exists.`);
+        continue;
+      }
+
+      // 2. Only create if it doesn't exist
       await Exam.create({
         name: exam.name,
         shortName: exam.shortName,
@@ -251,11 +260,12 @@ async function seedExams() {
         order: exam.order,
         isActive: true,
       });
+      console.log(`✅ Created: ${exam.slug}`);
     }
   }
 
   await closeSeed();
-  console.log("✅ Exam seeding completed");
+  console.log("🏁 Exam seeding process completed");
 }
 
 seedExams().catch((err) => {
