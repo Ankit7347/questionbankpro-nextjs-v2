@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { EXAMS_DATA } from "@/data/mockData";
+import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 
 export default function ChapterPage({ 
   params 
@@ -30,7 +31,15 @@ export default function ChapterPage({
   const subject = course?.subjects[subjectSlug as keyof typeof course.subjects];
   const data = subject?.chapters.find((c) => c.slug === chapterSlug);
 
-  if (!data) return <div className="p-10 text-center">Chapter not found in {subjectSlug}</div>;
+  if (!data) {
+    return (
+      <ResourceNotFound 
+        type="Chapter" 
+        slug={subjectSlug} 
+        backLink={`/exams/${examSlug}/${courseSlug}`} 
+      />
+    );
+  }
 
   const activeTopic = data.topics[activeTopicIndex];
   const totalTopics = data.topics.length;

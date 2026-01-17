@@ -15,6 +15,7 @@ import {
 
 // Import the centralized data
 import { EXAMS_DATA } from "@/data/mockData";
+import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 
 export default function SubjectPage({ params }: { params: Promise<{ examSlug: string; courseSlug: string; subjectSlug: string }> }) {
   const { examSlug, courseSlug, subjectSlug } = use(params);
@@ -25,9 +26,14 @@ export default function SubjectPage({ params }: { params: Promise<{ examSlug: st
   const course = exam?.courses[courseSlug as keyof typeof exam.courses];
   const data = course?.subjects[subjectSlug as keyof typeof course.subjects];
 
-  // Fallback if data doesn't exist for the slug
   if (!data) {
-    return <div className="p-8">Subject data not found for {subjectSlug}</div>;
+    return (
+      <ResourceNotFound 
+        type="Subject" 
+        slug={subjectSlug} 
+        backLink={`/exams/${examSlug}/${courseSlug}`} 
+      />
+    );
   }
 
   return (

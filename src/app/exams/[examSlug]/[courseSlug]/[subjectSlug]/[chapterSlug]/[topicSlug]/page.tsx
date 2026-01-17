@@ -17,6 +17,7 @@ import {
 
 // Import Centralized Data
 import { EXAMS_DATA } from "@/data/mockData";
+import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 
 export default function TopicPage({ 
   params 
@@ -33,9 +34,14 @@ export default function TopicPage({
   const chapter = subject?.chapters.find((c) => c.slug === chapterSlug);
   const data = chapter?.topics.find((t) => t.slug === topicSlug);
 
-  // Fallback if topic is not found
   if (!data) {
-    return <div className="p-20 text-center font-bold">Topic content not found.</div>;
+    return (
+      <ResourceNotFound 
+        type="Topic" 
+        slug={topicSlug} 
+        backLink={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}`} 
+      />
+    );
   }
 
   return (
