@@ -74,22 +74,34 @@ export default function CoursePage() {
     );
   }
 
-  return (
-    <main className="max-w-screen-xl mx-auto py-10 space-y-10 min-h-screen">
+return (
+  /* Remove the <main> tag and the py-10. 
+     The layout already provides the max-width and padding. */
+  <div className="space-y-6 md:space-y-8">
+    
+    {/* Section Header */}
+    <div className="flex flex-col gap-1">
+      <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+        <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+        Available Subjects
+      </h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Select a subject to view chapters and study materials.
+      </p>
+    </div>
 
-      {/* Grid Section */}
-      <section className="space-y-6">
-        <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-blue-600" />
-          Select Subject
-        </h2>
-        
-        <CourseSubjectSection 
-          subjects={data.subjects} 
-          examSlug={examSlug} 
-          courseSlug={courseSlug} 
-        />
-      </section>
-    </main>
-  );
+    {/* Subject Grid Section */}
+    <section>
+      <CourseSubjectSection 
+        subjects={data.subjects} 
+        examSlug={examSlug} 
+        courseSlug={courseSlug} 
+      />
+    </section>
+
+    {/* Helpful for mobile: Extra bottom padding so content isn't 
+        hidden by the mobile navigation bar */}
+    <div className="h-10 lg:hidden" />
+  </div>
+);
 }

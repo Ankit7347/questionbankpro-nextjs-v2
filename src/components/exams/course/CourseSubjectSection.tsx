@@ -19,7 +19,7 @@ export default function CourseSubjectSection({
       {subjects.map((subject) => (
         <Link
           key={subject.slug}
-          href={`/exams/${examSlug}/${courseSlug}/subject/${subject.slug}`}
+          href={`/exams/${examSlug}/${courseSlug}/${subject.slug}`}
           className="group flex items-center justify-between rounded-2xl border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-[#11141B] p-6 shadow-sm hover:border-blue-500 transition-all hover:shadow-xl hover:shadow-blue-500/5"
         >
           <div className="space-y-1">

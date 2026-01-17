@@ -31,21 +31,6 @@ export default function SyllabusPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-black">
-      {/* MODERN HERO SECTION */}
-      <div className="bg-white dark:bg-gray-950 border-b dark:border-gray-800">
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <div className="flex items-center gap-2 text-blue-600 font-semibold mb-4">
-            <GraduationCap size={20} />
-            <span className="tracking-widest text-xs uppercase">Official Curriculum</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 italic">
-            {courseSlug?.toString().replace(/-/g, " ").toUpperCase()}
-          </h1>
-          <p className="text-lg text-gray-500 max-w-2xl leading-relaxed">
-            A comprehensive breakdown of subjects, chapters, and marking schemes. Plan your study strategy based on subject weightage.
-          </p>
-        </div>
-      </div>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

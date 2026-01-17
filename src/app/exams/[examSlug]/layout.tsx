@@ -27,7 +27,7 @@ export default async function ExamLayout({
       {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 bg-white dark:bg-slate-950 transition-colors duration-300">
         {/* Adjusted padding for mobile (px-4) vs desktop (px-8) */}
-        <main className="max-w-screen-xl mx-auto py-6 px-4 md:py-8 md:px-8 space-y-6 md:space-y-8">
+        <main className="py-6 px-4 md:py-8 md:px-8 space-y-6 md:space-y-8">
           
           {/* SMART DYNAMIC BREADCRUMBS - Hidden on very small screens to save space */}
           <div className="hidden sm:block">
