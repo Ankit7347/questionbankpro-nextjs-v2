@@ -75,27 +75,7 @@ export default function CoursePage() {
   }
 
   return (
-    <main className="max-w-screen-xl mx-auto px-6 py-10 space-y-10 min-h-screen">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm font-semibold text-gray-500">
-        <Link href="/exams" className="hover:text-blue-600">Exams</Link>
-        <ChevronRight className="w-4 h-4" />
-        <Link href={`/exams/${data.exam.slug}`} className="hover:text-blue-600">{data.exam.name}</Link>
-        <ChevronRight className="w-4 h-4" />
-        <span className="text-gray-900 dark:text-white">{data.course.name}</span>
-      </nav>
-
-      {/* Header */}
-      <header className="relative p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-          {data.course.name}
-        </h1>
-        <div className="mt-4 flex items-center gap-3">
-          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-bold uppercase">
-            {data.exam.name}
-          </span>
-        </div>
-      </header>
+    <main className="max-w-screen-xl mx-auto py-10 space-y-10 min-h-screen">
 
       {/* Grid Section */}
       <section className="space-y-6">
