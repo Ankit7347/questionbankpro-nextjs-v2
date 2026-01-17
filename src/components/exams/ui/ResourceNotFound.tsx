@@ -48,14 +48,14 @@ export default function ResourceNotFound({ type, slug, backLink }: ResourceNotFo
             className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-blue-500/25"
           >
             <ArrowLeft className="w-5 h-5" />
-            Return to Directory
+            Return to Previous Page
           </Link>
           <Link
             href="/"
             className="flex items-center justify-center gap-2 px-8 py-4 bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-100 dark:hover:bg-slate-800 transition-all active:scale-95 border border-gray-100 dark:border-slate-800"
           >
             <Home className="w-5 h-5" />
-            Go to Dashboard
+            Go to Home
           </Link>
         </div>
 
