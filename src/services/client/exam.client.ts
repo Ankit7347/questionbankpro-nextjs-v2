@@ -35,7 +35,7 @@ export async function fetchExamCatalog(
  */
 export async function fetchExamLanding(): Promise<ApiResponseUI<ExamLandingUI[]>> {
   // 1. Get the base URL (Use environment variable for production)
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   
   try {
     const res = await fetch(`${baseUrl}/api/exams/landing`, {
