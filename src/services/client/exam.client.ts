@@ -38,7 +38,7 @@ export async function fetchExamLanding(): Promise<ApiResponseUI<ExamLandingUI[]>
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   
   try {
-    const res = await fetch(`${baseUrl}/api/exams/landing`, {
+    const res = await fetch(`${baseUrl}/exams/landing`, {
       // 2. Add caching config here
       next: { 
         revalidate: 3600, // Re-fetch data at most every hour
