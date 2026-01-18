@@ -33,19 +33,35 @@ export async function fetchExamCatalog(
  * ONE API call
  * Flat list
  */
-export async function fetchExamLanding(): Promise<
-  ApiResponseUI<ExamLandingUI[]>
-> {
-  const res = await fetch("/api/exams/landing");
+export async function fetchExamLanding(): Promise<ApiResponseUI<ExamLandingUI[]>> {
+  // 1. Get the base URL (Use environment variable for production)
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  
+  try {
+    const res = await fetch(`${baseUrl}/api/exams/landing`, {
+      // 2. Add caching config here
+      next: { 
+        revalidate: 3600, // Re-fetch data at most every hour
+        tags: ["exams-landing"] // Tag for manual cache clearing
+      }
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return {
+        success: false,
+        data: null,
+        error: "Failed to fetch exam landing",
+        statusCode: res.status,
+      };
+    }
+
+    return res.json();
+  } catch (error) {
     return {
       success: false,
       data: null,
-      error: "Failed to fetch exam landing",
-      statusCode: res.status,
+      error: "Network error occurred",
+      statusCode: 500,
     };
   }
-
-  return res.json();
 }

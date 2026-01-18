@@ -17,8 +17,8 @@ const testimonials = [
 		image: "/images/topperimg33.jpg",
 	},
 	{
-		name: "Rohit",
-		message: "Collection of notes at one place.",
+		name: "Prateek",
+		message: "Knowledge js the key to success and this page bridge the gap between you and knowledge",
 		image: "/images/topperimg44.jpg",
 	},
 ];
