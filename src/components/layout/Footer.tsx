@@ -26,7 +26,7 @@ const COURSES = [
     courses: [{ name: "NEET UG", slug: "neet-ug" }],
   },
   {
-    examSlug: "undergraduate-programs",
+    examSlug: "postgraduate-programs",
     // We can use the label as a heading or just list the courses
     label: "Degree Programs", 
     courses: [
