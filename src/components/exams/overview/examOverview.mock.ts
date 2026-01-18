@@ -16,6 +16,11 @@ export const syllabi = [
     name: "State Board Syllabus",
     boards: "Regional",
   },
+  {
+    slug: "gate-2026-cs-it",
+    name: "GATE Syllabus",
+    boards: "Regional",
+  },
 ];
 
 export const subjects = [
