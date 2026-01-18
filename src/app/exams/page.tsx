@@ -44,7 +44,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0B0E14] transition-colors duration-300">
+    <div className="bg-white dark:bg-[#0B0E14] transition-colors duration-300">
       <main className="max-w-screen-xl mx-auto px-6 py-12">
         
         {/* Header - Fixed Left Alignment */}

@@ -15,7 +15,7 @@ import { mapExamSidebar } from "@/models/dto/examSidebar.mapper";
 import { getCurrentLang } from "@/lib/i18n";
 import dbConnect from "@/lib/mongodb";
 
-export async function getExamSidebarServer(examSlug: string) {
+export async function getExamSidebarServer(examSlug: string,courseSlug:string) {
   const lang = getCurrentLang();
   await dbConnect();
   /** 1️⃣ Exam (MANDATORY) */
@@ -29,6 +29,7 @@ export async function getExamSidebarServer(examSlug: string) {
   /** 2️⃣ Course (MANDATORY – resolved internally) */
   const course = await Course.findOne({
     examId: exam._id,
+    slug: courseSlug,
     isDeleted: false,
   })
     .sort({ createdAt: 1 }) // first/default course

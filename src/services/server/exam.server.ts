@@ -81,3 +81,26 @@ export async function getExamCatalog(lang: "en" | "hi") {
     };
   });
 }
+
+export async function getExamBySlug(examSlug: string) {
+  await dbConnect();
+  
+  const exam = await Exam.findOne({ 
+    slug: examSlug, 
+    isDeleted: false 
+  }).select('_id name').lean();
+  
+  if (!exam) {
+    return {
+      success: false,
+      message: "Exam not found",
+      data: null
+    };
+  }
+
+  return {
+    success: true,
+    message: "Exam found",
+    data: exam
+  };
+}

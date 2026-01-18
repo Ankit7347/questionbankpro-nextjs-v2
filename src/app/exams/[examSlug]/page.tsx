@@ -14,20 +14,22 @@ export default async function ExamOverviewPage({
   const { examSlug } = await params;
 
   return (
-    <div className="flex flex-col">
-      {/* 1. Hero renders first with its background bleeding to edges */}
+    <div className="w-[90%] max-w-9xl mx-auto flex flex-col">
+      {/* 1. Hero: Keeps full width for background bleed */}
       <ExamHero examSlug={examSlug} />
       
-      {/* 2. Stats container overlaps Hero. No space-y between Hero and Stats! */}
-      {/* <div className="relative z-10"> */}
-        <ExamQuickStats /> 
-      {/* </div> */}
+      {/* Wrapper for 90% width content */}
+        
+        {/* 2. Stats: Pulling up to overlap the Hero if needed via negative margin */}
+        <div className="relative z-10 -mt-8"> 
+          <ExamQuickStats /> 
+        </div>
 
-      {/* 3. The rest of the content has standard spacing */}
-      {/* <div className="space-y-12 mt-12"> */}
-        <ExamSyllabusPicker examSlug={examSlug} syllabi={syllabi} />
-        <ExamSubjectGrid examSlug={examSlug} subjects={subjects} />
-      {/* </div> */}
+        {/* 3. Main Content Area */}
+        <div className="space-y-12 mt-12 mb-20">
+          <ExamSyllabusPicker examSlug={examSlug} syllabi={syllabi} />
+          <ExamSubjectGrid examSlug={examSlug} subjects={subjects} />
+        </div>
     </div>
   );
 }
