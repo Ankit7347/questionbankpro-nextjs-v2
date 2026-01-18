@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { FaBars, FaHome, FaUserCircle } from "react-icons/fa";
+import { FaBars, FaHome, FaUserCircle, FaSearch, FaTimes } from "react-icons/fa"; // Added icons
 import { FiLogIn, FiLogOut } from "react-icons/fi";
 
 import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
@@ -14,6 +14,7 @@ export default function Navbar() {
   const [exams, setExams] = useState<ExamLandingUI[]>([]);
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false); // New state
 
   const { data: session } = useSession();
   const searchRef = useRef<HTMLDivElement>(null);
@@ -21,89 +22,109 @@ export default function Navbar() {
   useEffect(() => {
     fetchExamLanding()
       .then((res) => {
-        if (res.success && res.data) {
-          setExams(res.data);
-        } else {
-          setExams([]);
-        }
+        if (res.success && res.data) setExams(res.data);
       })
       .catch(() => setExams([]));
   }, []);
 
   const filtered = search
-    ? exams.filter((exam) => {
-        const q = search.toLowerCase();
-
-        const examMatch =
-          exam.examName.toLowerCase().includes(q);
-
-        const courseMatch =
-          Array.isArray(exam.courses) &&
-          exam.courses.some((c) =>
-            c.name.toLowerCase().includes(q)
-          );
-
-        return examMatch || courseMatch;
-      })
+    ? exams.flatMap((exam) => 
+        (exam.courses || [])
+          .filter(c => 
+            exam.examName.toLowerCase().includes(search.toLowerCase()) || 
+            c.name.toLowerCase().includes(search.toLowerCase())
+          )
+          .map(course => ({ ...exam, targetCourse: course }))
+      )
     : [];
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          <FaHome /> Exam Preparation
-        </Link>
+        
+        {/* Logo - Hide when search is open on mobile to save space */}
+        {!isMobileSearchOpen && (
+          <Link href="/" className="flex items-center gap-2 font-bold whitespace-nowrap">
+            <FaHome /> 
+            {/* Change this line below */}
+            <span className="inline">Exam Preparation</span> 
+          </Link>
+        )}
 
-        {/* Search */}
-        <div ref={searchRef} className="relative w-64 hidden sm:block">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search exams or courses…"
-            className="w-full px-4 py-2 rounded-full border dark:bg-gray-700"
-          />
+        {/* Desktop Search & Mobile Search Container */}
+        <div 
+          ref={searchRef} 
+          className={`${
+            isMobileSearchOpen ? "flex-1 px-2" : "hidden sm:block w-64"
+          } relative transition-all duration-300`}
+        >
+          <div className="flex items-center gap-2">
+            <input
+              autoFocus={isMobileSearchOpen}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search exams..."
+              className="w-full px-4 py-2 rounded-full border dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {/* Close Mobile Search Button */}
+            {isMobileSearchOpen && (
+              <button onClick={() => { setIsMobileSearchOpen(false); setSearch(""); }}>
+                <FaTimes className="text-gray-500" />
+              </button>
+            )}
+          </div>
 
+          {/* Search Results Dropdown */}
           {search && filtered.length > 0 && (
-            <div className="absolute mt-1 w-full bg-white dark:bg-gray-800 border rounded shadow">
-              {filtered.map((exam) =>
-                exam.courses.map((course) => (
-                  <Link
-                    key={`${exam.examSlug}-${course.slug}`}
-                    href={`/exams/${exam.examSlug}/${course.slug}`}
-                    onClick={() => setSearch("")}
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-                  >
-                    {exam.examName} — {course.name}
-                  </Link>
-                ))
-              )}
+            <div className="absolute mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border rounded shadow-lg z-50">
+              {filtered.map((item) => (
+                <Link
+                  key={`${item.examSlug}-${item.targetCourse.slug}`}
+                  href={`/exams/${item.examSlug}/${item.targetCourse.slug}`}
+                  onClick={() => { setSearch(""); setIsMobileSearchOpen(false); }}
+                  className="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b last:border-0"
+                >
+                  <p className="text-xs text-blue-600 font-semibold">{item.examName}</p>
+                  <p className="text-sm dark:text-gray-200">{item.targetCourse.name}</p>
+                </Link>
+              ))}
             </div>
           )}
         </div>
 
-        {/* User / Menu */}
-        <button onClick={() => setMenuOpen((s) => !s)}>
-          {session ? <FaUserCircle size={28} /> : <FaBars size={24} />}
-        </button>
+        {/* Right Actions */}
+        <div className="flex items-center gap-4">
+          {/* Mobile Search Toggle Button */}
+          {!isMobileSearchOpen && (
+            <button 
+              className="sm:hidden text-gray-600 dark:text-gray-300"
+              onClick={() => setIsMobileSearchOpen(true)}
+            >
+              <FaSearch size={20} />
+            </button>
+          )}
 
+          <button onClick={() => setMenuOpen((s) => !s)} className="p-1">
+            {session ? (
+              <img src={session.user?.image || ""} className="w-8 h-8 rounded-full border" alt="user" />
+            ) : (
+              <FaBars size={24} />
+            )}
+          </button>
+        </div>
+
+        {/* User Menu Dropdown */}
         {menuOpen && (
-          <div className="absolute right-4 top-16 bg-white dark:bg-gray-800 border rounded shadow w-48 p-3">
+          <div className="absolute right-4 top-16 bg-white dark:bg-gray-800 border rounded shadow-xl w-48 p-3 z-50">
             {session ? (
               <>
-                <p className="font-medium">{session.user?.name}</p>
-                <button
-                  onClick={() => signOut()}
-                  className="mt-3 flex gap-2 text-red-500"
-                >
+                <p className="font-medium text-sm border-b pb-2 mb-2">{session.user?.name}</p>
+                <button onClick={() => signOut()} className="w-full flex items-center gap-2 text-red-500 text-sm py-2">
                   <FiLogOut /> Logout
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => signIn()}
-                className="flex gap-2 text-blue-600"
-              >
+              <button onClick={() => signIn()} className="w-full flex items-center gap-2 text-blue-600 text-sm py-2">
                 <FiLogIn /> Login
               </button>
             )}
