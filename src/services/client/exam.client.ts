@@ -36,12 +36,12 @@ export async function fetchExamCatalog(
 export async function fetchExamLanding(): Promise<ApiResponseUI<ExamLandingUI[]>> {
   // 1. Get the base URL (Use environment variable for production)
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  
+  const revalidateTime = Number(process.env.NEXT_PUBLIC_API_REVALIDATE) || 3600;
   try {
     const res = await fetch(`${baseUrl}/exams/landing`, {
       // 2. Add caching config here
       next: { 
-        revalidate: 3600, // Re-fetch data at most every hour
+        revalidate:revalidateTime , // Re-fetch data at most every hour
         tags: ["exams-landing"] // Tag for manual cache clearing
       }
     });

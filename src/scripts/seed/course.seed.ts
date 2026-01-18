@@ -51,6 +51,7 @@ const COURSES = [
         { name: "MBA", slug: "mba", order: 4, durationYears: 2, stream: "Management" },
         { name: "MTech", slug: "mtech", order: 5, durationYears: 2, stream: "Engineering" },
         { name: "LLM", slug: "llm", order: 6, durationYears: 2, stream: "Law" },
+        { name: "PGDM", slug: "pgdm", order: 7, durationYears: 2, stream: "Management" },
     ],
     },
 
