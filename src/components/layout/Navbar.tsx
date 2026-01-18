@@ -4,12 +4,59 @@
 import { useEffect, useState, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { FaBars, FaHome, FaUserCircle, FaSearch, FaTimes } from "react-icons/fa"; // Added icons
+import { FaBars, FaHome, FaSearch, FaTimes } from "react-icons/fa"; // Added icons
 import { FiLogIn, FiLogOut } from "react-icons/fi";
+// Use the session user type directly to ensure compatibility
+import { Session } from "next-auth";
 
 import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
 import { fetchExamLanding } from "@/services/client/exam.client";
 
+import { FaUser } from "react-icons/fa";
+
+// Function to generate a consistent color based on a string (like username/email)
+const getAvatarColor = (name:string) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  // Use HSL for better control: Hue (0-360), Saturation (70%), Lightness (60%)
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+};
+
+
+// Define the props to expect the 'user' object from the session
+interface UserAvatarProps {
+  user: Session["user"];
+}
+
+const UserAvatar = ({ user }: UserAvatarProps) => {
+  // Safe access to name with a fallback for the color generator
+  const bgColor = getAvatarColor(user?.name || "Guest");
+
+  return (
+    <div className="relative w-8 h-8 flex items-center justify-center rounded-full border overflow-hidden shrink-0">
+      {/* Background Color + Icon (Fallback) */}
+      <div 
+        style={{ backgroundColor: bgColor }}
+        className="absolute inset-0 flex items-center justify-center text-white"
+      >
+        <FaUser size={14} />
+      </div>
+
+      {/* Image (Sits on top of the fallback if it exists) */}
+      {user?.image && (
+        <img 
+          src={user.image} 
+          className="relative w-full h-full object-cover" 
+          alt={user.name || "user"} 
+          onError={(e) => { (e.currentTarget.style.display = 'none') }}
+        />
+      )}
+    </div>
+  );
+};
 export default function Navbar() {
   const [exams, setExams] = useState<ExamLandingUI[]>([]);
   const [search, setSearch] = useState("");
@@ -105,11 +152,15 @@ export default function Navbar() {
           )}
 
           <button onClick={() => setMenuOpen((s) => !s)} className="p-1">
-            {session ? (
-              <img src={session.user?.image || ""} className="w-8 h-8 rounded-full border" alt="user" />
-            ) : (
-              <FaBars size={24} />
-            )}
+            <div className="flex items-center gap-3">
+              {session ? (
+                <UserAvatar user={session.user} />
+              ) : (
+                <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+                  <FaBars size={20} className="text-gray-600" />
+                </div>
+              )}
+            </div>
           </button>
         </div>
 
@@ -124,9 +175,9 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <button onClick={() => signIn()} className="w-full flex items-center gap-2 text-blue-600 text-sm py-2">
+              <Link href="/login" className="w-full flex items-center gap-2 text-blue-600 text-sm py-2">
                 <FiLogIn /> Login
-              </button>
+              </Link>
             )}
           </div>
         )}

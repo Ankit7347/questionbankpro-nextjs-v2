@@ -13,72 +13,65 @@ const UserSchema = new Schema(
       unique: true,
       index: true,
     },
-
     name: {
       type: String,
       required: true,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
     },
-
     phone: {
       type: String,
     },
-
     passwordHash: {
       type: String,
       required: true,
     },
-
     role: {
       type: String,
       enum: ["student", "contentadmin", "superadmin"],
       default: "student",
     },
-
-    /**
-     * ✅ NEW FIELD — UI MODE PREFERENCE
-     */
     uiMode: {
       type: String,
       enum: ["light", "dark"],
       default: "light",
     },
-
     className: {
-      type: String, // Class 10 / BSc / MSc
+      type: String,
     },
-
+    courseName: {
+      type: String,
+    },
     competition: {
-      type: String, // JEE / NEET / GATE
+      type: String,
     },
-
-    stateId: {
+    stateName: {
+      type: String,
+    },
+    districtName: {
+      type: String,
+    },
+    // ✅ Specific ID fields with your naming convention
+    geolocationStateId: {
       type: Schema.Types.ObjectId,
       ref: "GeolocationState",
     },
-
-    districtId: {
+    geolocationDistrictId: {
       type: Schema.Types.ObjectId,
       ref: "GeolocationDistrict",
     },
-
     isActive: {
       type: Boolean,
       default: true,
     },
-
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
 
-const User =
-  models.User || model("User", UserSchema);
-
+const User = models.User || model("User", UserSchema);
 export default User;
