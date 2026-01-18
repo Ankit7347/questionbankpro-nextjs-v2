@@ -1,5 +1,4 @@
 // src/types/next-auth.d.ts
-
 import NextAuth, { DefaultSession } from "next-auth";
 import "next-auth/jwt";
 
@@ -8,6 +7,9 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: string;
     uiMode?: "light" | "dark";
+    name?: string | null;
+    email?: string | null;
+    picture?: string | null;
   }
 }
 
@@ -17,6 +19,9 @@ declare module "next-auth" {
       id: string;
       role: string;
       uiMode: "light" | "dark";
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
     } & DefaultSession["user"];
   }
 
@@ -24,5 +29,8 @@ declare module "next-auth" {
     id: string;
     role: string;
     uiMode: "light" | "dark";
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
   }
 }

@@ -9,7 +9,7 @@ DATA='{
     "competition": "postgraduate-programs",
     "courseName": "tt",
     "districtName": "Anakapalli",
-    "email": "qrnotes2021@gmail.com",
+    "email": "qrnotes2020@gmail.com",
     "name": "Ankit",
     "otherCourse": "tt",
     "password": "testing",
