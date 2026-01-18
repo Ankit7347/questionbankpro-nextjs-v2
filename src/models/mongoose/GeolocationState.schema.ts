@@ -8,14 +8,14 @@ import {
 
 const GeolocationStateSchema = new Schema(
   {
-    name: {
+    stateName: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
 
-    code: {
+    stateCode: {
       type: String, // optional: UP, MH, etc
     },
 
@@ -24,6 +24,4 @@ const GeolocationStateSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const GeolocationStateModel =
-  models.GeolocationState ||
-  model("GeolocationState", GeolocationStateSchema);
+export default models.GeolocationState ||  model("GeolocationState", GeolocationStateSchema);

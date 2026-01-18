@@ -8,13 +8,13 @@ import {
 
 const GeolocationDistrictSchema = new Schema(
   {
-    name: {
+    districtName: {
       type: String,
       required: true,
       trim: true,
     },
 
-    stateId: {
+    geolocationStateId: {
       type: Schema.Types.ObjectId,
       ref: "GeolocationState",
       required: true,
@@ -28,10 +28,8 @@ const GeolocationDistrictSchema = new Schema(
 
 // prevent duplicate district names per state
 GeolocationDistrictSchema.index(
-  { name: 1, stateId: 1 },
+  { districtName: 1, geolocationStateId: 1 },
   { unique: true }
 );
 
-export const GeolocationDistrictModel =
-  models.GeolocationDistrict ||
-  model("GeolocationDistrict", GeolocationDistrictSchema);
+export default models.GeolocationDistrict ||  model("GeolocationDistrict", GeolocationDistrictSchema);

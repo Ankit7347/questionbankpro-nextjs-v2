@@ -11,28 +11,9 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      className="
-        w-full
-        px-4 sm:px-6
-        py-8
-        bg-white dark:bg-gray-900
-        text-gray-800 dark:text-gray-200
-        border-t border-gray-200 dark:border-gray-700
-        transition-colors
-      "
-    >
+    <footer className="w-full px-4 sm:px-6 py-8 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-t border-gray-200 dark:border-gray-700 transition-colors">
       <div
-        className="
-          max-w-7xl
-          mx-auto
-          grid
-          grid-cols-1
-          gap-8
-          sm:grid-cols-2
-          md:grid-cols-4
-          text-sm
-        "
+        className="max-w-7xl mx-auto grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 text-sm "
       >
         {/* About */}
         <div className="space-y-2">
@@ -99,17 +80,10 @@ function SocialLink({
   children: React.ReactNode;
 }) {
   return (
-    <a
-      href={href}
+    <a href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="
-        p-2
-        rounded-full
-        border border-gray-200 dark:border-gray-700
-        hover:bg-gray-100 dark:hover:bg-gray-800
-        transition
-      "
+      className="p-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
     >
       <span className="w-5 h-5 block">{children}</span>
     </a>
