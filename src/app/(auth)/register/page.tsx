@@ -195,8 +195,7 @@ export default function RegisterPage() {
 
     return (
         <>
-            <Navbar />
-            <div className="flex items-center justify-center min-h-screen py-12 pt-24 bg-gray-100 dark:bg-gray-900 px-4">
+            <div className="flex items-center justify-center min-h-[70vh] py-12 bg-gray-100 dark:bg-gray-900 px-4">
                 <div className="p-6 md:p-8 w-full max-w-md bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
                     <h2 className="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">Create Account</h2>
 
@@ -282,7 +281,6 @@ export default function RegisterPage() {
                     </p>
                 </div>
             </div>
-            <Footer />
         </>
     );
 }

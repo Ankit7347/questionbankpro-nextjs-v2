@@ -77,7 +77,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="w-full min-h-[70vh] px-4 py-16 flex items-center justify-center dark:bg-gray-900">
       <form
         onSubmit={forgotMode ? undefined : handleLogin}
         className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow"
