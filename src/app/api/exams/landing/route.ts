@@ -1,12 +1,11 @@
 // src/app/api/exam/landing/route.ts
 
 import { NextResponse } from "next/server";
-import { getExamLandingList } from "@/services/server/examLanding.server";
+import { getExamLandingList } from "@/services/server/exam.server";
 
 export async function GET(req: Request) {
-  const lang =  req.headers.get("x-lang") === "hi" ? "hi" : "en";
-
-  const data = await getExamLandingList(lang);
+  
+  const data = await getExamLandingList();
 
   return NextResponse.json({
     success: true,

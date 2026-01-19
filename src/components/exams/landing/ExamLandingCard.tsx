@@ -1,10 +1,10 @@
 // src/components/exams/landing/ExamLandingCard.tsx
 
 import Link from "next/link";
-import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
+import { ExamUI } from "@/dto/exam.ui.dto";
 
 interface Props {
-  exam: ExamLandingUI;
+  exam: ExamUI;
 }
 
 export default function ExamLandingCard({ exam }: Props) {
@@ -14,9 +14,9 @@ export default function ExamLandingCard({ exam }: Props) {
         {exam.examName}
       </h3>
 
-      {exam.courses.length > 0 ? (
+      {exam.subExams.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-2">
-          {exam.courses.map((course) => (
+          {exam.subExams.map((course) => (
             <Link
               key={course.id}
               href={`/exams/${exam.examSlug}/${course.slug}`}

@@ -8,7 +8,7 @@ export interface ExamSidebarDto {
     name: string;
   } | null;
 
-  course: {
+  subExam: {
     slug: string;
     name: string;
   } | null;

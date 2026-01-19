@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { EducationLevelGroup } from "@/dto/examCatalog.ui.dto";
+import { EducationLevelGroupUI } from "@/dto/exam.ui.dto";
 
 interface Props {
-  group: EducationLevelGroup;
+  group: EducationLevelGroupUI;
 }
 
 export default function EducationLevelSection({ group }: Props) {
@@ -43,9 +43,9 @@ export default function EducationLevelSection({ group }: Props) {
                 Available Courses
               </span>
               
-              {exam.courses.length > 0 ? (
+              {exam.subExams.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {exam.courses.map((course) => (
+                  {exam.subExams.map((course) => (
                     <Link
                       key={course.id}
                       href={`/exams/${exam.examSlug}/${course.slug}`}

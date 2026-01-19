@@ -1,4 +1,5 @@
 // src/models/dto/exam.mapper.ts
+
 import { mapBaseFields } from "./base.mapper";
 
 type Lang = "en" | "hi";
@@ -10,36 +11,21 @@ function resolveText(
   return text[lang] ?? text.en;
 }
 
-export function mapExamCardDTO(
+function buildExamDTO(
   exam: any,
-  courses: any[],
+  subExams: any[],
   lang: Lang
 ) {
   return {
     ...mapBaseFields(exam),
     examName: resolveText(exam.name, lang),
     examSlug: exam.slug,
-    courses: courses.map((c) => ({
-      ...mapBaseFields(c),
-      name: resolveText(c.name, lang),
-      slug: c.slug,
+    subExams: subExams.map((se) => ({
+      ...mapBaseFields(se),
+      name: resolveText(se.name, lang),
+      slug: se.slug,
     })),
   };
 }
 
-export function mapExamLandingDTO(
-  exam: any,
-  courses: any[],
-  lang: Lang
-) {
-  return {
-    ...mapBaseFields(exam),
-    examName: resolveText(exam.name, lang),
-    examSlug: exam.slug,
-    courses: courses.map((c) => ({
-      ...mapBaseFields(c),
-      name: resolveText(c.name, lang),
-      slug: c.slug,
-    })),
-  };
-}
+export const mapExamDTO = buildExamDTO;

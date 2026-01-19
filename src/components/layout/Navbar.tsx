@@ -9,7 +9,7 @@ import { FiLogIn, FiLogOut } from "react-icons/fi";
 // Use the session user type directly to ensure compatibility
 import { Session } from "next-auth";
 
-import { ExamLandingUI } from "@/dto/examLanding.ui.dto";
+import { ExamUI } from "@/dto/exam.ui.dto";
 import { fetchExamLanding } from "@/services/client/exam.client";
 
 import { FaUser } from "react-icons/fa";
@@ -58,7 +58,7 @@ const UserAvatar = ({ user }: UserAvatarProps) => {
   );
 };
 export default function Navbar() {
-  const [exams, setExams] = useState<ExamLandingUI[]>([]);
+  const [exams, setExams] = useState<ExamUI[]>([]);
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false); // New state
@@ -76,7 +76,7 @@ export default function Navbar() {
 
   const filtered = search
     ? exams.flatMap((exam) => 
-        (exam.courses || [])
+        (exam.subExams || [])
           .filter(c => 
             exam.examName.toLowerCase().includes(search.toLowerCase()) || 
             c.name.toLowerCase().includes(search.toLowerCase())

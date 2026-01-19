@@ -10,8 +10,8 @@ export default function ExamSidebar({ data }: { data: ExamSidebarDto }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname(); // Get current URL path
 
-  if (!data.exam || !data.course) return null;
-  const { exam, course, subjects } = data;
+  if (!data.exam || !data.subExam) return null;
+  const { exam, subExam, subjects } = data;
 
   // Shared Sidebar Content
   const SidebarContent = () => (
@@ -21,7 +21,7 @@ export default function ExamSidebar({ data }: { data: ExamSidebarDto }) {
           {exam.name}
         </h2>
         <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-          {course.name}
+          {subExam.name}
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export default function ExamSidebar({ data }: { data: ExamSidebarDto }) {
         {subjects
           .sort((a, b) => a.order - b.order)
           .map((subject) => {
-            const subjectHref = `/exams/${exam.slug}/${course.slug}/${subject.slug}`;
+            const subjectHref = `/exams/${exam.slug}/${subExam.slug}/${subject.slug}`;
             // Check if current path matches subject link
             const isSubjectActive = pathname === subjectHref;
 

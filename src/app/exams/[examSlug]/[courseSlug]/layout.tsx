@@ -17,7 +17,7 @@ export default async function CourseLayout({
   // Pass BOTH slugs to your loader
   const data = await loadExamSidebar(examSlug, courseSlug);
 
-  if (!data.exam || !data.course) notFound();
+  if (!data.exam || !data.subExam) notFound();
 
   const totalChapters = data.subjects?.reduce(
     (acc, sub) => acc + (sub.chapters?.length || 0), 0
@@ -36,7 +36,7 @@ export default async function CourseLayout({
           
           <ExamPageHeader 
             examName={data.exam.name}
-            title={data.course.name}
+            title={data.subExam.name}
             description={`Comprehensive curriculum for ${data.exam.name} 2026.`}
             subjectCount={data.subjects?.length || 0}
             chapterCount={totalChapters}

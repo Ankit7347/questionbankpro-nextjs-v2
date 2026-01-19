@@ -1,7 +1,7 @@
 // src/scripts/seedSyllabus.ts
 import { initSeed, closeSeed } from "./_helpers";
 import Course from "../../models/mongoose/Course.schema";
-import Syllabus from "../../models/mongoose/Syllabus.schema";
+import OfficialSyllabus from "../../models/mongoose/OfficialSyllabus.schema";
 
 async function seedSyllabuses() {
   console.log("📘 Seeding Syllabuses for active courses...");
@@ -20,7 +20,7 @@ async function seedSyllabuses() {
 
   for (const course of courses) {
     // 2. Check if a syllabus already exists for this course to avoid duplicates
-    const existingSyllabus = await Syllabus.findOne({ 
+    const existingSyllabus = await OfficialSyllabus.findOne({ 
       courseId: course._id,
       isDeleted: false 
     });
@@ -32,7 +32,7 @@ async function seedSyllabuses() {
 
     // 3. Create a default syllabus for the course
     // We use localized names for the syllabus based on the course name
-    await Syllabus.create({
+    await OfficialSyllabus.create({
       courseId: course._id,
       name: {
         en: `${course.name.en} Syllabus 2026`,

@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getExamCourseOverview } from "@/services/server/examCourse.server";
+import { getExamSubExamOverview } from "@/services/server/examCourse.server";
 
 export async function GET(
   req: NextRequest,
@@ -17,7 +17,7 @@ export async function GET(
   const { examSlug, courseSlug } = await context.params;
 
 
-  const data = await getExamCourseOverview(
+  const data = await getExamSubExamOverview(
     examSlug,
     courseSlug
   );

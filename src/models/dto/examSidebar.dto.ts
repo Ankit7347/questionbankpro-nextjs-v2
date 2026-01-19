@@ -10,7 +10,7 @@ export interface ExamSidebarServerDto {
     name: string;
   } & BaseDTO) | null;
 
-  course: ({
+  subExam: ({
     slug: string;
     name: string;
   } & BaseDTO) | null;

@@ -8,7 +8,7 @@ import { Lang, resolveI18nField } from "@/lib/i18n";
 
 interface MapExamSidebarInput {
   exam: any;
-  course: any;
+  subExam: any;
   syllabus?: any | null;
   subjects: any[];
   lang: Lang;
@@ -16,15 +16,15 @@ interface MapExamSidebarInput {
 
 export function mapExamSidebar({
   exam,
-  course,
+  subExam,
   syllabus,
   subjects,
   lang,
 }: MapExamSidebarInput): ExamSidebarServerDto {
-  if (!exam || !course) {
+  if (!exam || !subExam) {
     return {
       exam: null,
-      course: null,
+      subExam: null,
       syllabus: null,
       subjects: [],
       lang,
@@ -38,10 +38,10 @@ export function mapExamSidebar({
       name: resolveI18nField(exam.name, lang),
     },
 
-    course: {
-      ...mapBaseFields(course),
-      slug: course.slug,
-      name: resolveI18nField(course.name, lang),
+    subExam: {
+      ...mapBaseFields(subExam),
+      slug: subExam.slug,
+      name: resolveI18nField(subExam.name, lang),
     },
 
     syllabus: syllabus

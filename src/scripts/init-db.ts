@@ -7,7 +7,6 @@ import dbConnect from "../lib/mongodb";
 import "../models/mongoose/EducationLevel.schema";
 import "../models/mongoose/Course.schema";
 import "../models/mongoose/Exam.schema";
-import "../models/mongoose/Syllabus.schema";
 import "../models/mongoose/Subject.schema";
 import "../models/mongoose/Chapter.schema";
 import "../models/mongoose/Topic.schema";

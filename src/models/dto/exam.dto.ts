@@ -3,20 +3,23 @@
 import { BaseDTO } from "./base.dto";
 
 /**
- * Used ONLY for /api/exams/landing
+ * SubExam shown under an Exam
  */
-export interface CourseLandingDTO extends BaseDTO {
+export interface SubExamDTO extends BaseDTO {
+  id: string;
   name: string;
   slug: string;
 }
 
-export interface ExamLandingDTO extends BaseDTO {
+/**
+ * Unified Exam UI
+ * Used for:
+ * - Exam Landing
+ * - Exam Catalog
+ */
+export interface ExamdDTO extends BaseDTO {
+  id: string;
   examName: string;
   examSlug: string;
-  courses: CourseLandingDTO[];
-}
-export interface ExamCardDTO extends BaseDTO {
-  examName: string;
-  examSlug: string;
-  courses: CourseLandingDTO[];
+  subExams: SubExamDTO[];
 }

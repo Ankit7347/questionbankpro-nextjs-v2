@@ -54,6 +54,10 @@ const SubExamSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    isVisibleOnCard: {
+      type: Boolean,
+      default: false,
+    },
 
     ...BaseSchemaFields,
   },

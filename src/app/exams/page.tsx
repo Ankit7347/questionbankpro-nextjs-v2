@@ -2,17 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchExamCatalog } from "@/services/client/exam.client";
-import { EducationLevelGroup } from "@/dto/examCatalog.ui.dto";
+import { EducationLevelGroupUI } from "@/dto/exam.ui.dto";
 import EducationLevelSection from "@/components/exams/catalog/EducationLevelSection";
 
 export default function ExamsPage() {
-  const [data, setData] = useState<EducationLevelGroup[]>([]);
+  const [data, setData] = useState<EducationLevelGroupUI[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeLevelId, setActiveLevelId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetchExamCatalog("en")
+    fetchExamCatalog()
       .then((res) => {
         if (res.success && res.data) {
           setData(res.data);
@@ -30,7 +30,7 @@ export default function ExamsPage() {
       ...group,
       exams: group.exams.filter(e => 
         e.examName.toLowerCase().includes(q) || 
-        e.courses.some(c => c.name.toLowerCase().includes(q))
+        e.subExams.some(c => c.name.toLowerCase().includes(q))
       ),
     }));
   }, [data, activeLevelId, search]);

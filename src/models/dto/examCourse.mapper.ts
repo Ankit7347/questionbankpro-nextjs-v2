@@ -22,7 +22,7 @@ function resolveText(
  */
 export function mapExamCourseOverviewDTO(
   exam: any,
-  course: any,
+  subExam: any,
   subjects: any[],
   lang: Lang
 ): ExamCourseOverviewDTO {
@@ -32,10 +32,10 @@ export function mapExamCourseOverviewDTO(
       name: resolveText(exam.name, lang),
       slug: exam.slug,
     },
-    course: {
-      ...mapBaseFields(course),
-      name: resolveText(course.name, lang),
-      slug: course.slug,
+    subExam: {
+      ...mapBaseFields(subExam),
+      name: resolveText(subExam.name, lang),
+      slug: subExam.slug,
     },
     subjects: subjects.map((s) => ({
       ...mapBaseFields(s),

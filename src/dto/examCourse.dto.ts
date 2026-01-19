@@ -12,7 +12,7 @@ export interface ExamCourseOverviewDTO {
     name: string;
     slug: string;
   };
-  course: {
+  subExam: {
     name: string;
     slug: string;
   };

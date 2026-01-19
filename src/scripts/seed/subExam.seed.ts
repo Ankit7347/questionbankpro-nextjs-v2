@@ -131,6 +131,7 @@ async function seedSubExams() {
         stream: item.stream ?? "General",
         order: item.order,
         isActive: true,
+        isVisibleOnCard: true
       });
 
       console.log(`✅ Created SubExam: ${item.slug}`);
