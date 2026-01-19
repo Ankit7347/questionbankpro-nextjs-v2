@@ -1,5 +1,6 @@
 // src/models/mongoose/Course.schema.ts
-import { Schema, model, models } from "mongoose";
+
+import { Schema, model, models, Types } from "mongoose";
 import {
   BaseSchemaFields,
   BaseSchemaOptions,
@@ -7,9 +8,23 @@ import {
 
 const CourseSchema = new Schema(
   {
+    subExamId: {
+      type: Types.ObjectId,
+      ref: "SubExam",
+      required: true,
+      index: true,
+    },
+
+    type: {
+      type: String,
+      enum: ["FULL", "CRASH", "TEST_SERIES"],
+      required: true,
+      index: true,
+    },
+
     name: {
-      en: { type: String, required: true, trim: true },
-      hi: { type: String, trim: true },
+      en: { type: String, required: true },
+      hi: { type: String },
     },
 
     slug: {
@@ -19,43 +34,35 @@ const CourseSchema = new Schema(
       trim: true,
     },
 
-    examId: {
-      type: Schema.Types.ObjectId,
-      ref: "Exam",
-      required: true,
-      index: true,
-    },
-
-    description: {
-      en: { type: String },
-      hi: { type: String },
-    },
-
-    durationYears: { type: Number },
-    totalSemesters: { type: Number },
-    classRange: { type: String },
-    stream: { type: String },
-
-    icon: { type: String },
-
-    badge: {
-      en: { type: String },
-      hi: { type: String },
-    },
-
-    order: {
+    basePrice: {
       type: Number,
       required: true,
     },
 
-    isVisibleOnCard: {
-      type: Boolean,
-      default: true,
+    salePrice: {
+      type: Number,
+      required: true,
+    },
+
+    currency: {
+      type: String,
+      default: "INR",
+    },
+
+    validFrom: {
+      type: Date,
+      required: true,
+    },
+
+    validTo: {
+      type: Date,
+      default: null,
     },
 
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
 
     ...BaseSchemaFields,
@@ -64,7 +71,7 @@ const CourseSchema = new Schema(
 );
 
 CourseSchema.index(
-  { examId: 1, slug: 1 },
+  { subExamId: 1, type: 1 },
   { unique: true }
 );
 

@@ -1,4 +1,4 @@
-// src/models/mongoose/Syllabus.schema.ts
+// src/models/mongoose/OfficialSyllabus.schema.ts
 
 import { Schema, model, models, Types } from "mongoose";
 import {
@@ -6,11 +6,11 @@ import {
   BaseSchemaOptions,
 } from "./base.schema";
 
-const SyllabusSchema = new Schema(
+const OfficialSyllabusSchema = new Schema(
   {
-    courseId: {
+    subExamId: {
       type: Types.ObjectId,
-      ref: "Course",
+      ref: "SubExam",
       required: true,
       index: true,
     },
@@ -38,7 +38,7 @@ const SyllabusSchema = new Schema(
 
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
       index: true,
     },
 
@@ -47,4 +47,10 @@ const SyllabusSchema = new Schema(
   BaseSchemaOptions
 );
 
-export default models.Syllabus || model("Syllabus", SyllabusSchema);
+OfficialSyllabusSchema.index(
+  { subExamId: 1, version: 1 },
+  { unique: true }
+);
+
+export default models.OfficialSyllabus ||
+  model("OfficialSyllabus", OfficialSyllabusSchema);

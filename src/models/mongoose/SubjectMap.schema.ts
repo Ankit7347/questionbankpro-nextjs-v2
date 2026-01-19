@@ -1,4 +1,5 @@
-// src/models/mongoose/SubjectMap.schema.ts 
+// src/models/mongoose/SubjectMap.schema.ts
+
 import { Schema, model, models, Types } from "mongoose";
 import {
   BaseSchemaFields,
@@ -9,7 +10,7 @@ const SubjectMapSchema = new Schema(
   {
     syllabusId: {
       type: Types.ObjectId,
-      ref: "Syllabus",
+      ref: "OfficialSyllabus",
       required: true,
       index: true,
     },
@@ -18,6 +19,7 @@ const SubjectMapSchema = new Schema(
       type: Types.ObjectId,
       ref: "Subject",
       required: true,
+      index: true,
     },
 
     order: {
@@ -48,6 +50,11 @@ const SubjectMapSchema = new Schema(
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
+);
+
+SubjectMapSchema.index(
+  { syllabusId: 1, subjectId: 1 },
+  { unique: true }
 );
 
 export default models.SubjectMap || model("SubjectMap", SubjectMapSchema);

@@ -71,19 +71,47 @@
 
 set -e
 
-create_file() {
-  if [ ! -f "$1" ]; then
-    mkdir -p "$(dirname "$1")"
-    echo "// $1" > "$1"
-    echo "Created file: $1"
+# create_file() {
+#   if [ ! -f "$1" ]; then
+#     mkdir -p "$(dirname "$1")"
+#     echo "// $1" > "$1"
+#     echo "Created file: $1"
+#   fi
+# }
+
+# echo "Initializing Exams Sidebar UI..."
+
+# create_file "src/components/exams/sidebar/ExamSidebar.tsx"
+# create_file "src/components/exams/sidebar/SidebarSubject.tsx"
+# create_file "src/components/exams/sidebar/SidebarChapter.tsx"
+# create_file "src/components/exams/sidebar/index.ts"
+
+# echo "✅ Exams Sidebar UI initialized."
+#!/usr/bin/env bash
+
+BASE_DIR="src/models/mongoose"
+
+FILES=(
+  "Exam.schema.ts"
+  "SubExam.schema.ts"
+  "OfficialSyllabus.schema.ts"
+  "SubjectMap.schema.ts"
+  "Course.schema.ts"
+  "CourseSubjectAccessMap.schema.ts"
+)
+
+# Ensure base directory exists
+mkdir -p "$BASE_DIR"
+
+for FILE in "${FILES[@]}"; do
+  FILE_PATH="$BASE_DIR/$FILE"
+
+  if [ -f "$FILE_PATH" ]; then
+    echo "✔ Exists: $FILE_PATH"
+  else
+    touch "$FILE_PATH"
+    echo "➕ Created: $FILE_PATH"
   fi
-}
+done
 
-echo "Initializing Exams Sidebar UI..."
-
-create_file "src/components/exams/sidebar/ExamSidebar.tsx"
-create_file "src/components/exams/sidebar/SidebarSubject.tsx"
-create_file "src/components/exams/sidebar/SidebarChapter.tsx"
-create_file "src/components/exams/sidebar/index.ts"
-
-echo "✅ Exams Sidebar UI initialized."
+echo "✅ Schema file check completed."
