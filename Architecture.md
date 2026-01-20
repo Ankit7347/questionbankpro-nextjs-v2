@@ -341,3 +341,94 @@ Every file must start with a top-level comment containing its full relative path
 Example:
 
 // src/services/server/officialSyllabus.server.ts
+
+
+
+
+
+
+## Course (Commercial / Access Layer)
+
+Course is not part of the official syllabus hierarchy.
+
+Purpose:
+- Commercial offering
+- Access control
+- Pricing, validity, and availability
+- UI-level bundling
+
+Relationship:
+- One SubExam → many Courses
+- Each Course belongs to exactly one SubExam
+- Course never owns or maps syllabus data
+
+Rules:
+- Course must not reference OfficialSyllabus
+- Course must not reference Subject, Chapter, Topic, or mapping tables
+- Course may reference SubExam only
+
+Example structure:
+```txt
+Course
+ ├── subExamId
+ ├── type (FULL | CRASH | TEST_SERIES)
+ ├── name (localized)
+ ├── slug
+ ├── basePrice
+ ├── salePrice
+ ├── currency
+ ├── validFrom
+ ├── validTo
+ ├── isActive
+ └── metadata (createdAt, updatedAt, isDeleted)
+
+
+---
+
+Coupon (Commercial / Pricing Layer)
+
+Coupon is a pricing modifier and not part of syllabus or course ownership.
+
+Purpose:
+
+Discount management
+
+Promotional pricing
+
+Controlled access benefits
+
+
+Relationship:
+
+Coupon may apply to:
+
+One or more Courses
+
+One or more SubExams
+
+
+Coupon does not own or modify Course data
+
+
+Rules:
+
+Coupon must not reference OfficialSyllabus
+
+Coupon must not reference Subject, Chapter, Topic, or mapping tables
+
+Coupon affects price calculation only
+
+
+Example structure:
+
+Coupon
+ ├── code
+ ├── discountType (PERCENT | FLAT)
+ ├── discountValue
+ ├── applicableCourseIds[]
+ ├── applicableSubExamIds[]
+ ├── validFrom
+ ├── validTo
+ ├── usageLimit
+ ├── isActive
+ └── metadata (createdAt, updatedAt, isDeleted)
