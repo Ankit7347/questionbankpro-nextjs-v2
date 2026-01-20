@@ -1,21 +1,15 @@
----
-
-QuestionbankPro – Architecture Summary
-
+# QuestionbankPro – Architecture Summary  
 (Final, Corrected, Enforced & Schema-Accurate)
 
-> Status: Canonical source of truth
-Aligned with: Official exam PDFs (GATE / UPSC / SSC etc.)
-Locked: ✅ Yes
+Status: Canonical source of truth  
+Aligned with: Official exam PDFs (GATE / UPSC / SSC etc.)  
+Locked: Yes
 
+## 1. App Layer (Routing & UI)
+<!-- src/app/ -->
 
-
-
----
-
-1. App Layer (Routing & UI)
-
-<!-- src/app/ -->src/app/
+```txt
+src/app/
 ├── layout.tsx                 ← Global providers (theme, i18n, auth)
 ├── page.tsx                   ← Landing
 ├── api/                       ← Thin API routes only
@@ -34,15 +28,15 @@ Locked: ✅ Yes
 │                   ├── chapter/[chapterSlug]/page.tsx
 │                   └── topic/[topicSlug]/page.tsx
 
-Rules
+Rules:
 
-❌ No mongoose imports
+No mongoose imports
 
-❌ No server DTO imports
+No server DTO imports
 
-✅ UI DTOs only
+UI DTOs only
 
-✅ UI hierarchy is a projection, not DB ownership
+UI hierarchy is a projection, not DB ownership
 
 
 
@@ -64,27 +58,32 @@ Rules
 ├── ChapterMap.schema.ts
 ├── TopicMap.schema.ts
 
-base.schema.ts
+base.schema.ts:
 
 createdAt
+
 updatedAt
+
 updatedBy
+
 isDeleted
-timestamps: true
 
-Rules
+timestamps enabled
 
-❌ Never used in UI
 
-❌ Never returned directly from API
+Rules:
 
-✅ Used only inside server services
+Never imported in UI
+
+Never returned directly from API
+
+Used only in server services
 
 
 
 ---
 
-3. The CORRECT Official Syllabus Hierarchy (LOCKED)
+3. Official Syllabus Hierarchy (Locked)
 
 Exam
  └── SubExam                    (GATE 2026 – CS)
@@ -96,17 +95,15 @@ Exam
                                └── TopicMap
                                     └── Topic
 
-Core Truth
+Core truth:
 
-> OfficialSyllabus is the sole owner of syllabus content
+OfficialSyllabus is the single owner of syllabus content
 
+SubExam does not own subjects
 
+Course does not exist in syllabus ownership
 
-SubExam ❌ does NOT own subjects
-
-Course ❌ does NOT exist in syllabus ownership
-
-Subjects / Chapters / Topics are canonical & reusable
+Subjects, Chapters, Topics are canonical and reusable
 
 Context is applied only via mapping tables
 
@@ -116,19 +113,19 @@ Context is applied only via mapping tables
 
 4. Collections & Responsibility (Authoritative)
 
-Exam Context
+Exam context:
 
 Exam
 SubExam
 OfficialSyllabus
 
-Canonical Content (Global)
+Canonical content (global, reusable):
 
 Subject
 Chapter
 Topic
 
-Contextual Mapping (Ordered)
+Contextual mapping (ordered):
 
 SubjectMap   (officialSyllabusId + subjectId + order)
 ChapterMap  (subjectMapId + chapterId + order)
@@ -151,9 +148,13 @@ TopicMap    (chapterMapId + topicId + order)
 ├── apiResponse.dto.ts
 └── *.mapper.ts
 
-Mappers convert mongoose → server DTO
+Details:
 
-API never leaks DB shape
+Server DTOs define what API is allowed to expose
+
+Mappers convert mongoose models to server DTOs
+
+API never leaks DB structure
 
 
 
@@ -169,11 +170,13 @@ API never leaks DB shape
 ├── Chapter.dto.ts
 └── Topic.dto.ts
 
-❌ No mongoose
+Rules:
 
-❌ No server DTO imports
+No mongoose imports
 
-✅ Used by pages, components, hooks
+No server DTO imports
+
+Used by pages, components, hooks only
 
 
 
@@ -190,13 +193,17 @@ API never leaks DB shape
 ├── subject.server.ts
 └── *.server.ts
 
-Rules
+Rules:
 
-✅ Uses mongoose + server DTOs
+Uses mongoose models
 
-❌ No request / response objects
+Uses server DTOs and mappers
 
-✅ Throws ApiError only
+Contains business logic
+
+No request or response objects
+
+Throws ApiError only
 
 
 
@@ -210,11 +217,13 @@ Rules
 ├── officialSyllabus.client.ts
 └── *.client.ts
 
+Rules:
+
 Calls API routes
 
 Consumes ApiResponse<T>
 
-Returns UI DTOs
+Returns UI DTOs only
 
 
 
@@ -229,29 +238,29 @@ interface ApiResponse<T> {
   statusCode: number
 }
 
-Rules
+Rules:
 
-❌ No raw res.json
+No raw res.json or ad-hoc responses
 
-❌ No ad-hoc responses
-
-✅ Only via response.util.ts
+Response creation only via response.util.ts
 
 
 
 ---
 
-8. Error Handling
+8. Error Handling Layer
 
 <!-- src/lib/ -->src/lib/
-├── apiError.ts
-├── response.util.ts
+├── apiError.ts        ← typed server errors with HTTP status
+├── response.util.ts  ← centralized success / error formatter
 ├── validators.ts
 └── constants.ts
 
-All server errors → ApiError
+Rules:
 
-API routes translate → ApiResponse
+All server errors must be ApiError
+
+API routes translate errors into ApiResponse
 
 
 
@@ -266,19 +275,21 @@ API routes translate → ApiResponse
 │   └── hi.json
 └── types.ts
 
-Rules
+Rules:
 
-Language resolved once
+Language resolved once per request
 
-Server returns localized strings
+Server services receive lang
 
-❌ UI does not translate business data
+DTOs return localized strings
+
+UI does not translate business data
 
 
 
 ---
 
-10. Request → Response Lifecycle (Strict)
+10. Request–Response Flow (Strict)
 
 UI
  → client service
@@ -292,14 +303,12 @@ UI
  → UI DTO
  → UI
 
-Any shortcut = ❌ violation
-
 
 ---
 
-11. HARD ENFORCEMENT RULES (NON-NEGOTIABLE)
+11. Enforcement Rules (Non-Negotiable)
 
-❌ Forbidden
+Forbidden:
 
 Subject.examId
 
@@ -312,7 +321,7 @@ Topic.chapterId
 Course → syllabus linkage
 
 
-✅ Allowed
+Allowed:
 
 Only mapping collections define hierarchy
 
@@ -322,27 +331,13 @@ Only mapping collections define hierarchy
 
 12. Automation & Documentation Rules
 
-Auto-Scaffolding
+Script must auto-create missing folders and files
 
-Script must create:
+Used during setup and CI
 
-All folders
-
-Placeholder files
+Every file must start with a top-level comment containing its full relative path
 
 
-Used in setup / CI
-
-
-File Header Rule
-
-Every file starts with:
+Example:
 
 // src/services/server/officialSyllabus.server.ts
-
-
----
-
-🔒 FINAL ONE-LINE TRUTH (PIN THIS)
-
-> OfficialSyllabus is the single source of syllabus truth; everything else is context or projection
