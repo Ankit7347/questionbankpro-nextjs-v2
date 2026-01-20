@@ -22,14 +22,14 @@ import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 export default function TopicPage({ 
   params 
 }: { 
-  params: Promise<{ examSlug: string; courseSlug: string; subjectSlug: string; chapterSlug: string; topicSlug: string }> 
+  params: Promise<{ examSlug: string; subExamSlug: string; subjectSlug: string; chapterSlug: string; topicSlug: string }> 
 }) {
-  const { examSlug, courseSlug, subjectSlug, chapterSlug, topicSlug } = use(params);
+  const { examSlug, subExamSlug, subjectSlug, chapterSlug, topicSlug } = use(params);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   // Data Lookup Logic
   const exam = EXAMS_DATA[examSlug as keyof typeof EXAMS_DATA];
-  const course = exam?.courses[courseSlug as keyof typeof exam.courses];
+  const course = exam?.courses[subExamSlug as keyof typeof exam.courses];
   const subject = course?.subjects[subjectSlug as keyof typeof course.subjects];
   const chapter = subject?.chapters.find((c) => c.slug === chapterSlug);
   const data = chapter?.topics.find((t) => t.slug === topicSlug);
@@ -39,7 +39,7 @@ export default function TopicPage({
       <ResourceNotFound 
         type="Topic" 
         slug={topicSlug} 
-        backLink={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}`} 
+        backLink={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapterSlug}`} 
       />
     );
   }
@@ -50,7 +50,7 @@ export default function TopicPage({
       <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-900">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link 
-            href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}`}
+            href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapterSlug}`}
             className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -99,7 +99,7 @@ export default function TopicPage({
               <Printer className="w-4 h-4" /> Print Article
             </button>
             <Link 
-              href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}`} 
+              href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapterSlug}`} 
               className="w-full sm:w-auto flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:translate-x-1"
             >
               Back to Playlist <ArrowRight className="w-5 h-5" />

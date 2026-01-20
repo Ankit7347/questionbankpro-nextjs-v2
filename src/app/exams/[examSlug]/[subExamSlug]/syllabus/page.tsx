@@ -27,7 +27,7 @@ const SYLLABUS_DATA = [
 export default function SyllabusPage() {
   const params = useParams();
   const examSlug = params.examSlug;
-  const courseSlug = params.courseSlug;
+  const subExamSlug = params.subExamSlug;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-black">
@@ -66,7 +66,7 @@ export default function SyllabusPage() {
                   </div>
 
                   <Link
-                    href={`/exams/${examSlug}/${courseSlug}/${subject.slug}`}
+                    href={`/exams/${examSlug}/${subExamSlug}/${subject.slug}`}
                     className="inline-flex items-center font-bold text-sm text-blue-600 dark:text-blue-400 hover:gap-2 transition-all"
                   >
                     Explore Subject Details <ChevronRight size={16} />

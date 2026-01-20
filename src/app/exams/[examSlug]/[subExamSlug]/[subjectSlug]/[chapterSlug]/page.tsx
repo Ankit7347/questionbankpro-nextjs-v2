@@ -1,4 +1,4 @@
-// src/app/exams/[examSlug]/[courseSlug]/[subjectSlug]/[chapterSlug]/page.tsx
+// src/app/exams/[examSlug]/[subExamSlug]/[subjectSlug]/[chapterSlug]/page.tsx
 "use client";
 
 import { useState, use } from "react";
@@ -21,13 +21,13 @@ import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 export default function ChapterPage({ 
   params 
 }: { 
-  params: Promise<{ examSlug: string; courseSlug: string; subjectSlug: string; chapterSlug: string }> 
+  params: Promise<{ examSlug: string; subExamSlug: string; subjectSlug: string; chapterSlug: string }> 
 }) {
-  const { examSlug, courseSlug, subjectSlug, chapterSlug } = use(params);
+  const { examSlug, subExamSlug, subjectSlug, chapterSlug } = use(params);
   const [activeTopicIndex, setActiveTopicIndex] = useState(0);
 
   const exam = EXAMS_DATA[examSlug as keyof typeof EXAMS_DATA];
-  const course = exam?.courses[courseSlug as keyof typeof exam.courses];
+  const course = exam?.courses[subExamSlug as keyof typeof exam.courses];
   const subject = course?.subjects[subjectSlug as keyof typeof course.subjects];
   const data = subject?.chapters.find((c) => c.slug === chapterSlug);
 
@@ -36,7 +36,7 @@ export default function ChapterPage({
       <ResourceNotFound 
         type="Chapter" 
         slug={subjectSlug} 
-        backLink={`/exams/${examSlug}/${courseSlug}`} 
+        backLink={`/exams/${examSlug}/${subExamSlug}`} 
       />
     );
   }
@@ -53,7 +53,7 @@ export default function ChapterPage({
       <main className="flex-1 overflow-y-auto border-r border-gray-100 dark:border-slate-900">
         <div className="p-4 border-b border-gray-50 dark:border-slate-900 flex items-center justify-between bg-gray-50/50 dark:bg-slate-900/50">
           <Link 
-            href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}`} 
+            href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}`} 
             className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -92,7 +92,7 @@ export default function ChapterPage({
                 </h1>
                 {/* NEW: Direct Link to Deep Focus Page */}
                 <Link 
-                  href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}/${activeTopic.slug}`}
+                  href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapterSlug}/${activeTopic.slug}`}
                   className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
                   title="Open in Full Screen Focus Mode"
                 >
@@ -193,7 +193,7 @@ export default function ChapterPage({
                   
                   {/* NEW: Deep Focus Navigation Link */}
                   <Link 
-                    href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapterSlug}/${topic.slug}`}
+                    href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapterSlug}/${topic.slug}`}
                     className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-blue-600 flex items-center gap-1"
                   >
                     Read <ExternalLink className="w-3 h-3" />

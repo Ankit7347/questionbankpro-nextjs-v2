@@ -4,16 +4,16 @@ import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
 import { ExamCourseOverviewDTO } from "@/dto/examCourse.dto";
 
 /**
- * /exams/[examSlug]/[courseSlug] page
+ * /exams/[examSlug]/[subExamSlug] page
  * Fetches the specific course details including subjects
  */
 export async function fetchCourseOverview(
   examSlug: string,
-  courseSlug: string,
+  subExamSlug: string,
   lang: "en" | "hi" = "en"
 ): Promise<ApiResponseUI<ExamCourseOverviewDTO>> {
   try {
-    const res = await fetch(`/api/exams/${examSlug}/${courseSlug}`, {
+    const res = await fetch(`/api/exams/${examSlug}/${subExamSlug}`, {
       headers: { "x-lang": lang },
     });
 
@@ -21,7 +21,7 @@ export async function fetchCourseOverview(
       return {
         success: false,
         data: null,
-        error: `Failed to fetch course: ${courseSlug}`,
+        error: `Failed to fetch course: ${subExamSlug}`,
         statusCode: res.status,
       };
     }

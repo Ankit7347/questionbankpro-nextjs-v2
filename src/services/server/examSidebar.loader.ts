@@ -7,13 +7,13 @@
 import { getExamSidebarServer } from "./examSidebar.server";
 import { ApiError } from "@/lib/apiError";
 
-export async function loadExamSidebar(examSlug: string,courseSlug: string) {
+export async function loadExamSidebar(examSlug: string,subExamSlug: string) {
   if (!examSlug) {
     throw new Error("Missing examSlug in layout params");
   }
 
   try {
-    return await getExamSidebarServer(examSlug,courseSlug);
+    return await getExamSidebarServer(examSlug,subExamSlug);
   } catch (error) {
     // ⛔ NEVER crash a layout
     if (error instanceof ApiError) {

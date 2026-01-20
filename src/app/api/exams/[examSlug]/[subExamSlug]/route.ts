@@ -1,4 +1,4 @@
-// src/app/api/exams/[examSlug]/[courseSlug]/route.ts
+// src/app/api/exams/[examSlug]/[subExamSlug]/route.ts
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -9,17 +9,17 @@ export async function GET(
   context: {
     params: Promise<{
       examSlug: string;
-      courseSlug: string;
+      subExamSlug: string;
     }>;
   }
 ) {
   // ✅ IMPORTANT: params is a Promise in Next.js 14/15
-  const { examSlug, courseSlug } = await context.params;
+  const { examSlug, subExamSlug } = await context.params;
 
 
   const data = await getExamSubExamOverview(
     examSlug,
-    courseSlug
+    subExamSlug
   );
   
   if (!data) {

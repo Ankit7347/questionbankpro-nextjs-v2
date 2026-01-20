@@ -1,4 +1,4 @@
-// src/app/exams/[examSlug]/[courseSlug]/layout.tsx
+// src/app/exams/[examSlug]/[subExamSlug]/layout.tsx
 import { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import ExamSidebar from "@/components/exams/sidebar/ExamSidebar";
@@ -10,13 +10,13 @@ export default async function CourseLayout({
   params,
 }: {
   children: ReactNode;
-  params: Promise<{ examSlug: string; courseSlug: string }>;
+  params: Promise<{ examSlug: string; subExamSlug: string }>;
 }) {
-  const { examSlug, courseSlug } = await params;
+  const { examSlug, subExamSlug } = await params;
   
   // Pass BOTH slugs to your loader
-  const data = await loadExamSidebar(examSlug, courseSlug);
-
+  const data = await loadExamSidebar(examSlug, subExamSlug);
+  
   if (!data.exam || !data.subExam) notFound();
 
   const totalChapters = data.subjects?.reduce(

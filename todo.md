@@ -8,7 +8,7 @@ No theory, no extra explanation.
 ### 1. Data & Architecture (Locked)
 
 * Sidebar data is fetched **once** in
-  `src/app/exams/[examSlug]/[courseSlug]/layout.tsx`
+  `src/app/exams/[examSlug]/[subExamSlug]/layout.tsx`
 * Layout calls **server service directly**
 * Client services are **NOT used** in layouts
 * UI receives **only frontend-safe DTOs**
@@ -39,7 +39,7 @@ No theory, no extra explanation.
   * Use `cache()` or `unstable_cache`
 * Cache key:
 
-  * `examSlug + courseSlug + lang`
+  * `examSlug + subExamSlug + lang`
 * Revalidate when:
 
   * syllabus / subject / chapter changes

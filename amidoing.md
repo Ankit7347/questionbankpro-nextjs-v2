@@ -229,7 +229,7 @@ What you said:
 ### Next logical step (pick one):
 
 1. Add **search + tabs** on `/exams` (client-side only)
-2. Build `/exams/[examSlug]/[courseSlug]/page.tsx`
+2. Build `/exams/[examSlug]/[subExamSlug]/page.tsx`
 3. Add caching strategy (ISR vs no-store)
 
 Tell me which one, and we’ll do it cleanly, **one step at a time**.

@@ -7,10 +7,10 @@ import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
 
 export async function fetchExamSidebar(
   examSlug: string,
-  courseSlug: string
+  subExamSlug: string
 ): Promise<ExamSidebarDto> {
   const res = await fetch(
-    `/api/exams/${examSlug}/${courseSlug}/sidebar`,
+    `/api/exams/${examSlug}/${subExamSlug}/sidebar`,
     { cache: "no-store" }
   );
 

@@ -18,7 +18,7 @@ function resolveText(
 
 /**
  * Maps raw database entities to ExamCourseOverviewDTO
- * Used for the /exams/[examSlug]/[courseSlug] page
+ * Used for the /exams/[examSlug]/[subExamSlug] page
  */
 export function mapExamCourseOverviewDTO(
   exam: any,

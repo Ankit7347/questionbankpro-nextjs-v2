@@ -1,4 +1,4 @@
-// src/app/exams/[examSlug]/[courseSlug]/[subjectSlug]/page.tsx
+// src/app/exams/[examSlug]/[subExamSlug]/[subjectSlug]/page.tsx
 "use client";
 
 import { useState, use } from "react";
@@ -17,13 +17,13 @@ import {
 import { EXAMS_DATA } from "@/data/mockData";
 import ResourceNotFound from "@/components/exams/ui/ResourceNotFound";
 
-export default function SubjectPage({ params }: { params: Promise<{ examSlug: string; courseSlug: string; subjectSlug: string }> }) {
-  const { examSlug, courseSlug, subjectSlug } = use(params);
+export default function SubjectPage({ params }: { params: Promise<{ examSlug: string; subExamSlug: string; subjectSlug: string }> }) {
+  const { examSlug, subExamSlug, subjectSlug } = use(params);
   const [activeTab, setActiveTab] = useState<"path" | "syllabus">("path");
 
   // Fetch the specific data from our centralized store
   const exam = EXAMS_DATA[examSlug as keyof typeof EXAMS_DATA];
-  const course = exam?.courses[courseSlug as keyof typeof exam.courses];
+  const course = exam?.courses[subExamSlug as keyof typeof exam.courses];
   const data = course?.subjects[subjectSlug as keyof typeof course.subjects];
 
   if (!data) {
@@ -31,7 +31,7 @@ export default function SubjectPage({ params }: { params: Promise<{ examSlug: st
       <ResourceNotFound 
         type="Subject" 
         slug={subjectSlug} 
-        backLink={`/exams/${examSlug}/${courseSlug}`} 
+        backLink={`/exams/${examSlug}/${subExamSlug}`} 
       />
     );
   }
@@ -90,7 +90,7 @@ export default function SubjectPage({ params }: { params: Promise<{ examSlug: st
               </div>
 
               <Link
-                href={`/exams/${examSlug}/${courseSlug}/${subjectSlug}/${chapter.slug}`}
+                href={`/exams/${examSlug}/${subExamSlug}/${subjectSlug}/${chapter.slug}`}
                 className={`flex-1 group p-5 rounded-2xl border transition-all ${
                   chapter.status === "current"
                     ? "bg-white dark:bg-slate-900 border-blue-500 shadow-lg shadow-blue-500/10"

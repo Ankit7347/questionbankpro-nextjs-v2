@@ -1,4 +1,4 @@
-// src/app/exams/[examSlug]/[courseSlug]/page.tsx
+// src/app/exams/[examSlug]/[subExamSlug]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import { fetchCourseOverview } from "@/services/client/course.client";
 import CourseSubjectSection from "@/components/exams/course/CourseSubjectSection";
 
 export default function CoursePage() {
-  const { examSlug, courseSlug } = useParams<{ examSlug: string; courseSlug: string }>();
+  const { examSlug, subExamSlug } = useParams<{ examSlug: string; subExamSlug: string }>();
 
   const [data, setData] = useState<ExamCourseOverviewDTO | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function CoursePage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      const response = await fetchCourseOverview(examSlug, courseSlug);
+      const response = await fetchCourseOverview(examSlug, subExamSlug);
       
       if (response.success && response.data) {
         setData(response.data);
@@ -31,7 +31,7 @@ export default function CoursePage() {
     };
 
     loadData();
-  }, [examSlug, courseSlug]);
+  }, [examSlug, subExamSlug]);
 
   if (loading) {
     return (
@@ -52,7 +52,7 @@ export default function CoursePage() {
           Course Not Found
         </h1>
         <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-md text-lg leading-relaxed">
-          The course <span className="text-red-600 font-bold italic">"{courseSlug.replace(/-/g, " ")}" </span> 
+          The course <span className="text-red-600 font-bold italic">"{subExamSlug.replace(/-/g, " ")}" </span> 
           does not exist or has been moved. If you think this is a mistake, please check back later.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -95,7 +95,7 @@ return (
       <CourseSubjectSection 
         subjects={data.subjects} 
         examSlug={examSlug} 
-        courseSlug={courseSlug} 
+        subExamSlug={subExamSlug} 
       />
     </section>
 
