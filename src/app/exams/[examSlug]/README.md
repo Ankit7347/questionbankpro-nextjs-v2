@@ -17,8 +17,6 @@
 │   ├── pyq/
 │   └── tests/
 │
-├── (shell)/                    ← optional landing layout
-│   └── page.tsx
 │
-└── page.tsx                    ← optional (can delete later)
+└── page.tsx                    ← main exam have all subexam card etc
 ```
