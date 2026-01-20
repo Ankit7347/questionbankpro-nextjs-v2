@@ -233,3 +233,7 @@ What you said:
 3. Add caching strategy (ISR vs no-store)
 
 Tell me which one, and we’ll do it cleanly, **one step at a time**.
+
+
+
+http://localhost:3000/exams/gate-exam/gate-2026-cs-it/pyq/2024/cs
