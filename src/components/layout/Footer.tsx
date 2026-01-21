@@ -30,9 +30,9 @@ const COURSES = [
     // We can use the label as a heading or just list the courses
     label: "Degree Programs", 
     courses: [
-        { name: "BTech", slug: "btech" },
-        { name: "MBA", slug: "mba" },
-        { name: "PGDM", slug: "pgdm" }
+        { name: "BTech", slug: "btech-cs" },
+        { name: "MBA", slug: "mba-finance" },
+        { name: "PGDM", slug: "pgdm-analytics" }
     ],
   },
   {

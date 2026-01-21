@@ -37,6 +37,18 @@ const EXAMS = [
         order: 2,
       },
       {
+        "name": { "en": "ISC Board", "hi": "आईएससी बोर्ड" },
+        "shortName": { "en": "ISC", "hi": "आईएससी" },
+        "slug": "isc-board",
+        "description": {
+          "en": "Indian School Certificate curriculum for Class 12.",
+          "hi": "कक्षा 12 के लिए भारतीय स्कूल प्रमाणपत्र पाठ्यक्रम।"
+        },
+        "icon": "fa-solid fa-graduation-cap",
+        "bannerImage": "sample.png",
+        "order": 4
+      },
+      {
         name: { en: "State Boards", hi: "राज्य बोर्ड" },
         shortName: { en: "State", hi: "राज्य" },
         slug: "state-board",
@@ -48,6 +60,18 @@ const EXAMS = [
         bannerImage: "sample.png",
         order: 3,
       },
+      {
+        "name": { "en": "UP Board", "hi": "यूपी बोर्ड" },
+        "shortName": { "en": "UPBMSP", "hi": "यूपी बोर्ड" },
+        "slug": "up-board",
+        "description": {
+          "en": "Uttar Pradesh Madhyamik Shiksha Parishad curriculum.",
+          "hi": "उत्तर प्रदेश माध्यमिक शिक्षा परिषद पाठ्यक्रम।"
+        },
+        "icon": "fa-solid fa-building-columns",
+        "bannerImage": "sample.png",
+        "order": 5
+      }
     ],
   },
   {

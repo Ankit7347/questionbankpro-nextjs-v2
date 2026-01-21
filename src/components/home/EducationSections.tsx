@@ -6,10 +6,10 @@ const sections = [
 		text: "Bachelor of Technology is an undergraduate academic degree conferred after completion of a three-to-five year program.",
 		image: "/images/btech.jpg",
 		links: [
-			{ label: "AKTU Previous Year Paper Solved / Autonomous (B.Tech)", href: "/exam/aktu/cse/previous-year-paper" },
-			{ label: "Computer Science and Engineering/Information Technology", href: "/exam/aktu/cse/previous-year-paper" },
-			{ label: "Computer System Business System", href: "/exam/aktu/csbs/previous-year-paper" },
-			{ label: "Other Branches...", href: "/exam/aktu/cse/previous-year-paper" },
+			{ label: "AKTU Previous Year Paper Solved / Autonomous (B.Tech)", href: "/exams/undergraduate-programs/btech/pyq/2024" },
+			{ label: "Computer Science and Engineering/Information Technology", href: "/exams/undergraduate-programs/btech/pyq/2024" },
+			{ label: "Computer System Business System", href: "/exams/undergraduate-programs/btech/pyq/2024" },
+			{ label: "Other Branches...", href: "/exams/undergraduate-programs/btech/pyq/2024" },
 		],
 	},
 	{
@@ -17,10 +17,10 @@ const sections = [
 		text: "The CISCE is a semi-gov-para privately held board of school education in India that conducts the ICSE and ISC exams.",
 		image: "/images/cisce.jpg",
 		links: [
-			{ label: "12th(ISC) Previous Year Paper", href: "/exam/isc/class-12/previous-year-paper" },
-			{ label: "12th(ISC) Previous Year Solved Papers", href: "/exam/isc/class-12/previous-year-solved-paper" },
-			{ label: "10th(ICSE) Previous Year Paper", href: "/exam/icse/class-10/previous-year-paper" },
-			{ label: "10th(ICSE) Previous Year Solved Papers", href: "/exam/icse/class-10/previous-year-solved-paper" },
+			{ label: "12th(ISC) Previous Year Paper", href: "/exams/isc-board/class-12/pyq" },
+			{ label: "12th(ISC) Previous Year Solved Papers", href: "/exams/isc-board/class-12/solved-paper" },
+			{ label: "10th(ICSE) Previous Year Paper", href: "/exams/icse-board/class-10/pyq" },
+			{ label: "10th(ICSE) Previous Year Solved Papers", href: "/exams/icse-board/class-10/solved-paper" },
 		],
 	},
 	{
@@ -28,10 +28,10 @@ const sections = [
 		text: "The Central Board of Secondary Education (CBSE) is a national board of education in India, established in 1929 to integrate and cooperate in secondary education.",
 		image: "/images/cbse.jpg",
 		links: [
-			{ label: "12th Previous Year Paper", href: "/exam/cbse/class-12/previous-year-paper" },
-			{ label: "12th Previous Year Solved Papers", href: "/exam/cbse/class-12/previous-year-solved-paper" },
-			{ label: "10th Previous Year Paper", href: "/exam/cbse/class-10/previous-year-paper" },
-			{ label: "10th Previous Year Solved Papers", href: "/exam/cbse/class-10/previous-year-solved-paper" },
+			{ label: "12th Previous Year Paper", href: "/exams/cbse-board/class-12/pyq" },
+			{ label: "12th Previous Year Solved Papers", href: "/exams/cbse-board/class-12/solved-paper" },
+			{ label: "10th Previous Year Paper", href: "/exams/cbse-board/class-10/pyq" },
+			{ label: "10th Previous Year Solved Papers", href: "/exams/cbse-board/class-10/solved-paper" },
 		],
 	},
 	{
@@ -39,10 +39,10 @@ const sections = [
 		text: "The Uttar Pradesh State Board of High School and Intermediate Education is an autonomous examining authority.",
 		image: "/images/upboard.jpg",
 		links: [
-			{ label: "12th Previous Year Paper", href: "/exam/up-board/class-12/previous-year-paper" },
-			{ label: "12th Previous Year Solved Papers", href: "/exam/up-board/class-12/previous-year-solved-paper" },
-			{ label: "10th Previous Year Paper", href: "/exam/up-board/class-10/previous-year-paper" },
-			{ label: "10th Previous Year Solved Papers", href: "/exam/up-board/class-10/previous-year-solved-paper" },
+			{ label: "12th Previous Year Paper", href: "/exams/up-board/class-12/pyq" },
+			{ label: "12th Previous Year Solved Papers", href: "/exams/up-board/class-12/solved-paper" },
+			{ label: "10th Previous Year Paper", href: "/exams/up-board/class-10/pyq" },
+			{ label: "10th Previous Year Solved Papers", href: "/exams/up-board/class-10/solved-paper" },
 		],
 	},
 ];
