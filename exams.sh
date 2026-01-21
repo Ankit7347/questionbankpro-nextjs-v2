@@ -89,17 +89,14 @@ set -e
 # echo "✅ Exams Sidebar UI initialized."
 #!/usr/bin/env bash
 
-BASE_DIR="src/models/mongoose"
+BASE_DIR="src/components/exams/assessment"
 
 FILES=(
-  "Exam.schema.ts"
-  "SubExam.schema.ts"
-  "OfficialSyllabus.schema.ts"
-  "SubjectMap.schema.ts"
-  "Course.schema.ts"
-  "CourseSubjectAccessMap.schema.ts"
+  "Timer.tsx"
+  "Sidebar.tsx"
+  "QuestionCard.tsx"
+  "ResultView.tsx"
 )
-
 # Ensure base directory exists
 mkdir -p "$BASE_DIR"
 
