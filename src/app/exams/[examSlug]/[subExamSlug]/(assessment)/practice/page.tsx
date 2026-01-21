@@ -21,8 +21,10 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
   const [answers, setAnswers] = useState<{ [key: string]: number }>({});
   const [markedForReview, setMarkedForReview] = useState<{ [key: string]: boolean }>({});
 
-  const session = EXAM_DATA.sessions[currentSessionIdx];
-  const question = session.subjects[0].questions[currentQuestionIdx];
+  // --- SAFE DATA ACCESS ---
+  const session = EXAM_DATA.sessions[currentSessionIdx] || EXAM_DATA.sessions[0];
+  const subject = session.subjects[0];
+  const question = subject.questions[currentQuestionIdx] || subject.questions[0];
   const qKey = `${session.id}-${question.id}`;
 
   const allQs = useMemo(() => EXAM_DATA.sessions.flatMap(s => 
@@ -34,7 +36,7 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
   [markedForReview]);
 
   const isLastQuestion = currentSessionIdx === EXAM_DATA.sessions.length - 1 && 
-                         currentQuestionIdx === session.subjects[0].questions.length - 1;
+                         currentQuestionIdx === subject.questions.length - 1;
 
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
@@ -45,6 +47,30 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
       if (data.timeLeft > 0) setTimeLeft(data.timeLeft);
     }
   }, [storageKey]);
+
+  // --- NAVIGATION LOGIC ---
+  const handleNext = () => {
+    if (currentQuestionIdx < subject.questions.length - 1) {
+      setCurrentQuestionIdx(prev => prev + 1);
+    } else if (currentSessionIdx < EXAM_DATA.sessions.length - 1) {
+      setCurrentSessionIdx(prev => prev + 1);
+      setCurrentQuestionIdx(0);
+    } else {
+      handleFinishAttempt();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIdx > 0) {
+      setCurrentQuestionIdx(prev => prev - 1);
+    } else if (currentSessionIdx > 0) {
+      // Move to the LAST question of the PREVIOUS session
+      const prevSessionIdx = currentSessionIdx - 1;
+      const prevSessionQs = EXAM_DATA.sessions[prevSessionIdx].subjects[0].questions;
+      setCurrentSessionIdx(prevSessionIdx);
+      setCurrentQuestionIdx(prevSessionQs.length - 1);
+    }
+  };
 
   const handleFinishAttempt = () => {
     if (markedKeys.length > 0) {
@@ -58,7 +84,24 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
       submitFinal();
     }
   };
-
+  const handleNextInReview = () => {
+  // Find the index of the current question in the markedKeys array
+  const currentMarkedIdx = markedKeys.indexOf(qKey);
+  
+  if (currentMarkedIdx !== -1 && currentMarkedIdx < markedKeys.length - 1) {
+    // Jump to the NEXT marked question
+    const nextKey = markedKeys[currentMarkedIdx + 1];
+    const [sessId, qId] = nextKey.split("-");
+    const sIdx = EXAM_DATA.sessions.findIndex(s => s.id === sessId);
+    const qIdx = EXAM_DATA.sessions[sIdx].subjects[0].questions.findIndex(q => q.id === Number(qId));
+    
+    setCurrentSessionIdx(sIdx);
+    setCurrentQuestionIdx(qIdx);
+  } else {
+    // If it was the last marked question, submit
+    submitFinal();
+  }
+};
   const submitFinal = () => {
     setIsSubmitted(true);
     localStorage.removeItem(storageKey);
@@ -70,8 +113,12 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors">
       {isReviewing && (
         <div className="max-w-7xl mx-auto mb-6 p-4 bg-purple-600 text-white rounded-2xl flex justify-between items-center shadow-lg">
-          <span className="font-black text-xs uppercase tracking-widest">Review Mode: Checking Marked Items ({markedKeys.length} left)</span>
-          <button onClick={submitFinal} className="bg-white text-purple-600 px-4 py-2 rounded-xl font-black text-xs hover:bg-purple-50 transition-all">Submit Final</button>
+          <span className="font-black text-xs uppercase tracking-widest leading-none">
+            Review Mode: {markedKeys.length} Questions Remaining
+          </span>
+          <button onClick={submitFinal} className="bg-white text-purple-600 px-4 py-2 rounded-xl font-black text-[10px] hover:bg-purple-50">
+            Submit Final
+          </button>
         </div>
       )}
 
@@ -94,24 +141,31 @@ export default function PracticePage({ params }: { params: Promise<{ examSlug: s
           </div>
 
           <QuestionCard 
-            question={question} language={language} userAnswer={answers[qKey]}
+            question={question} 
+            language={language} 
+            userAnswer={answers[qKey]}
             onSelect={(idx: number) => setAnswers(prev => ({ ...prev, [qKey]: idx }))}
             onClear={() => setAnswers(prev => { const n = { ...prev }; delete n[qKey]; return n; })}
             isMarked={!!markedForReview[qKey]}
             onToggleMark={() => setMarkedForReview(prev => ({ ...prev, [qKey]: !prev[qKey] }))}
-            onNext={isLastQuestion ? handleFinishAttempt : () => {
-              if (currentQuestionIdx < session.subjects[0].questions.length - 1) setCurrentQuestionIdx(p => p + 1);
-              else { setCurrentSessionIdx(p => p + 1); setCurrentQuestionIdx(0); }
-            }}
+            isReviewing={isReviewing} // Pass the state here
+            onNext={isReviewing ? handleNextInReview : handleNext}
+            onPrev={handlePrevious} // Added this
             isLast={isLastQuestion}
-            setQuestionIdx={setCurrentQuestionIdx}
+            currentQuestionIdx={currentQuestionIdx}
+            currentSessionIdx={currentSessionIdx}
           />
         </div>
 
         <Sidebar 
-          sessions={EXAM_DATA.sessions} currentSessionIdx={currentSessionIdx} setCurrentSessionIdx={setCurrentSessionIdx}
-          currentQuestionIdx={currentQuestionIdx} setCurrentQuestionIdx={setCurrentQuestionIdx}
-          answers={answers} markedForReview={markedForReview} onFinish={handleFinishAttempt}
+          sessions={EXAM_DATA.sessions} 
+          currentSessionIdx={currentSessionIdx} 
+          setCurrentSessionIdx={setCurrentSessionIdx}
+          currentQuestionIdx={currentQuestionIdx} 
+          setCurrentQuestionIdx={setCurrentQuestionIdx}
+          answers={answers} 
+          markedForReview={markedForReview} 
+          onFinish={handleFinishAttempt}
         />
       </div>
     </div>
