@@ -151,7 +151,7 @@ export default async function RootLayout({
 
         {/* Early theme hydration fix (safe) */}
 
-        <Script
+        {/* <Script
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -172,7 +172,7 @@ export default async function RootLayout({
               })();
             `,
           }}
-        />
+        /> */}
 
 
 

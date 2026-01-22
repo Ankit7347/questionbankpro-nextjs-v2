@@ -156,3 +156,14 @@
     background: #334155; /* Slate-700 for dark mode */
   }
 }
+
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior-y: none;
+  /* Remove the hardcoded white background */
+}

@@ -86,7 +86,7 @@ export default function Navbar() {
     : [];
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
+    <nav className="sticky top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
         
         {/* Logo - Hide when search is open on mobile to save space */}

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const QuickRevisionNotes = () => {
   return (
-    <section className="min-h-[40vh] md:mt-20 max-h-screen flex justify-center items-center bg-green-400 dark:bg-green-600 px-3 sm:px-6 md:px-12">
+    <section className="w-full min-h-[40vh] md:min-h-[40vh] flex justify-center items-center bg-green-400 dark:bg-green-600 px-3 sm:px-6 md:px-12 py-10 md:py-0">
       <div className="w-full max-w-screen-xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8">
         {/* Left Side */}
         <div className="flex flex-col justify-center w-full md:w-1/2 text-center md:text-left">

@@ -19,12 +19,7 @@ export default async function HomePage() {
       <Navbar />
       <main className="space-y-5">
         <QuickRevisionNotes />
-
-        {/* Exam catalog section */}
-        <section className="max-w-screen-xl mx-auto px-4">
-          <ExamLandingList lang="en" />
-        </section>
-
+        <ExamLandingList lang="en" />
         <EducationSections />
         <TopperTestimonials />
         <ContactForm />

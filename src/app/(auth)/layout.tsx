@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <Navbar />
 
       {/* This container grows to fill the space between Navbar and Footer */}
-      <main className="flex-1 pt-16 flex flex-col">
+      <main className="flex-1 flex flex-col">
         {children}
       </main>
 
