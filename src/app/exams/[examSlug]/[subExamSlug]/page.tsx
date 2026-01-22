@@ -75,9 +75,7 @@ export default function CoursePage() {
   }
 
 return (
-  /* Remove the <main> tag and the py-10. 
-     The layout already provides the max-width and padding. */
-  <div className="space-y-6 md:space-y-8">
+  <div className="space-y-6 md:space-y-8 p-4">
     
     {/* Section Header */}
     <div className="flex flex-col gap-1">
