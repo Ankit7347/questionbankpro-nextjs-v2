@@ -37,41 +37,54 @@ const CourseSchema = new Schema(
     basePrice: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     salePrice: {
       type: Number,
       required: true,
-    },
-
-    currency: {
-      type: String,
-      default: "INR",
+      min: 0,
+      validate: {
+        validator: function (this: any, v: number) {
+          return v <= this.basePrice;
+        },
+        message: "salePrice cannot exceed basePrice",
+      },
     },
 
     validFrom: {
       type: Date,
-      required: true,
     },
 
     validTo: {
       type: Date,
-      default: null,
     },
 
-    isActive: {
-      type: Boolean,
-      default: true,
+    visibility: {
+      type: String,
+      enum: ["PUBLIC", "PRIVATE"],
+      default: "PUBLIC",
       index: true,
     },
 
-    ...BaseSchemaFields,
+    description: {
+      en: { type: String },
+      hi: { type: String },
+    },
   },
-  BaseSchemaOptions
+  {
+    ...BaseSchemaOptions,
+  }
 );
 
+/**
+ * UNIQUE: One course slug per SubExam
+ * Allows:
+ *  - Multiple FULL / CRASH / TEST_SERIES
+ *  - Multiple language batches
+ */
 CourseSchema.index(
-  { subExamId: 1, type: 1 },
+  { subExamId: 1, slug: 1 },
   { unique: true }
 );
 
