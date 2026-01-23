@@ -60,6 +60,12 @@ const CourseSchema = new Schema(
       type: Date,
     },
 
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+
     visibility: {
       type: String,
       enum: ["PUBLIC", "PRIVATE"],
