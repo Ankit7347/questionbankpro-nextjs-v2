@@ -77,6 +77,7 @@ const CourseSchema = new Schema(
       en: { type: String },
       hi: { type: String },
     },
+    ...BaseSchemaFields,
   },
   {
     ...BaseSchemaOptions,

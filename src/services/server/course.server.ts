@@ -3,6 +3,8 @@
 import dbConnect from "@/lib/mongodb";
 import Course from "@/models/mongoose/Course.schema";
 import SubExam from "@/models/mongoose/SubExam.schema";
+import { mapCourseAccessDTO } from "@/models/dto/courseAccess.mapper";
+
 import { getCurrentLang } from "@/lib/i18n";
 import {
   BadRequest,
@@ -117,11 +119,11 @@ export async function deleteCourseById(courseId: string) {
 export async function listCoursesBySubExam(
   subExamSlug: string | null
 ) {
+  const lang = getCurrentLang();
   if (!subExamSlug) {
     throw BadRequest("subExamSlug is required");
   }
 
-  const lang = getCurrentLang();
   await dbConnect();
 
   const subExam = await SubExam.findOne({
@@ -142,19 +144,17 @@ export async function listCoursesBySubExam(
     visibility: "PUBLIC",
     isDeleted: false,
     $and: [
-      {
-        $or: [{ validFrom: null }, { validFrom: { $lte: now } }],
-      },
-      {
-        $or: [{ validTo: null }, { validTo: { $gte: now } }],
-      },
+      { $or: [{ validFrom: null }, { validFrom: { $lte: now } }] },
+      { $or: [{ validTo: null }, { validTo: { $gte: now } }] },
     ],
   })
     .sort({ createdAt: -1 })
     .lean();
 
-  return courses.map((course) => mapCourseDTO(course, lang));
+  // ✅ RETURN ACCESS-AWARE SHAPE
+  return courses.map((course) => mapCourseAccessDTO(course, lang));
 }
+
 
 /* =========================================================
    TOGGLE COURSE ACTIVE (Operational Kill Switch)
