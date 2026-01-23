@@ -68,6 +68,4 @@ const CouponSchema = new Schema(
   BaseSchemaOptions
 );
 
-CouponSchema.index({ code: 1 }, { unique: true });
-
 export default models.Coupon || model("Coupon", CouponSchema);
