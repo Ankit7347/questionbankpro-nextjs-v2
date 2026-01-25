@@ -68,4 +68,144 @@
 # : > src/services/contactUs.service.ts
 # : > src/services/user.service.ts
 
-echo "✔ All 10 model files cleared and ready in src/models"
+# echo "✔ All 10 model files cleared and ready in src/models"
+#!/bin/bash
+
+# ============================================
+# Admin Dashboard Route Initializer
+# Project: Questionbankpro
+# Purpose:
+# - Creates admin dashboard routes
+# - Adds placeholder page.tsx files
+# - NO business logic
+# - Safe to run once
+# ============================================
+
+BASE_DIR="src/app/(admin)/admin"
+
+echo "Initializing Admin Dashboard structure..."
+
+# ---------- DASHBOARD ----------
+mkdir -p $BASE_DIR/dashboard
+cat <<EOF > $BASE_DIR/dashboard/page.tsx
+/**
+ * Path: /admin/dashboard
+ * Role:
+ * - Entry point for Admin Control Panel
+ * - Navigation-only page
+ * - NO data fetching
+ * - NO business logic
+ */
+export default function AdminDashboardPage() {
+  return <h1 className="text-xl font-bold">Admin Dashboard</h1>;
+}
+EOF
+
+# ---------- EXAMS ----------
+mkdir -p $BASE_DIR/exams
+cat <<EOF > $BASE_DIR/exams/page.tsx
+/**
+ * Path: /admin/exams
+ * Role:
+ * - Manage Exam & SubExam
+ * - Create / Update / Disable exams
+ * - Structural hierarchy only
+ */
+export default function AdminExamsPage() {
+  return <h1>Exam Management (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- SYLLABUS ----------
+mkdir -p $BASE_DIR/syllabus
+cat <<EOF > $BASE_DIR/syllabus/page.tsx
+/**
+ * Path: /admin/syllabus
+ * Role:
+ * - Manage Official Syllabus
+ * - Subjects, Chapters, Topics
+ * - Academic content ONLY
+ */
+export default function AdminSyllabusPage() {
+  return <h1>Syllabus Management (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- MAPPINGS ----------
+mkdir -p $BASE_DIR/mappings
+cat <<EOF > $BASE_DIR/mappings/page.tsx
+/**
+ * Path: /admin/mappings
+ * Role:
+ * - SubjectMap
+ * - ChapterMap
+ * - TopicMap
+ * - Relationship configuration layer
+ */
+export default function AdminMappingsPage() {
+  return <h1>Syllabus Mapping Console (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- COURSES ----------
+mkdir -p $BASE_DIR/courses
+cat <<EOF > $BASE_DIR/courses/page.tsx
+/**
+ * Path: /admin/courses
+ * Role:
+ * - Commercial Course management
+ * - Pricing, validity, activation
+ * - Bound to SubExam
+ */
+export default function AdminCoursesPage() {
+  return <h1>Course Management (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- COUPONS ----------
+mkdir -p $BASE_DIR/coupons
+cat <<EOF > $BASE_DIR/coupons/page.tsx
+/**
+ * Path: /admin/coupons
+ * Role:
+ * - Coupon creation
+ * - Access rules
+ * - Discounts & offers
+ */
+export default function AdminCouponsPage() {
+  return <h1>Coupons & Access (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- QUESTIONS ----------
+mkdir -p $BASE_DIR/questions
+cat <<EOF > $BASE_DIR/questions/page.tsx
+/**
+ * Path: /admin/questions
+ * Role:
+ * - Question Bank
+ * - Quiz creation
+ * - Submissions (future)
+ */
+export default function AdminQuestionsPage() {
+  return <h1>Question Bank (Coming Soon)</h1>;
+}
+EOF
+
+# ---------- USERS ----------
+mkdir -p $BASE_DIR/users
+cat <<EOF > $BASE_DIR/users/page.tsx
+/**
+ * Path: /admin/users
+ * Role:
+ * - User management
+ * - Admin / Student roles
+ * - Account controls
+ */
+export default function AdminUsersPage() {
+  return <h1>User Management (Coming Soon)</h1>;
+}
+EOF
+
+echo "Admin Dashboard routes initialized successfully."
+
