@@ -1,8 +1,56 @@
 // src/services/client/course.client.ts
 
+/**
+ * Course Client Service
+ * =====================
+ *
+ * Pattern reference:
+ * - src/services/client/exam.client.ts
+ *
+ * Responsibility:
+ * - Client-side gateway for course APIs
+ * - Fetches dashboard courses
+ * - Returns ApiResponseUI<DashboardCoursesUI>
+ *
+ * Rules:
+ * - NO business logic
+ * - NO inline DTO definitions
+ * - DTOs come ONLY from src/dto
+ */
+
 import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
+import { DashboardCoursesUI } from "@/dto/course.ui.dto";
 import { ExamCourseOverviewDTO } from "@/dto/examCourse.dto";
-import { CourseUI } from "@/dto/course.ui.dto";
+
+/**
+ * Dashboard → Courses
+ * ONE API call
+ */
+export async function fetchDashboardCourses(): Promise<ApiResponseUI<DashboardCoursesUI>> {
+  try {
+    const res = await fetch('/api/dashboard/courses');
+
+    if (!res.ok) {
+      return {
+        success: false,
+        data: null,
+        error: "Failed to fetch dashboard courses",
+        statusCode: res.status,
+      };
+    }
+
+    return res.json();
+  } catch {
+    return {
+      success: false,
+      data: null,
+      error: "Network error occurred",
+      statusCode: 500,
+    };
+  }
+}
+
+
 
 /**
  * /exams/[examSlug]/[subExamSlug] page
@@ -37,94 +85,3 @@ export async function fetchCourseOverview(
     };
   }
 }
-
-
-/**
- * Dashboard → Courses page
- * Fetches:
- * 1. User enrolled courses
- * 2. Available courses for exploration
- */
-export async function fetchDashboardCourses(
-  subExamSlug: string
-): Promise<
-  ApiResponseUI<{
-    enrolled: CourseUI[];
-    explore: CourseUI[];
-  }>
-> {
-  try {
-    const userId = '69738bce5ccf5655b013cfba';
-
-    if (!userId) {
-      return {
-        success: false,
-        data: null,
-        error: "User not authenticated",
-        statusCode: 401,
-      };
-    }
-
-    // 1. Fetch enrolled courses
-    const enrolledRes = await fetch("/api/user/courses", {
-      headers: { "x-user-id": userId },
-    });
-
-    if (!enrolledRes.ok) {
-      return {
-        success: false,
-        data: null,
-        error: "Failed to fetch enrolled courses",
-        statusCode: enrolledRes.status,
-      };
-    }
-
-    const enrolledJson = await enrolledRes.json();
-    const enrolled: CourseUI[] = enrolledJson.data ?? [];
-
-    // 2. Fetch explore courses
-    const exploreRes = await fetch(
-      `/api/course/by-subexam?subExamSlug=${subExamSlug}`,
-      { headers: { "x-user-id": userId } }
-    );
-
-    if (!exploreRes.ok) {
-      return {
-        success: false,
-        data: null,
-        error: "Failed to fetch available courses",
-        statusCode: exploreRes.status,
-      };
-    }
-
-    const exploreJson = await exploreRes.json();
-    const explore: CourseUI[] = exploreJson.data ?? [];
-
-    // =====================================
-    // FIX: Remove duplicates from explore
-    // =====================================
-    const enrolledIds = new Set(enrolled.map((c) => c.id));
-    const filteredExplore = explore.filter(
-      (c) => !enrolledIds.has(c.id)
-    );
-
-    // FINAL return
-    return {
-      success: true,
-      data: {
-        enrolled,
-        explore: filteredExplore,
-      },
-      error: null,
-      statusCode: 200,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      data: null,
-      error: error instanceof Error ? error.message : "Network error occurred",
-      statusCode: 500,
-    };
-  }
-}
-

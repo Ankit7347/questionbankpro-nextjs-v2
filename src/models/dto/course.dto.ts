@@ -26,3 +26,26 @@ export interface CourseDTO extends BaseDTO {
   isActive: boolean;
   visibility: "PUBLIC" | "PRIVATE";
 }
+import { CourseAccessDTO } from "./courseAccess.dto";
+
+/**
+ * DashboardCoursesDTO
+ * -------------------
+ * Course-domain aggregate DTO
+ * Used ONLY for dashboard APIs
+ */
+export interface DashboardCoursesDTO {
+    context: {
+        examSlug: string;
+        subExamSlug: string;
+    };
+    myCourses: {
+        active: CourseAccessDTO[];
+        expiring: CourseAccessDTO[];
+        expired: CourseAccessDTO[];
+    };
+    explore: {
+        free: CourseAccessDTO[];
+        paid: CourseAccessDTO[];
+    };
+}

@@ -1,54 +1,56 @@
-// src/dto/course.ui.dto.ts
-
+// src/models/dto/course.dto.ts
 /**
- * Course UI DTO
- * -------------------------
- * Used ONLY by UI components (Dashboard / Courses page)
- * Represents a merged projection of:
- * - Course (commercial)
- * - Pricing (resolved)
- * - UserCourseAccess (enrollment)
- *
- * UI must NOT derive business logic from this.
+ * CourseUI
+ * --------
+ * UI-facing course model.
+ * Derived from CourseAccessAPI.
  */
-
 export interface CourseUI {
   id: string;
-
   name: string;
   slug: string;
-
   type: "FULL" | "CRASH" | "TEST_SERIES";
 
-  /* --------------------------------
-     Pricing (already resolved)
-  --------------------------------- */
-  price: {
+  examSlug: string;
+  subExamSlug: string;
+
+  price?: {
     base: number;
-    sale: number;
     final: number;
-    discountPercent?: number; // e.g. 25 for 25% OFF
-    currency: string; // INR
+    discountPercent?: number;
+    currency: string;
   };
 
-  /* --------------------------------
-     User Access State
-  --------------------------------- */
   access: {
-    isEnrolled: boolean;
-    accessType?: "FREE" | "PAID";
-    status?: "ACTIVE" | "EXPIRED" | "REVOKED";
-    validTill?: string | null; // ISO string for UI
+    status: "LIFETIME" | "ACTIVE" | "EXPIRING" | "EXPIRED" | "NONE";
+    expiresAt?: string | null;
   };
 
-  /* --------------------------------
-     UI Flags (rendering hints only)
-  --------------------------------- */
   flags: {
     isFree: boolean;
-    isNew?: boolean;
-    isPopular?: boolean;
   };
-  examSlug: string;
-  subExamSlug:string;
+}
+
+
+
+/**
+ * DashboardCoursesUI
+ * -----------------
+ * Course-domain DTO for dashboard page
+ * Returned by /api/dashboard/courses
+ */
+export interface DashboardCoursesUI {
+  context: {
+    examSlug: string;
+    subExamSlug: string;
+  };
+  myCourses: {
+    active: CourseUI[];
+    expiring: CourseUI[];
+    expired: CourseUI[];
+  };
+  explore: {
+    free: CourseUI[];
+    paid: CourseUI[];
+  };
 }

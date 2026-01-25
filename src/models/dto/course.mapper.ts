@@ -40,3 +40,22 @@ function buildCourseDTO(
 }
 
 export const mapCourseDTO = buildCourseDTO;
+import { CourseAccessDTO } from "./courseAccess.dto";
+
+/**
+ * DashboardCoursesDTO
+ * -------------------
+ * Course-domain DTO for dashboard response
+ * Contains ONLY other DTOs
+ */
+export interface DashboardCoursesDTO {
+  myCourses: {
+    active: CourseAccessDTO[];
+    expiring: CourseAccessDTO[];
+    expired: CourseAccessDTO[];
+  };
+  explore: {
+    free: CourseAccessDTO[];
+    paid: CourseAccessDTO[];
+  };
+}

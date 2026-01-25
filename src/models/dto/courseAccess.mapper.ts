@@ -11,18 +11,31 @@ function resolveText(
 ): string {
   return text[lang] ?? text.en;
 }
+
 /**
  * Maps:
  * - Course mongoose doc
  * - UserCourseAccess mongoose doc (optional)
  * → CourseAccessDTO
+ *
+ * IMPORTANT DOMAIN RULES:
+ * - FREE / PAID comes from access.accessType
+ * - Time-bound vs lifetime comes from access.accessValidTill
+ * - Price does NOT decide entitlement
  */
 export function mapCourseAccessDTO(
   course: any,
   lang: Lang = "en",
   access?: any
 ): CourseAccessDTO {
-  const isFree = course.salePrice === 0;
+  const isFreeAccess = access?.accessType === "FREE";
+
+  const discountPercent =
+    !isFreeAccess && course.salePrice < course.basePrice
+      ? Math.floor(
+          ((course.basePrice - course.salePrice) / course.basePrice) * 100
+        )
+      : undefined;
 
   return {
     ...mapBaseFields(course),
@@ -38,18 +51,18 @@ export function mapCourseAccessDTO(
       sale: course.salePrice,
       final: course.salePrice,
       currency: course.currency ?? "INR",
-      discountPercent: course.salePrice < course.basePrice ? Math.floor(((course.basePrice - course.salePrice) / course.basePrice) * 100) : 0
+      discountPercent,
     },
 
     access: {
       isEnrolled: Boolean(access),
-      accessType: access?.accessType,
+      accessType: access?.accessType, // FREE or PAID
       status: access?.status,
-      validTill: access?.accessValidTill ?? null,
+      validTill: access?.accessValidTill ?? null, // allows time-bound FREE
     },
 
     flags: {
-      isFree,
+      isFree: isFreeAccess,
     },
   };
 }
