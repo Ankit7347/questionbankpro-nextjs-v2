@@ -1,6 +1,7 @@
 // src/app/api/admin/exams/[examId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Exam from "@/models/mongoose/Exam.schema";
+import dbConnect from "@/lib/mongodb";
 
 /**
  * NOTE (Next.js 15):
@@ -14,7 +15,7 @@ export async function GET(
 ) {
   // ✅ unwrap params (IMPORTANT)
   const { examId } = await ctx.params;
-
+  await dbConnect();
   const exam = await Exam.findOne({
     _id: examId,
     deleted: { $ne: true },
@@ -41,7 +42,7 @@ export async function PATCH(
   const { examId } = await ctx.params;
 
   const body = await req.json();
-
+  await dbConnect();
   const updated = await Exam.findByIdAndUpdate(
     examId,
     { $set: body },

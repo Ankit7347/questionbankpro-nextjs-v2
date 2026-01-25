@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import DataTable from "@/components/admin/DataTable";
 
 type SubExamRow = {
@@ -26,6 +26,7 @@ type ApiResponse = {
 
 export default function SubExamsPage() {
   const { examId } = useParams<{ examId: string }>();
+  const router = useRouter();
 
   const [data, setData] = useState<SubExamRow[]>([]);
   const [page, setPage] = useState(1);
@@ -66,9 +67,35 @@ export default function SubExamsPage() {
     setLoading(false);
   }
 
+  async function deleteSubExam(subExamId: string) {
+    if (!confirm("Delete this SubExam?")) return;
+
+    await fetch(`/api/admin/sub-exams/${subExamId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isDeleted: true }),
+    });
+
+    fetchSubExams();
+  }
+
   return (
     <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">SubExams</h1>
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">SubExams</h1>
+
+        <button
+          onClick={() =>
+            router.push(
+              `/admin/exams/${examId}/sub-exams/new`
+            )
+          }
+          className="border px-4 py-2 rounded"
+        >
+          + Add SubExam
+        </button>
+      </div>
 
       <DataTable<SubExamRow>
         data={data}
@@ -95,6 +122,41 @@ export default function SubExamsPage() {
           { label: "Order", accessor: "order" },
           { label: "Active", accessor: "isActive" },
         ]}
+        renderActions={(row) => (
+          <div className="flex gap-3 text-sm">
+            {/* Overview */}
+            <button
+              className="text-indigo-600"
+              onClick={() =>
+                router.push(
+                  `/admin/sub-exams/${row._id}`
+                )
+              }
+            >
+              Overview
+            </button>
+
+            {/* Edit */}
+            <button
+              className="text-blue-600"
+              onClick={() =>
+                router.push(
+                  `/admin/sub-exams/${row._id}/edit`
+                )
+              }
+            >
+              Edit
+            </button>
+
+            {/* Delete */}
+            <button
+              className="text-red-600"
+              onClick={() => deleteSubExam(row._id)}
+            >
+              Delete
+            </button>
+          </div>
+        )}
       />
     </div>
   );

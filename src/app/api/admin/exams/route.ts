@@ -1,6 +1,7 @@
 // src/app/api/admin/exams/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Exam from "@/models/mongoose/Exam.schema";
+import dbConnect from "@/lib/mongodb";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
         ],
       }
     : { deleted: { $ne: true } };
-
+  await dbConnect();
   const [data, total] = await Promise.all([
     Exam.find(query)
       .skip((page - 1) * limit)

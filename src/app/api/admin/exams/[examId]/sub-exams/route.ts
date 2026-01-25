@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import SubExam from "@/models/mongoose/SubExam.schema";
+import dbConnect from "@/lib/mongodb";
 
 /**
  * GET → List SubExams under Exam
@@ -16,7 +17,7 @@ export async function GET(
   const page = Number(searchParams.get("page") || 1);
   const limit = Number(searchParams.get("limit") || 10);
   const search = searchParams.get("search") || "";
-
+  await dbConnect();
   const query: any = {
     examId,
     isDeleted: { $ne: true },
@@ -51,7 +52,7 @@ export async function POST(
 ) {
   const { examId } = await ctx.params;
   const body = await req.json();
-
+  await dbConnect();
   const subExam = await SubExam.create({
     ...body,
     examId,
