@@ -3,24 +3,16 @@
 
 import { CourseUI } from "@/dto/course.ui.dto";
 
-/**
- * CourseCard
- * ==========
- *
- * STATE-DRIVEN UI COMPONENT
- *
- * Rules:
- * - NO `mode`
- * - NO enrollment guessing
- * - CTA decided ONLY by `course.access.status`
- * - Pure render component
- */
 export default function CourseCard({ course }: { course: CourseUI }) {
-  const { name, type, price, access, flags, examSlug, subExamSlug, slug } =
-    course;
+  const { name, type, price, access, flags, examSlug, subExamSlug, slug } = course;
+
+  // Visual status config
+  const isExpired = access.status === "EXPIRED";
+  const isExpiring = access.status === "EXPIRING";
+  const isActive = access.status === "ACTIVE" || access.status === "LIFETIME";
 
   /* -----------------------------
-     CTA Resolver (UI-only)
+     CTA Resolver (Logic remains yours)
   ------------------------------ */
   function renderCTA() {
     switch (access.status) {
@@ -29,7 +21,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         return (
           <a
             href={`/exams/${examSlug}/${subExamSlug}/study/${slug}`}
-            className="flex w-full items-center justify-center rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-black dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700 shadow-sm shadow-blue-200"
           >
             Go to Course
           </a>
@@ -37,14 +29,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
 
       case "EXPIRING":
         return (
-          <button className="w-full rounded-xl bg-yellow-500 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-600">
+          <button className="w-full rounded-xl bg-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-amber-600 transition shadow-sm shadow-amber-200">
             Renew Access
           </button>
         );
 
       case "EXPIRED":
         return (
-          <div className="w-full rounded-xl bg-gray-200 px-4 py-3 text-center text-sm font-bold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+          <div className="w-full rounded-xl bg-gray-100 px-4 py-3 text-center text-sm font-bold text-gray-500 border border-gray-200">
             Expired
           </div>
         );
@@ -52,11 +44,11 @@ export default function CourseCard({ course }: { course: CourseUI }) {
       case "NONE":
       default:
         return flags.isFree ? (
-          <button className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700">
+          <button className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 transition">
             Enroll Free
           </button>
         ) : (
-          <button className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-700">
+          <button className="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-black transition">
             Buy Now
           </button>
         );
@@ -64,65 +56,67 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   }
 
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-      {/* -----------------------------
-          Top Content
-      ------------------------------ */}
-      <div>
-        <div className="mb-2 flex items-start justify-between">
-          <h3 className="line-clamp-2 text-lg font-bold text-gray-900 dark:text-white">
+    <div 
+      className={`group relative flex flex-col h-full rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
+        ${isExpired ? "opacity-75 grayscale-[0.5] border-gray-200" : "border-gray-100 shadow-sm"}
+        ${isExpiring ? "border-l-4 border-l-amber-400" : ""}
+        ${isActive ? "border-l-4 border-l-blue-500" : ""}
+      `}
+    >
+      {/* 1. Header & Tags */}
+      <div className="mb-3 flex items-start justify-between gap-4">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="inline-block rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+              {type}
+            </span>
+            {flags.isFree && (
+              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-100">
+                FREE
+              </span>
+            )}
+          </div>
+          <h3 className="line-clamp-2 text-lg font-bold leading-tight text-gray-900 group-hover:text-blue-600 transition-colors">
             {name}
           </h3>
-
-          {flags.isFree && (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              FREE
-            </span>
-          )}
         </div>
+      </div>
 
-        <div className="mb-4 inline-block rounded bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-          {type} COURSE
-        </div>
-
-        {/* -----------------------------
-            Pricing
-        ------------------------------ */}
-        <div className="mb-6">
-          {flags.isFree ? (
-            <div>
-              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                ₹0
-              </div>
-              <div className="text-xs text-gray-400">
-                Free Access
-                {access.expiresAt && " (Limited Time)"}
-              </div>
-            </div>
-          ) : (
-            price && (
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black text-gray-900 dark:text-white">
+      {/* 2. Pricing/Status Info (Pushed to middle) */}
+      <div className="flex-grow flex flex-col justify-end mb-5">
+        {!isExpired && (
+          <div className="mt-2">
+            {flags.isFree ? (
+              <div className="text-xl font-black text-emerald-600">₹0</div>
+            ) : (
+              price && (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-black text-gray-900">
                     ₹{price.final.toLocaleString()}
                   </span>
-
                   {price.discountPercent && (
-                    <span className="rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-bold text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                    <span className="text-xs font-bold text-red-500">
                       {price.discountPercent}% OFF
                     </span>
                   )}
                 </div>
-              </div>
-            )
-          )}
-        </div>
+              )
+            )}
+          </div>
+        )}
+        
+        {/* Status Text */}
+        {access.expiresAt && (
+          <p className={`mt-1 text-[11px] font-medium ${isExpiring ? "text-amber-600" : "text-gray-400"}`}>
+            {isExpired ? "Access ended" : `Expires: ${new Date(access.expiresAt).toLocaleDateString()}`}
+          </p>
+        )}
       </div>
 
-      {/* -----------------------------
-          Action Section
-      ------------------------------ */}
-      <div className="mt-4">{renderCTA()}</div>
+      {/* 3. Action (Pinned to bottom) */}
+      <div className="mt-auto">
+        {renderCTA()}
+      </div>
     </div>
   );
 }
