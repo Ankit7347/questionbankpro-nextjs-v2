@@ -54,7 +54,7 @@ export async function fetchDashboardCourses(
   }>
 > {
   try {
-    const userId = '45606d9c-0015-4b86-b634-518967c7f7ce';
+    const userId = '69738bce5ccf5655b013cfba';
 
     if (!userId) {
       return {
@@ -65,13 +65,9 @@ export async function fetchDashboardCourses(
       };
     }
 
-    /* --------------------------------
-       1. Fetch enrolled courses
-    --------------------------------- */
+    // 1. Fetch enrolled courses
     const enrolledRes = await fetch("/api/user/courses", {
-      headers: {
-        "x-user-id": userId,
-      },
+      headers: { "x-user-id": userId },
     });
 
     if (!enrolledRes.ok) {
@@ -86,19 +82,12 @@ export async function fetchDashboardCourses(
     const enrolledJson = await enrolledRes.json();
     const enrolled: CourseUI[] = enrolledJson.data ?? [];
 
-    /* --------------------------------
-       2. Fetch available courses
-    --------------------------------- */
+    // 2. Fetch explore courses
     const exploreRes = await fetch(
       `/api/course/by-subexam?subExamSlug=${subExamSlug}`,
-      {
-        headers: {
-          "x-user-id": userId, // optional, future-proof
-        },
-      }
+      { headers: { "x-user-id": userId } }
     );
 
-    
     if (!exploreRes.ok) {
       return {
         success: false,
@@ -110,12 +99,21 @@ export async function fetchDashboardCourses(
 
     const exploreJson = await exploreRes.json();
     const explore: CourseUI[] = exploreJson.data ?? [];
-    
+
+    // =====================================
+    // FIX: Remove duplicates from explore
+    // =====================================
+    const enrolledIds = new Set(enrolled.map((c) => c.id));
+    const filteredExplore = explore.filter(
+      (c) => !enrolledIds.has(c.id)
+    );
+
+    // FINAL return
     return {
       success: true,
       data: {
         enrolled,
-        explore,
+        explore: filteredExplore,
       },
       error: null,
       statusCode: 200,
@@ -124,11 +122,9 @@ export async function fetchDashboardCourses(
     return {
       success: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Network error occurred",
+      error: error instanceof Error ? error.message : "Network error occurred",
       statusCode: 500,
     };
   }
 }
+

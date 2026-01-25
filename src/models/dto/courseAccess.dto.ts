@@ -24,6 +24,7 @@ export interface CourseAccessDTO extends BaseDTO {
     sale: number;
     final: number;
     currency: string;
+    discountPercent: number;
   };
 
   access: {

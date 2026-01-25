@@ -26,7 +26,7 @@ export function mapCourseAccessDTO(
 
   return {
     ...mapBaseFields(course),
-    
+
     id: course._id.toString(),
 
     name: resolveText(course.name, lang),
@@ -38,6 +38,7 @@ export function mapCourseAccessDTO(
       sale: course.salePrice,
       final: course.salePrice,
       currency: course.currency ?? "INR",
+      discountPercent: course.salePrice < course.basePrice ? Math.floor(((course.basePrice - course.salePrice) / course.basePrice) * 100) : 0
     },
 
     access: {

@@ -2,12 +2,12 @@
 import React from "react";
 import { CourseUI } from "@/dto/course.ui.dto";
 
-export default function CourseCard({ course }: { course: CourseUI }) {
+export default function CourseCard({ course,mode }: { course: CourseUI, mode: "enrolled" | "explore"; }) {
   const { name, type, price, access, flags } = course;
 
   return (
     <div className="group flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-500/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-      
+
       {/* Top Content */}
       <div>
         <div className="mb-2 flex items-start justify-between gap-2">
@@ -62,22 +62,35 @@ export default function CourseCard({ course }: { course: CourseUI }) {
 
       {/* Action Section */}
       <div className="mt-4">
-        {access.isEnrolled ? (
-          <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-black active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-gray-200">
+        {mode === "enrolled" ? (
+          /* ======================
+             ENROLLED → GO TO COURSE
+             ====================== */
+          <a
+            href={`/exams/${course.examSlug}/${course.subExamSlug}/study/${course.slug}`}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-black active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-gray-200"
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Go to Course
-          </button>
+          </a>
         ) : flags.isFree ? (
+          /* ======================
+             EXPLORE → FREE COURSE
+             ====================== */
           <button className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-700 active:scale-[0.98]">
             Enroll Now
           </button>
         ) : (
+          /* ======================
+             EXPLORE → PAID COURSE
+             ====================== */
           <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] shadow-sm shadow-blue-200 dark:shadow-none">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             Buy Now
           </button>
         )}
       </div>
+
     </div>
   );
 }

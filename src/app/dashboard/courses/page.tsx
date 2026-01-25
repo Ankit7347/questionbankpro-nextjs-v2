@@ -63,7 +63,7 @@ export default function CoursesPage() {
           {enrolled.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {enrolled.map((course) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard key={course.id} course={course} mode="enrolled" />
               ))}
             </div>
           ) : (
@@ -84,7 +84,7 @@ export default function CoursesPage() {
           {explore.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {explore.map((course) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard key={course.id} course={course} mode="explore" />
               ))}
             </div>
           ) : (

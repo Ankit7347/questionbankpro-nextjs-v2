@@ -49,4 +49,6 @@ export interface CourseUI {
     isNew?: boolean;
     isPopular?: boolean;
   };
+  examSlug: string;
+  subExamSlug:string;
 }
