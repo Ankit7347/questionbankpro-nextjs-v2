@@ -65,7 +65,11 @@ const CourseSchema = new Schema(
       default: true,
       index: true,
     },
-
+    isGloballyFree: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     visibility: {
       type: String,
       enum: ["PUBLIC", "PRIVATE"],

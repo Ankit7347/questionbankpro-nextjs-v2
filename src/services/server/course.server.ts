@@ -196,8 +196,8 @@ import UserCourseAccess from "@/models/mongoose/UserCourseAccess.schema";
 import { DashboardCoursesDTO } from "@/models/dto/course.dto";
 
 export async function getDashboardCourses(): Promise<DashboardCoursesDTO> {
-  const userId= "69738bce5ccf5655b013cfba";
-  const subExamSlug ="gate-2026-cs-it";
+  const userId = "69738bce5ccf5655b013cfba";
+  const subExamSlug = "gate-2026-cs-it";
   if (!userId || !subExamSlug) {
     throw BadRequest("Invalid request");
   }
@@ -276,16 +276,26 @@ export async function getDashboardCourses(): Promise<DashboardCoursesDTO> {
 
     // ✅ ONLY mapper output
     const dto = mapCourseAccessDTO(course, lang, access);
+    const isWithinFreeWindow =
+      (!course.validFrom || course.validFrom <= now) &&
+      (!course.validTo || course.validTo >= now);
+
+    const isCatalogFree =
+      course.isGloballyFree === true && isWithinFreeWindow;
 
     /* ----------------------------
        Explore (not enrolled)
     ----------------------------- */
     if (!access) {
-      dto.flags.isFree
-        ? result.explore.free.push(dto)
-        : result.explore.paid.push(dto);
+      if (isCatalogFree) {
+        dto.flags.isFree = true; // catalog-level free
+        result.explore.free.push(dto);
+      } else {
+        result.explore.paid.push(dto);
+      }
       continue;
     }
+
 
     /* ----------------------------
        Lifetime / Free
