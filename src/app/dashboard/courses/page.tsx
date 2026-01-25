@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CourseCard from "@/components/course/courseCard";
+import CourseCard from "@/components/course/CourseCard";
 import { CourseUI } from "@/dto/course.ui.dto";
 import { fetchDashboardCourses } from "@/services/client/course.client";
 
