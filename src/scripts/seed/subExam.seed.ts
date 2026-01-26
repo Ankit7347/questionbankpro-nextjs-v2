@@ -4,75 +4,104 @@ import { initSeed, closeSeed } from "./_helpers";
 import Exam from "../../models/mongoose/Exam.schema";
 import SubExam from "../../models/mongoose/SubExam.schema";
 
-interface ISubExamSeed {
+interface ISchoolItem {
   name: string;
   slug: string;
   order: number;
-  stream?: string;
+  class: number;
 }
 
-const SUB_EXAMS = [
+interface ICompetitiveItem {
+  name: string;
+  slug: string;
+  order: number;
+  stream: string;
+}
+
+type SubExamBlock =
+  | {
+    examSlug: string;
+    type: "school";
+    items: ISchoolItem[];
+  }
+  | {
+    examSlug: string;
+    type: "competitive";
+    year: number;
+    items: ICompetitiveItem[];
+  }
+  | {
+    examSlug: string;
+    type: "program";
+    items: ICompetitiveItem[];
+  }
+  ;
+const SUB_EXAMS: SubExamBlock[] = [
+  /* ------------------------------------------------------------------ */
+  /* SCHOOL BOARDS                                                       */
+  /* ------------------------------------------------------------------ */
   {
     examSlug: "cbse-board",
-    year: 2026,
+    type: "school",
     items: [
-      { name: "Class 6", slug: "cbse-class-6", order: 1, stream: "6" },
-      { name: "Class 7", slug: "cbse-class-7", order: 2, stream: "7" },
-      { name: "Class 8", slug: "cbse-class-8", order: 3, stream: "8" },
-      { name: "Class 9", slug: "cbse-class-9", order: 4, stream: "9" },
-      { name: "Class 10", slug: "cbse-class-10", order: 5, stream: "10" },
-      { name: "Class 11", slug: "cbse-class-11", order: 6, stream: "11" },
-      { name: "Class 12", slug: "cbse-class-12", order: 7, stream: "12" },
+      { name: "Class 6", slug: "cbse-class-6", order: 1, class: 6 },
+      { name: "Class 7", slug: "cbse-class-7", order: 2, class: 7 },
+      { name: "Class 8", slug: "cbse-class-8", order: 3, class: 8 },
+      { name: "Class 9", slug: "cbse-class-9", order: 4, class: 9 },
+      { name: "Class 10", slug: "cbse-class-10", order: 5, class: 10 },
+      { name: "Class 11", slug: "cbse-class-11", order: 6, class: 11 },
+      { name: "Class 12", slug: "cbse-class-12", order: 7, class: 12 },
     ],
   },
   {
     examSlug: "icse-board",
-    year: 2026,
+    type: "school",
     items: [
-      { name: "Class 6", slug: "icse-class-6", order: 1, stream: "6" },
-      { name: "Class 7", slug: "icse-class-7", order: 2, stream: "7" },
-      { name: "Class 8", slug: "icse-class-8", order: 3, stream: "8" },
-      { name: "Class 9", slug: "icse-class-9", order: 4, stream: "9" },
-      { name: "Class 10", slug: "icse-class-10", order: 5, stream: "10" },
+      { name: "Class 6", slug: "icse-class-6", order: 1, class: 6 },
+      { name: "Class 7", slug: "icse-class-7", order: 2, class: 7 },
+      { name: "Class 8", slug: "icse-class-8", order: 3, class: 8 },
+      { name: "Class 9", slug: "icse-class-9", order: 4, class: 9 },
+      { name: "Class 10", slug: "icse-class-10", order: 5, class: 10 },
     ],
   },
   {
     examSlug: "isc-board",
-    year: 2026,
+    type: "school",
     items: [
-      { name: "Class 11", slug: "isc-class-11", order: 1, stream: "11" },
-      { name: "Class 12", slug: "isc-class-12", order: 2, stream: "12" },
+      { name: "Class 11", slug: "isc-class-11", order: 1, class: 11 },
+      { name: "Class 12", slug: "isc-class-12", order: 2, class: 12 },
     ],
   },
   {
     examSlug: "state-board",
-    year: 2026,
+    type: "school",
     items: [
-      { name: "Class 6", slug: "state-board-class-6", order: 1, stream: "6" },
-      { name: "Class 7", slug: "state-board-class-7", order: 2, stream: "7" },
-      { name: "Class 8", slug: "state-board-class-8", order: 3, stream: "8" },
-      { name: "Class 9", slug: "state-board-class-9", order: 4, stream: "9" },
-      { name: "Class 10", slug: "state-board-class-10", order: 5, stream: "10" },
-      { name: "Class 11", slug: "state-board-class-11", order: 6, stream: "11" },
-      { name: "Class 12", slug: "state-board-class-12", order: 7, stream: "12" },
+      { name: "Class 6", slug: "state-board-class-6", order: 1, class: 6 },
+      { name: "Class 7", slug: "state-board-class-7", order: 2, class: 7 },
+      { name: "Class 8", slug: "state-board-class-8", order: 3, class: 8 },
+      { name: "Class 9", slug: "state-board-class-9", order: 4, class: 9 },
+      { name: "Class 10", slug: "state-board-class-10", order: 5, class: 10 },
+      { name: "Class 11", slug: "state-board-class-11", order: 6, class: 11 },
+      { name: "Class 12", slug: "state-board-class-12", order: 7, class: 12 },
     ],
-  }, {
+  },
+  {
     examSlug: "up-board",
-    year: 2026,
+    type: "school",
     items: [
-      { name: "Class 6", slug: "up-board-class-6", order: 1, stream: "6" },
-      { name: "Class 7", slug: "up-board-class-7", order: 2, stream: "7" },
-      { name: "Class 8", slug: "up-board-class-8", order: 3, stream: "8" },
-      { name: "Class 9", slug: "up-board-class-9", order: 4, stream: "9" },
-      { name: "Class 10", slug: "up-board-class-10", order: 5, stream: "10" },
-      { name: "Class 11", slug: "up-board-class-11", order: 6, stream: "11" },
-      { name: "Class 12", slug: "up-board-class-12", order: 7, stream: "12" },
+      { name: "Class 6", slug: "up-board-class-6", order: 1, class: 6 },
+      { name: "Class 7", slug: "up-board-class-7", order: 2, class: 7 },
+      { name: "Class 8", slug: "up-board-class-8", order: 3, class: 8 },
+      { name: "Class 9", slug: "up-board-class-9", order: 4, class: 9 },
+      { name: "Class 10", slug: "up-board-class-10", order: 5, class: 10 },
+      { name: "Class 11", slug: "up-board-class-11", order: 6, class: 11 },
+      { name: "Class 12", slug: "up-board-class-12", order: 7, class: 12 },
     ],
   },
 
   {
     "examSlug": "undergraduate-programs",
-    "year": 2026,
+    type: "program",
     "items": [
       { "name": "B.Tech Computer Science", "slug": "btech-cs", "order": 1, "stream": "Engineering" },
       { "name": "B.Tech Mechanical", "slug": "btech-me", "order": 2, "stream": "Engineering" },
@@ -92,7 +121,7 @@ const SUB_EXAMS = [
   },
   {
     "examSlug": "postgraduate-programs",
-    "year": 2026,
+    type: "program",
     "items": [
       { "name": "M.Tech Computer Science", "slug": "mtech-cs", "order": 1, "stream": "Engineering" },
       { "name": "M.Tech Structural Engg.", "slug": "mtech-structural", "order": 2, "stream": "Engineering" },
@@ -113,7 +142,7 @@ const SUB_EXAMS = [
 
   {
     examSlug: "engineering-entrance",
-    year: 2026,
+    type: "program",
     items: [
       { name: "JEE Main", slug: "jee-main", order: 1, stream: "Engineering" },
       { name: "JEE Advanced", slug: "jee-advanced", order: 2, stream: "Engineering" },
@@ -123,7 +152,7 @@ const SUB_EXAMS = [
 
   {
     examSlug: "medical-entrance",
-    year: 2026,
+    type: "program",
     items: [
       { name: "NEET UG", slug: "neet-ug", order: 1, stream: "Medical" },
       { name: "AIIMS", slug: "aiims", order: 2, stream: "Medical" },
@@ -132,7 +161,7 @@ const SUB_EXAMS = [
 
   {
     examSlug: "banking-exams",
-    year: 2026,
+    type: "program",
     items: [
       { name: "IBPS PO", slug: "ibps-po", order: 1, stream: "Banking" },
       { name: "SBI PO", slug: "sbi-po", order: 2, stream: "Banking" },
@@ -141,6 +170,7 @@ const SUB_EXAMS = [
 
   {
     examSlug: "gate-exam",
+    type: "competitive",
     year: 2026,
     items: [
       {
@@ -164,41 +194,81 @@ async function seedSubExams() {
   await initSeed();
 
   for (const block of SUB_EXAMS) {
-    const exam = await Exam.findOne({
-      slug: block.examSlug,
-      isDeleted: false,
-    });
-
+    const exam = await Exam.findOne({ slug: block.examSlug, isDeleted: false });
     if (!exam) {
       console.warn(`⚠️ Exam not found: ${block.examSlug}`);
       continue;
     }
 
-    for (const item of block.items as ISubExamSeed[]) {
-      const exists = await SubExam.findOne({ slug: item.slug });
-      if (exists) {
-        console.log(`⏭️ Skipping: ${item.slug}`);
-        continue;
+    // SCHOOL
+    if (block.type === "school") {
+      for (const item of block.items) {
+        const exists = await SubExam.findOne({ slug: item.slug });
+        if (exists) continue;
+
+        await SubExam.create({
+          examId: exam._id,
+          type: "school",
+          class: item.class,
+          name: { en: item.name },
+          slug: item.slug,
+          order: item.order,
+          isActive: true,
+          isVisibleOnCard: true,
+        });
+
+        console.log(`✅ Created SubExam: ${item.slug}`);
       }
+    }
 
-      await SubExam.create({
-        examId: exam._id,
-        name: { en: item.name },
-        slug: item.slug,
-        year: block.year,
-        stream: item.stream ?? "General",
-        order: item.order,
-        isActive: true,
-        isVisibleOnCard: true
-      });
+    // COMPETITIVE (GATE / JEE / NEET / BANKING)
+    if (block.type === "competitive") {
+      for (const item of block.items) {
+        const exists = await SubExam.findOne({ slug: item.slug });
+        if (exists) continue;
 
-      console.log(`✅ Created SubExam: ${item.slug}`);
+        await SubExam.create({
+          examId: exam._id,
+          type: "competitive",
+          year: block.year,
+          stream: item.stream,
+          name: { en: item.name },
+          slug: item.slug,
+          order: item.order,
+          isActive: true,
+          isVisibleOnCard: true,
+        });
+
+        console.log(`✅ Created SubExam: ${item.slug}`);
+      }
+    }
+
+    // PROGRAM (UG / PG)
+    if (block.type === "program") {
+      for (const item of block.items) {
+        const exists = await SubExam.findOne({ slug: item.slug });
+        if (exists) continue;
+
+        await SubExam.create({
+          examId: exam._id,
+          type: "program",
+          stream: item.stream,
+          name: { en: item.name },
+          slug: item.slug,
+          order: item.order,
+          isActive: true,
+          isVisibleOnCard: true,
+        });
+
+        console.log(`✅ Created SubExam: ${item.slug}`);
+      }
     }
   }
 
   await closeSeed();
   console.log("🏁 SubExam seeding completed");
 }
+
 
 seedSubExams().catch((err) => {
   console.error("❌ SubExam seeding failed", err);

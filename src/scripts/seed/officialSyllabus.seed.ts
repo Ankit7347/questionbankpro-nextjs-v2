@@ -31,16 +31,27 @@ async function seedOfficialSyllabuses() {
       continue;
     }
 
-    // 3. Create default official syllabus
-    await OfficialSyllabus.create({
+    // 3. Create default official syllabus (type-aware)
+    const syllabusPayload: any = {
       subExamId: subExam._id,
-      year: subExam.year,
       version: 1,
-      validFrom: subExam.year,
-      validTo: null,
       isActive: true,
       isDeleted: false,
-    });
+    };
+
+    if (subExam.type === "competitive") {
+      syllabusPayload.year = subExam.year;
+      syllabusPayload.validFrom = subExam.year;
+      syllabusPayload.validTo = null;
+    } else {
+      // school + program
+      syllabusPayload.year = 2026;        // semantic placeholder
+      syllabusPayload.validFrom = 2026;   // means "always valid"
+      syllabusPayload.validTo = null;
+    }
+
+    await OfficialSyllabus.create(syllabusPayload);
+
 
     createdCount++;
   }
