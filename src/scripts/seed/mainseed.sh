@@ -4,5 +4,6 @@ npx tsx educationLevel.seed.ts
 npx tsx exam.seed.ts 
 npx tsx subExam.seed.ts 
 npx tsx officialSyllabus.seed.ts
-npx tsx gate-2026-cs-it-syllabus.seed
-npx tsx course-gate-2026-cs-it.seed
+npx tsx gate-2026-cs-it-syllabus.seed.ts
+npx tsx course-gate-2026-cs-it.seed.ts
+npx tsx geolocationstatesdistricts.seed.ts

@@ -142,7 +142,8 @@ const SUB_EXAMS: SubExamBlock[] = [
 
   {
     examSlug: "engineering-entrance",
-    type: "program",
+    type: "competitive",
+    year:2026,
     items: [
       { name: "JEE Main", slug: "jee-main", order: 1, stream: "Engineering" },
       { name: "JEE Advanced", slug: "jee-advanced", order: 2, stream: "Engineering" },
@@ -152,7 +153,8 @@ const SUB_EXAMS: SubExamBlock[] = [
 
   {
     examSlug: "medical-entrance",
-    type: "program",
+    type: "competitive",
+    year:2026,
     items: [
       { name: "NEET UG", slug: "neet-ug", order: 1, stream: "Medical" },
       { name: "AIIMS", slug: "aiims", order: 2, stream: "Medical" },
@@ -161,7 +163,8 @@ const SUB_EXAMS: SubExamBlock[] = [
 
   {
     examSlug: "banking-exams",
-    type: "program",
+    type: "competitive",
+    year:2026,
     items: [
       { name: "IBPS PO", slug: "ibps-po", order: 1, stream: "Banking" },
       { name: "SBI PO", slug: "sbi-po", order: 2, stream: "Banking" },

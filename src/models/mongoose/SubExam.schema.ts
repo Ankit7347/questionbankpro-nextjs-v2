@@ -106,7 +106,7 @@ SubExamSchema.index(
 
 // COMPETITIVE → one (year + stream) per exam
 SubExamSchema.index(
-  { examId: 1, year: 1, stream: 1 },
+  { examId: 1, year: 1,slug:1, stream: 1 },
   {
     unique: true,
     partialFilterExpression: { type: "competitive" },

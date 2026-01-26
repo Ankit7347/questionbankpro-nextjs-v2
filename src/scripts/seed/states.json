@@ -1,0 +1,254 @@
+[
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee2b9" },
+    "stateName": "Andaman and Nicobar Islands",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.200Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.210Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee2bd" },
+    "stateName": "Andhra Pradesh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.291Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.291Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee2d8" },
+    "stateName": "Arunachal Pradesh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.371Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.371Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee2f2" },
+    "stateName": "Assam",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.440Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.440Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee315" },
+    "stateName": "Bihar",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.519Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.519Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee33c" },
+    "stateName": "Chandigarh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.585Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.585Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee33e" },
+    "stateName": "Chhattisgarh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.670Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.670Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee35b" },
+    "stateName": "Dadra and Nagar Haveli and Daman and Diu",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.744Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.744Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee35f" },
+    "stateName": "Delhi",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.820Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.820Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee36b" },
+    "stateName": "Goa",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.892Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.892Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85c5fc474dc44cee36e" },
+    "stateName": "Gujarat",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:28.954Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:28.954Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee390" },
+    "stateName": "Haryana",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.081Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.081Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee3a7" },
+    "stateName": "Himachal Pradesh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.149Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.149Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee3b4" },
+    "stateName": "Jammu and Kashmir",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.234Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.234Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee3c9" },
+    "stateName": "Jharkhand",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.317Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.317Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee3e2" },
+    "stateName": "Karnataka",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.380Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.380Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee402" },
+    "stateName": "Kerala",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.444Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.444Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee411" },
+    "stateName": "Ladakh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.521Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.521Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee414" },
+    "stateName": "Lakshadweep",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.583Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.583Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee416" },
+    "stateName": "Madhya Pradesh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.663Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.663Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee44b" },
+    "stateName": "Maharashtra",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.749Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.749Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee470" },
+    "stateName": "Manipur",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.827Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.827Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee481" },
+    "stateName": "Meghalaya",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.899Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.899Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85d5fc474dc44cee48e" },
+    "stateName": "Mizoram",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:29.963Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:29.963Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee49a" },
+    "stateName": "Nagaland",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.049Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.049Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee4a7" },
+    "stateName": "Odisha",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.122Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.122Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee4c6" },
+    "stateName": "Puducherry",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.206Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.206Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee4cb" },
+    "stateName": "Punjab",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.281Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.281Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee4e3" },
+    "stateName": "Rajasthan",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.349Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.349Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee508" },
+    "stateName": "Sikkim",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.438Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.438Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee50f" },
+    "stateName": "Tamil Nadu",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.501Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.501Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee536" },
+    "stateName": "Telangana",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.582Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.582Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee558" },
+    "stateName": "Tripura",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.649Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.649Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee561" },
+    "stateName": "Uttar Pradesh",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.729Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.729Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee5ad" },
+    "stateName": "Uttarakhand",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.804Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.804Z" }
+  },
+  {
+    "_id": { "$oid": "67b9f85e5fc474dc44cee5bb" },
+    "stateName": "West Bengal",
+    "isDeleted": false,
+    "createdAt": { "$date": "2025-02-22T16:16:30.858Z" },
+    "updatedAt": { "$date": "2025-02-22T16:16:30.858Z" }
+  }
+]
