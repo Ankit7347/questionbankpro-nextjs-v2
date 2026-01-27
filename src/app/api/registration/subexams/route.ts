@@ -53,6 +53,7 @@ export async function GET() {
         board: se.type === "school" ? exam.slug : null,
         class: se.type === "school" ? se.class : null,
         level, // Returns "ug", "pg", or null
+        subExamSlug:se.slug
       };
     }).filter(Boolean); // Filter out any null entries from safety check
 

@@ -9,13 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label"; // Assuming you have a Label component
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { registerUser } from "@/services/client/register.client";
 
-/* ================================
-   Types (Unchanged)
-================================ */
 interface RegistrationSubExam {
   _id: string;
   label: string;
@@ -23,6 +20,7 @@ interface RegistrationSubExam {
   board?: string | null;
   class?: number | null;
   level?: "ug" | "pg" | null;
+  subExamSlug: string;
 }
 interface GeoState { id: string; stateName: string; }
 interface GeoDistrict { id: string; districtName: string; }
@@ -108,32 +106,104 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.password.length < 6) return toast.error("Password too short");
 
-    // 1. Find the descriptive names based on the selected IDs
+    // 1. Basic Validation
+    /* =========================
+       VALIDATION LOGIC
+    ========================== */
+    if (!form.name.trim()) return toast.error("Name is required");
+    if (!form.email.trim()) return toast.error("Email is required");
+    if (!form.phone.trim()) return toast.error("Phone number is required");
+    if (!form.geolocationStateId) return toast.error("Please select a state");
+    if (!form.geolocationDistrictId) return toast.error("Please select a district");
+    
+    // 2. Category & Exam Validation
+    if (!selectedCategory) return toast.error("Please select an education category");
+    
+    if (selectedCategory === "school" && (!selectedBoard || !selectedClass)) {
+      return toast.error("Please select your Board and Class");
+    }
+    if (selectedCategory === "program" && !selectedLevel) {
+      return toast.error("Please select your degree level (UG/PG)");
+    }
+    if (!form.subExamId) {
+      return toast.error(`Please select a specific ${selectedCategory === 'competitive' ? 'exam' : 'course'}`);
+    }
+
+    // 3. Password Validation
+    if (form.password.length < 6) return toast.error("Password must be at least 6 characters");
+
     const selectedState = states.find(s => s.id === form.geolocationStateId);
     const selectedDistrict = districts.find(d => d.id === form.geolocationDistrictId);
     const selectedSubExam = subExams.find(se => se._id === form.subExamId);
 
-    // 2. Construct the data object to match RegisterFormData
+    if (!selectedSubExam) return toast.error("Invalid selection");
+
+    const examType = selectedSubExam.type;
+
+    // educationLevel
+    let educationLevel: "school" | "ug" | "pg";
+    if (examType === "school") {
+      educationLevel = "school";
+    } else if (examType === "program") {
+      educationLevel = selectedSubExam.level as "ug" | "pg";
+    } else {
+      // competitive
+      educationLevel = "ug"; // default, stable choice
+    }
+
+    // className
+    let className = "";
+    if (examType === "school") {
+      className = `${selectedSubExam.board?.toUpperCase()} Class ${selectedSubExam.class}`;
+    } else if (examType === "program") {
+      className = selectedSubExam.label; // e.g. BSc Mathematics
+    } else {
+      className = "Competitive";
+    }
+
+    // subExamSlug (stable, required)
+    const subExamSlug = selectedSubExam.subExamSlug
+    /* =========================
+       FINAL SUBMISSION PAYLOAD
+       (100% SCHEMA COMPLIANT)
+    ========================== */
+
     const submissionData = {
-      ...form,
-      stateName: selectedState?.stateName || "",
-      districtName: selectedDistrict?.districtName || "",
-      className: selectedSubExam?.label || "", // Assuming label is the name you want
-      competition: form.subExamId, // Putting the ID here as requested
+      // basic
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+
+      // location
+      geolocationStateId: form.geolocationStateId,
+      geolocationDistrictId: form.geolocationDistrictId,
+      stateName: selectedState!.stateName,
+      districtName: selectedDistrict!.districtName,
+
+      // education
+      educationLevel,
+      className,
+      courseName: selectedSubExam.label,
+      examType,
+
+      // subexam
+      subExamId: selectedSubExam._id,
+      subExamSlug,
+
     };
 
     setRegisterLoading(true);
-    // 3. Pass the new object instead of just 'form'
     const success = await registerUser(submissionData);
+    setRegisterLoading(false);
 
     if (success) router.push("/login");
-    setRegisterLoading(false);
   };
 
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50 py-12 px-4">
+    <div className="flex items-center justify-center bg-slate-50 py-12 px-4">
       <div className="w-full max-w-md bg-white shadow-2xl border border-slate-100 rounded-2xl p-8">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-extrabold text-slate-900">Create Account</h2>
@@ -144,20 +214,20 @@ export default function RegisterPage() {
           {/* Basic Info Group */}
           <div className="space-y-3">
             <input
-              placeholder="Full Name"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Full Name *"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             />
             <input
-              placeholder="Email Address"
+              placeholder="Email Address *"
               type="email"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
             />
             <input
-              placeholder="Phone Number"
+              placeholder="Phone Number *"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={form.phone}
               onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
@@ -168,39 +238,34 @@ export default function RegisterPage() {
 
           {/* Location Group */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Select
-                value={form.geolocationStateId}
-                onValueChange={(v) => setForm((p) => ({ ...p, geolocationStateId: v, geolocationDistrictId: "" }))}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="State" />
-                </SelectTrigger>
-                <SelectContent>
-                  {states.map((s) => <SelectItem key={s.id} value={s.id}>{s.stateName}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={form.geolocationStateId}
+              onValueChange={(v) => setForm((p) => ({ ...p, geolocationStateId: v, geolocationDistrictId: "" }))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="State *" />
+              </SelectTrigger>
+              <SelectContent>
+                {states.map((s) => <SelectItem key={s.id} value={s.id}>{s.stateName}</SelectItem>)}
+              </SelectContent>
+            </Select>
 
-            <div className="space-y-1.5">
-              <Select
-                value={form.geolocationDistrictId}
-                onValueChange={(v) => setForm((p) => ({ ...p, geolocationDistrictId: v }))}
-                disabled={!form.geolocationStateId}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="District" />
-                </SelectTrigger>
-                <SelectContent>
-                  {districts.map((d) => <SelectItem key={d.id} value={d.id}>{d.districtName}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={form.geolocationDistrictId}
+              onValueChange={(v) => setForm((p) => ({ ...p, geolocationDistrictId: v }))}
+              disabled={!form.geolocationStateId}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="District *" />
+              </SelectTrigger>
+              <SelectContent>
+                {districts.map((d) => <SelectItem key={d.id} value={d.id}>{d.districtName}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Exam Selection Group - Fixed height container to prevent jumps */}
           <div className="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
-            <Label className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Education Details</Label>
+            <Label className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Education Details *</Label>
 
             <Select
               value={selectedCategory}
@@ -228,7 +293,7 @@ export default function RegisterPage() {
                 <>
                   <Select value={selectedBoard} onValueChange={setSelectedBoard}>
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select Board" />
+                      <SelectValue placeholder="Select Board *" />
                     </SelectTrigger>
                     <SelectContent>
                       {[...new Set(subExams.filter((s) => s.type === "school").map((s) => s.board))].map(
@@ -240,7 +305,7 @@ export default function RegisterPage() {
                   {selectedBoard && (
                     <Select value={String(selectedClass)} onValueChange={(v) => setSelectedClass(Number(v))}>
                       <SelectTrigger className="bg-white animate-in fade-in slide-in-from-top-1">
-                        <SelectValue placeholder="Select Class" />
+                        <SelectValue placeholder="Select Class *" />
                       </SelectTrigger>
                       <SelectContent>
                         {[...new Set(subExams.filter((s) => s.type === "school" && s.board === selectedBoard).map((s) => s.class))].map(
@@ -255,7 +320,7 @@ export default function RegisterPage() {
               {selectedCategory === "program" && (
                 <Select value={selectedLevel} onValueChange={(v) => setSelectedLevel(v as "ug" | "pg")}>
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Select Level (UG/PG)" />
+                    <SelectValue placeholder="Select Level (UG/PG) *" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ug">Undergraduate (UG)</SelectItem>
@@ -264,16 +329,15 @@ export default function RegisterPage() {
                 </Select>
               )}
 
-              {/* Final Exam Selection Dropdown */}
               {(selectedCategory === "competitive" || (filteredSubExams.length > 1)) && (
                 <Select
-                  key={`${selectedCategory}-${selectedBoard}-${selectedClass}-${selectedLevel}`} // Key forces re-render to fix "stuck" values
+                  key={`${selectedCategory}-${selectedBoard}-${selectedClass}-${selectedLevel}`} 
                   value={form.subExamId}
                   onValueChange={(v) => setForm((p) => ({ ...p, subExamId: v }))}
                   disabled={subExamLoading}
                 >
                   <SelectTrigger className="bg-white border-blue-200 ring-1 ring-blue-50">
-                    <SelectValue placeholder="Select Specific Exam" />
+                    <SelectValue placeholder="Select Specific Option *" />
                   </SelectTrigger>
                   <SelectContent>
                     {filteredSubExams.map((se) => (
@@ -287,7 +351,7 @@ export default function RegisterPage() {
 
           <input
             type="password"
-            placeholder="Create Password (min. 6 chars)"
+            placeholder="Create Password * (min. 6 chars)"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             value={form.password}
             onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}

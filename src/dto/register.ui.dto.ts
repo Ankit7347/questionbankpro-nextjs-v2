@@ -7,7 +7,6 @@ export interface RegisterFormData {
     districtName: string;
     className: string;
     courseName?: string;
-    competition: string;
     password: string;
 }
 
