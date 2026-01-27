@@ -2,50 +2,157 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRegistration } from "@/services/server/register.server";
 
+/**
+ * Register API
+ * =============
+ * This route validates the registration payload coming from RegisterPage.
+ * Validation MUST stay in sync with:
+ * - RegisterFormData (UI DTO)
+ * - User.schema.ts (DB schema)
+ *
+ * NOTE:
+ * - `competition` has been REMOVED from schema and UI
+ * - `educationLevel` drives UG / PG / School logic
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // 1. Mandatory fields check
-    const requiredFields = [
-      "name", "email", "phone", "stateName", 
-      "districtName", "className", "competition", "password",
+    /* =========================
+       1. REQUIRED FIELD CHECK
+       (Schema-aligned)
+    ========================== */
+    const requiredFields: string[] = [
+      // basic
+      "name",
+      "email",
+      "phone",
+      "password",
+
+      // location
+      "geolocationStateId",
+      "geolocationDistrictId",
+      "stateName",
+      "districtName",
+
+      // education
+      "educationLevel",
+      "examType",
+      "className",
+      "courseName",
+
+      // sub-exam
+      "subExamId",
+      "subExamSlug",
     ];
 
     for (const field of requiredFields) {
-      if (!body[field] || body[field].toString().trim() === "") {
+      if (
+        body[field] === undefined ||
+        body[field] === null ||
+        body[field].toString().trim() === ""
+      ) {
         return NextResponse.json(
-          { success: false, data: null, error: `${field} is required`, statusCode: 400 },
+          {
+            success: false,
+            data: null,
+            error: `${field} is required`,
+            statusCode: 400,
+          },
           { status: 400 }
         );
       }
     }
 
-    // 2. Conditional check for UG/PG
-    if (["ug", "pg"].includes(body.className) && !body.courseName) {
+    /* =========================
+       2. ENUM / VALUE VALIDATION
+    ========================== */
+
+    // educationLevel validation
+    if (!["school", "ug", "pg"].includes(body.educationLevel)) {
       return NextResponse.json(
-        { success: false, data: null, error: "courseName is required for UG/PG", statusCode: 400 },
+        {
+          success: false,
+          data: null,
+          error: "Invalid educationLevel",
+          statusCode: 400,
+        },
         { status: 400 }
       );
     }
 
-    // 3. Call the logic service
+    // examType validation
+    if (!["school", "program", "competitive"].includes(body.examType)) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: null,
+          error: "Invalid examType",
+          statusCode: 400,
+        },
+        { status: 400 }
+      );
+    }
+
+    /* =========================
+       3. CONSISTENCY CHECKS
+       (Defensive, not UI logic)
+    ========================== */
+
+    // School consistency
+    if (body.examType === "school" && body.educationLevel !== "school") {
+      return NextResponse.json(
+        {
+          success: false,
+          data: null,
+          error: "educationLevel must be 'school' for school examType",
+          statusCode: 400,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Program consistency
+    if (
+      body.examType === "program" &&
+      !["ug", "pg"].includes(body.educationLevel)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: null,
+          error: "educationLevel must be 'ug' or 'pg' for program examType",
+          statusCode: 400,
+        },
+        { status: 400 }
+      );
+    }
+
+    /* =========================
+       4. CALL DOMAIN SERVICE
+    ========================== */
     const data = await executeRegistration(body);
 
-    // 4. Standard Success Response
-    return NextResponse.json({
-      success: true,
-      data,
-      error: null,
-      statusCode: 201,
-    });
+    /* =========================
+       5. SUCCESS RESPONSE
+    ========================== */
+    return NextResponse.json(
+      {
+        success: true,
+        data,
+        error: null,
+        statusCode: 201,
+      },
+      { status: 201 }
+    );
 
   } catch (error: any) {
     console.error("API Register Error:", error);
 
-    // 5. Handle Conflicts (Email exists) vs Server Errors
-    const isConflict = error.message.includes("exists");
-    
+    const isConflict =
+      typeof error?.message === "string" &&
+      error.message.toLowerCase().includes("exists");
+
     return NextResponse.json(
       {
         success: false,

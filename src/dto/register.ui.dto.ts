@@ -1,14 +1,28 @@
 // src/dto/register.ui.dto.ts
 export interface RegisterFormData {
-    name: string;
-    email: string;
-    phone: string;
-    stateName: string;
-    districtName: string;
-    className: string;
-    courseName?: string;
-    password: string;
+  // Basic
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+
+  // Location
+  geolocationStateId: string;
+  geolocationDistrictId: string;
+  stateName: string;
+  districtName: string;
+
+  // Education
+  educationLevel: "school" | "ug" | "pg";
+  examType: "school" | "program" | "competitive";
+  className: string;
+  courseName: string;
+
+  // SubExam
+  subExamId: string;
+  subExamSlug: string;
 }
+
 
 /**
  * Clean User object for UI use only
