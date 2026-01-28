@@ -111,9 +111,26 @@ export default function RegisterPage() {
     /* =========================
        VALIDATION LOGIC
     ========================== */
+    // --- Email Validation (Popular Domains) ---
+    const popularEmailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail|icloud|aol|live|msn)\.com$/i;
+
+    // --- Phone Validation (10 Digits) ---
+    const phoneRegex = /^[0-9]{10}$/;
+
+    // 1. Basic Validation
     if (!form.name.trim()) return toast.error("Name is required");
-    if (!form.email.trim()) return toast.error("Email is required");
-    if (!form.phone.trim()) return toast.error("Phone number is required");
+
+    if (!form.email.trim()) {
+      return toast.error("Email is required");
+    } else if (!popularEmailRegex.test(form.email)) {
+      return toast.error("Please use a valid personal email (Gmail, Yahoo, Outlook, etc.)");
+    }
+
+    if (!form.phone.trim()) {
+      return toast.error("Phone number is required");
+    } else if (!phoneRegex.test(form.phone)) {
+      return toast.error("Please enter a valid 10-digit phone number");
+    }
     if (!form.geolocationStateId) return toast.error("Please select a state");
     if (!form.geolocationDistrictId) return toast.error("Please select a district");
 
@@ -228,9 +245,15 @@ export default function RegisterPage() {
             />
             <input
               placeholder="Phone Number *"
+              type="tel" // Changed to tel for mobile keyboard support
+              maxLength={10} // Hard limit at 10 characters
               className="flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-slate-700"
               value={form.phone}
-              onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+              onChange={(e) => {
+                // Only allow numbers to be typed
+                const val = e.target.value.replace(/\D/g, "");
+                setForm((p) => ({ ...p, phone: val }));
+              }}
             />
           </div>
 
