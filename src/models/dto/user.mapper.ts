@@ -7,22 +7,35 @@ export const mapUser = (doc: any): UserDTO => {
 
   return {
     ...mapBaseFields(doc),
-    // Use uuid if available, fallback to id (from NextAuth session)
+
+    // identity
     uuid: doc.uuid || doc.id || "",
-    name: doc.name || "Guest",
+    name: doc.name || "",
     email: doc.email || "",
     phone: doc.phone || "",
-    role: doc.role || "user",
+
+    // access & UI
+    role: doc.role || "student",
     uiMode: doc.uiMode || "light",
-    image: doc.image || "", // Added for the avatar image
-    className: doc.className || "",
-    courseName: doc.courseName || null,
-    competition: doc.competition || "",
-    stateName: doc.stateName || "",
-    districtName: doc.districtName || "",
-    // Handling potential null/undefined for geolocation IDs
+    image: doc.image || "",
+
+    // education
+    educationLevel: doc.educationLevel,
+    examType: doc.examType,
+    className: doc.className,
+    courseName: doc.courseName,
+
+    // sub-exam
+    subExamId: doc.subExamId?.toString() || "",
+    subExamSlug: doc.subExamSlug,
+
+    // location
+    stateName: doc.stateName,
+    districtName: doc.districtName,
     geolocationStateId: doc.geolocationStateId?.toString() || "",
     geolocationDistrictId: doc.geolocationDistrictId?.toString() || "",
+
+    // system
     isActive: doc.isActive ?? true,
   };
 };
