@@ -5,12 +5,12 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 const features = [
+	{ title: "Courses", href: "/dashboard/courses", desc: "Browse and enroll in helpful courses" },
 	{ title: "Previous Year Papers", href: "/dashboard/previous-papers", desc: "Access board-wise past papers" },
 	{ title: "Solved Papers", href: "/dashboard/solved-papers", desc: "View solved papers with detailed answers" },
 	{ title: "Quizzes", href: "/dashboard/quiz", desc: "Practice topic-based MCQs and mock tests" },
 	{ title: "Notes", href: "/dashboard/notes", desc: "Get concise notes for quick revision" },
 	{ title: "Syllabus", href: "/dashboard/syllabus", desc: "Explore official board syllabus" },
-	{ title: "Courses", href: "/dashboard/courses", desc: "Browse and enroll in helpful courses" },
 ];
 
 export default function DashboardPage() {
