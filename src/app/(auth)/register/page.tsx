@@ -116,10 +116,10 @@ export default function RegisterPage() {
     if (!form.phone.trim()) return toast.error("Phone number is required");
     if (!form.geolocationStateId) return toast.error("Please select a state");
     if (!form.geolocationDistrictId) return toast.error("Please select a district");
-    
+
     // 2. Category & Exam Validation
     if (!selectedCategory) return toast.error("Please select an education category");
-    
+
     if (selectedCategory === "school" && (!selectedBoard || !selectedClass)) {
       return toast.error("Please select your Board and Class");
     }
@@ -203,11 +203,11 @@ export default function RegisterPage() {
 
 
   return (
-    <div className="flex items-center justify-center bg-slate-50 py-12 px-4">
-      <div className="w-full max-w-md bg-white shadow-2xl border border-slate-100 rounded-2xl p-8">
+    <div className="flex items-center justify-center bg-slate-50 dark:bg-slate-950 py-12 px-4 transition-colors">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl border border-slate-100 dark:border-slate-800 rounded-2xl p-8">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-extrabold text-slate-900">Create Account</h2>
-          <p className="text-slate-500 mt-2">Join us to start your journey</p>
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Create Account</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Join us to start your journey</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -215,26 +215,26 @@ export default function RegisterPage() {
           <div className="space-y-3">
             <input
               placeholder="Full Name *"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-slate-700"
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             />
             <input
               placeholder="Email Address *"
               type="email"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-slate-700"
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
             />
             <input
               placeholder="Phone Number *"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-slate-700"
               value={form.phone}
               onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
             />
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-slate-100 dark:border-slate-800" />
 
           {/* Location Group */}
           <div className="grid grid-cols-2 gap-3">
@@ -242,11 +242,11 @@ export default function RegisterPage() {
               value={form.geolocationStateId}
               onValueChange={(v) => setForm((p) => ({ ...p, geolocationStateId: v, geolocationDistrictId: "" }))}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                 <SelectValue placeholder="State *" />
               </SelectTrigger>
-              <SelectContent>
-                {states.map((s) => <SelectItem key={s.id} value={s.id}>{s.stateName}</SelectItem>)}
+              <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                {states.map((s) => <SelectItem key={s.id} value={s.id} className="dark:text-slate-100">{s.stateName}</SelectItem>)}
               </SelectContent>
             </Select>
 
@@ -255,17 +255,17 @@ export default function RegisterPage() {
               onValueChange={(v) => setForm((p) => ({ ...p, geolocationDistrictId: v }))}
               disabled={!form.geolocationStateId}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                 <SelectValue placeholder="District *" />
               </SelectTrigger>
-              <SelectContent>
-                {districts.map((d) => <SelectItem key={d.id} value={d.id}>{d.districtName}</SelectItem>)}
+              <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                {districts.map((d) => <SelectItem key={d.id} value={d.id} className="dark:text-slate-100">{d.districtName}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
-            <Label className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Education Details *</Label>
+          <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
+            <Label className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Education Details *</Label>
 
             <Select
               value={selectedCategory}
@@ -277,13 +277,13 @@ export default function RegisterPage() {
                 setForm((p) => ({ ...p, subExamId: "" }));
               }}
             >
-              <SelectTrigger className="bg-white">
+              <SelectTrigger className="bg-white dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="school">Schooling</SelectItem>
-                <SelectItem value="program">College / Degree</SelectItem>
-                <SelectItem value="competitive">Competitive Exams</SelectItem>
+              <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                <SelectItem value="school" className="dark:text-slate-100">Schooling</SelectItem>
+                <SelectItem value="program" className="dark:text-slate-100">College / Degree</SelectItem>
+                <SelectItem value="competitive" className="dark:text-slate-100">Competitive Exams</SelectItem>
               </SelectContent>
             </Select>
 
@@ -292,24 +292,24 @@ export default function RegisterPage() {
               {selectedCategory === "school" && (
                 <>
                   <Select value={selectedBoard} onValueChange={setSelectedBoard}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600">
                       <SelectValue placeholder="Select Board *" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                       {[...new Set(subExams.filter((s) => s.type === "school").map((s) => s.board))].map(
-                        (b) => b && <SelectItem key={b} value={b}>{b.toUpperCase()}</SelectItem>
+                        (b) => b && <SelectItem key={b} value={b} className="dark:text-slate-100">{b.toUpperCase()}</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
 
                   {selectedBoard && (
                     <Select value={String(selectedClass)} onValueChange={(v) => setSelectedClass(Number(v))}>
-                      <SelectTrigger className="bg-white animate-in fade-in slide-in-from-top-1">
+                      <SelectTrigger className="bg-white dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 animate-in fade-in slide-in-from-top-1">
                         <SelectValue placeholder="Select Class *" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                         {[...new Set(subExams.filter((s) => s.type === "school" && s.board === selectedBoard).map((s) => s.class))].map(
-                          (c) => c && <SelectItem key={c} value={String(c)}>Class {c}</SelectItem>
+                          (c) => c && <SelectItem key={c} value={String(c)} className="dark:text-slate-100">Class {c}</SelectItem>
                         )}
                       </SelectContent>
                     </Select>
@@ -319,29 +319,29 @@ export default function RegisterPage() {
 
               {selectedCategory === "program" && (
                 <Select value={selectedLevel} onValueChange={(v) => setSelectedLevel(v as "ug" | "pg")}>
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600">
                     <SelectValue placeholder="Select Level (UG/PG) *" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ug">Undergraduate (UG)</SelectItem>
-                    <SelectItem value="pg">Postgraduate (PG)</SelectItem>
+                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                    <SelectItem value="ug" className="dark:text-slate-100">Undergraduate (UG)</SelectItem>
+                    <SelectItem value="pg" className="dark:text-slate-100">Postgraduate (PG)</SelectItem>
                   </SelectContent>
                 </Select>
               )}
 
               {(selectedCategory === "competitive" || (filteredSubExams.length > 1)) && (
                 <Select
-                  key={`${selectedCategory}-${selectedBoard}-${selectedClass}-${selectedLevel}`} 
+                  key={`${selectedCategory}-${selectedBoard}-${selectedClass}-${selectedLevel}`}
                   value={form.subExamId}
                   onValueChange={(v) => setForm((p) => ({ ...p, subExamId: v }))}
                   disabled={subExamLoading}
                 >
-                  <SelectTrigger className="bg-white border-blue-200 ring-1 ring-blue-50">
+                  <SelectTrigger className="bg-white dark:bg-slate-800 dark:text-slate-100 border-blue-200 dark:border-blue-900 ring-1 ring-blue-50 dark:ring-blue-900/20">
                     <SelectValue placeholder="Select Specific Option *" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                     {filteredSubExams.map((se) => (
-                      <SelectItem key={se._id} value={se._id}>{se.label}</SelectItem>
+                      <SelectItem key={se._id} value={se._id} className="dark:text-slate-100">{se.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -352,14 +352,14 @@ export default function RegisterPage() {
           <input
             type="password"
             placeholder="Create Password * (min. 6 chars)"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-slate-700"
             value={form.password}
             onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
           />
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition-all duration-200 transform active:scale-[0.98] disabled:bg-slate-300 disabled:cursor-not-allowed shadow-lg shadow-blue-100"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition-all duration-200 transform active:scale-[0.98] disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:cursor-not-allowed shadow-lg shadow-blue-100 dark:shadow-none"
             disabled={registerLoading || pageLoading}
           >
             {registerLoading ? (

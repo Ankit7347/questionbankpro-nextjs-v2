@@ -1,6 +1,8 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
+
 
 type Theme = "light" | "dark" | "system";
 const THEME_ORDER: Theme[] = ["light", "dark", "system"];
@@ -87,9 +89,9 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   const cycleTheme = () => {
     if (spinning) return;
     setSpinning(true);
-    
+
     const next = THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length];
-    
+
     setTheme(next);
     writeTheme(next);
     applyTheme(next);
@@ -117,7 +119,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
           `}
         >
           {icons[theme]}
-          
+
           {/* Subtle indicator dot */}
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
@@ -126,6 +128,12 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
         </button>
       </div>
       {children}
+      <Toaster
+        theme={theme === "system" ? "system" : theme}
+        richColors
+        closeButton
+        position="top-right"
+      />
     </>
   );
 }
