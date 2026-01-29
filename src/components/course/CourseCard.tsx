@@ -2,6 +2,7 @@
 "use client";
 
 import { CourseUI } from "@/dto/course.ui.dto";
+import Link from "next/link";
 
 export default function CourseCard({ course }: { course: CourseUI }) {
   const { name, type, price, access, flags, examSlug, subExamSlug, slug } = course;
@@ -10,7 +11,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   const isExpired = access.status === "EXPIRED";
   const isExpiring = access.status === "EXPIRING";
   const isActive = access.status === "ACTIVE" || access.status === "LIFETIME";
-
+  const btnBase = "flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-bold transition shadow-sm";
   /* -----------------------------
      CTA Resolver (Logic remains yours)
   ------------------------------ */
@@ -43,20 +44,20 @@ export default function CourseCard({ course }: { course: CourseUI }) {
 
       case "NONE":
       default:
-        return flags.isFree ? (
-          <button className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 transition">
-            Enroll Free
-          </button>
-        ) : (
-          <button className="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-black transition">
-            Buy Now
-          </button>
+        const isFree = flags.isFree;
+        return (
+          <Link
+            href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}`}
+            className={`${btnBase} ${isFree ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-900 hover:bg-black"} text-white`}
+          >
+            {isFree ? "Enroll Free" : "Buy Now"}
+          </Link>
         );
     }
   }
 
   return (
-    <div 
+    <div
       className={`group relative flex flex-col h-full rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
         ${isExpired ? "opacity-75 grayscale-[0.5] border-gray-200" : "border-gray-100 shadow-sm"}
         ${isExpiring ? "border-l-4 border-l-amber-400" : ""}
@@ -104,7 +105,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
             )}
           </div>
         )}
-        
+
         {/* Status Text */}
         {access.expiresAt && (
           <p className={`mt-1 text-[11px] font-medium ${isExpiring ? "text-amber-600" : "text-gray-400"}`}>
