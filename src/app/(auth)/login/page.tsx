@@ -27,6 +27,14 @@ export default function LoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!form.email || !form.password) {
+      toast.error("Missing Fields", {
+        description: "Please enter both email and password.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     const res = await signIn("credentials", {
@@ -87,20 +95,26 @@ export default function LoginPage() {
         </h1>
 
         <input
+          id="email"
           type="email"
           name="email"
+          value={form.email}
           placeholder="Email"
           onChange={handleChange}
+          autoComplete="username"
           className="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-900 dark:text-white"
           required
         />
 
         {!forgotMode && (
           <input
+            id="password"
             type="password"
             name="password"
+            value={form.password}
             placeholder="Password"
             onChange={handleChange}
+            autoComplete="current-password"
             className="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-900 dark:text-white"
             required
           />
