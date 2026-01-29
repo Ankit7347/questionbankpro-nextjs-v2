@@ -5,7 +5,7 @@ import { CourseUI } from "@/dto/course.ui.dto";
 import Link from "next/link";
 
 export default function CourseCard({ course }: { course: CourseUI }) {
-  const { name, type, price, access, flags, examSlug, subExamSlug, slug } = course;
+  const { name, type, price, access, flags, examSlug, subExamSlug, slug,id } = course;
 
   // Visual status config
   const isExpired = access.status === "EXPIRED";
@@ -47,7 +47,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         const isFree = flags.isFree;
         return (
           <Link
-            href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}`}
+            href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}&courseId=${id}`}
             className={`${btnBase} ${isFree ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-900 hover:bg-black"} text-white`}
           >
             {isFree ? "Enroll Free" : "Buy Now"}

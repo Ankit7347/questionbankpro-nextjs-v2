@@ -18,8 +18,9 @@ export default function CheckoutPage() {
     const [coupon, setCoupon] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(false);
 
-    const slug = searchParams.get("slug") || "course";
+    const slug = searchParams.get("slug");
     const type = searchParams.get("type");
+    const courseId = searchParams.get("courseId");
     const [invalidCoupon, setInvalidCoupon] = useState(false); // New state for error
 
     const handleApplyCoupon = () => {
@@ -36,11 +37,33 @@ export default function CheckoutPage() {
         return () => clearTimeout(timer);
     }, []);
 
+    // CheckoutPage component
     const handleAction = async () => {
         setLoading(true);
-        await new Promise((res) => setTimeout(res, 2000));
-        setLoading(false);
-        router.push(`/dashboard/courses/view/${slug}`);
+        try {
+            const response = await fetch("/api/dashboard/courses/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    slug: slug,
+                    coupon: appliedCoupon ? coupon : null,
+                    // These IDs should ideally come from your course data/search params
+                    courseId: courseId,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Enrollment failed");
+            }
+
+            router.push(`/dashboard/courses`);
+        } catch (err: any) {
+            alert(err.message); // Simple error feedback
+        } finally {
+            setLoading(false);
+        }
     };
 
     const features = [
@@ -92,7 +115,7 @@ export default function CheckoutPage() {
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 capitalize leading-tight">
-                                    {slug.replace(/-/g, ' ')}
+                                    {slug?.replace(/-/g, ' ')}
                                 </h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">English • All Levels • 2026 Updated</p>
                             </div>

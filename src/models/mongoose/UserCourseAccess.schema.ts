@@ -73,10 +73,9 @@ const UserCourseAccessSchema = new Schema(
       default: "ACTIVE",
       index: true,
     },
+    ...BaseSchemaFields
   },
-  {
-    ...BaseSchemaOptions,
-  }
+  BaseSchemaOptions
 );
 
 /**
