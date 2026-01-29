@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Price & Coupon Logic
-    const isFree = coupon?.toUpperCase() === "FREE2026";
+    const isFree = "FREE2026";
     const accessType = isFree ? "FREE" : "PAID";
     const pricePaid = isFree ? 0 : 1999;
 
