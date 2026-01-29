@@ -1,42 +1,11 @@
+// src/components/ThemeProvider.tsx
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
-
+import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 
 type Theme = "light" | "dark" | "system";
-const THEME_ORDER: Theme[] = ["light", "dark", "system"];
-
-/* ------------------ */
-/* System resolver    */
-/* ------------------ */
-
-function resolveSystemTheme(): "dark" | "light" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function writeTheme(theme: Theme): void {
-  // If system, we store "system" so the reader knows to resolve it next time
-  document.cookie = `theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
-}
-
-function applyTheme(theme: Theme): void {
-  const root = document.documentElement;
-  if (theme === "system") {
-    const systemRes = resolveSystemTheme();
-    root.classList.toggle("dark", systemRes === "dark");
-  } else {
-    root.classList.toggle("dark", theme === "dark");
-  }
-}
-
-function readTheme(): Theme {
-  if (typeof document === "undefined") return "light";
-  const match = document.cookie.match(/(?:^|; )theme=([^;]+)/);
-  const value = match?.[1] as Theme;
-  return THEME_ORDER.includes(value) ? value : "light";
-}
 
 /* ------------------ */
 /* Icons (Improved)   */
@@ -62,85 +31,82 @@ const icons: Record<Theme, React.ReactElement> = {
   ),
 };
 
-interface ThemeProviderProps {
-  children: ReactNode;
-}
-
-export default function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>("light");
-  const [spinning, setSpinning] = useState(false);
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [spinning, setSpinning] = useState(false);
 
+  // Avoid hydration mismatch by only rendering after mount
   useEffect(() => {
-    const saved = readTheme();
-    setTheme(saved);
-    // applyTheme(saved);
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    // Only listen if the user has explicitly chosen "system"
-    if (theme !== "system") return;
-
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      // Re-verify we are still on system before applying
-      if (theme === "system") applyTheme("system");
-    };
-
-    media.addEventListener("change", handler);
-    return () => media.removeEventListener("change", handler);
-  }, [theme]); // theme is already in the dependency array, which is good!
+  if (!mounted) return null;
 
   const cycleTheme = () => {
     if (spinning) return;
     setSpinning(true);
 
-    const next = THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length];
+    const themes: Theme[] = ["light", "dark", "system"];
+    const currentTheme = (theme as Theme) || "system";
+    const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+    const nextTheme = themes[nextIndex];
 
-    setTheme(next);
-    writeTheme(next);
-    applyTheme(next);
+    setTheme(nextTheme);
 
     setTimeout(() => setSpinning(false), 500);
   };
 
-  if (!mounted) return <>{children}</>;
-
   return (
-    <>
-      <div className="fixed bottom-6 right-6 z-[100]">
-        <button
-          onClick={cycleTheme}
-          aria-label={`Switch theme (currently ${theme})`}
-          aria-live="polite"
-          className={`
-            relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300
-            /* Light Mode Styles: Added clear border and off-white bg */
-            bg-white border-2 border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.1)] 
-            /* Dark Mode Styles: Glassmorphism and subtle border */
-            dark:bg-gray-900 dark:border-gray-700 dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]
-            /* Interaction */
-            hover:scale-110 active:scale-90
-            ${spinning ? "animate-spin-slow" : ""}
-          `}
-        >
-          {icons[theme]}
+    <div className="fixed bottom-6 right-6 z-[100]">
+      <button
+        onClick={cycleTheme}
+        aria-label={`Switch theme (currently ${theme})`}
+        className={`
+          relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300
+          /* Light Mode Styles: Added clear border and off-white bg */
+          bg-white border-2 border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.1)] 
+          /* Dark Mode Styles: Glassmorphism and subtle border */
+          dark:bg-gray-900 dark:border-gray-700 dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]
+          /* Interaction */
+          hover:scale-110 active:scale-90
+          ${spinning ? "animate-spin-slow" : ""}
+        `}
+      >
+        {icons[theme as Theme] || icons.system}
 
-          {/* Subtle indicator dot */}
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500/20 border border-blue-500/50"></span>
-          </span>
-        </button>
-      </div>
+        {/* Subtle indicator dot */}
+        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500/20 border border-blue-500/50"></span>
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function ToasterWithTheme() {
+  const { theme } = useTheme();
+  return (
+    <Toaster
+      theme={theme as "light" | "dark" | "system"}
+      richColors
+      closeButton
+      position="top-right"
+    />
+  );
+}
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export default function ThemeProvider({ children }: ThemeProviderProps) {
+  return (
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
       {children}
-      <Toaster
-        theme={theme === "system" ? "system" : theme}
-        richColors
-        closeButton
-        position="top-right"
-      />
-    </>
+      <ThemeToggle />
+      <ToasterWithTheme />
+    </NextThemesProvider>
   );
 }
