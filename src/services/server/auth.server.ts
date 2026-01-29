@@ -54,7 +54,6 @@ export async function validateResetToken(
     email,
     token: otp,
   }).lean();
-  console.log(token,email,otp)
 
   return Boolean(token);
 }

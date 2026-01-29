@@ -67,15 +67,32 @@ function ResetPasswordPage() {
   /* ----------------------------- */
 
   async function handleSubmit() {
+    // 1. Check if fields are empty
+    if (!password.trim() || !confirmPassword.trim()) {
+      toast.error("Fields required", {
+        description: "Please enter and confirm your new password.",
+      });
+      return;
+    }
+
+    // 2. Check for minimum length
+    if (password.length < 8) {
+      toast.error("Password too short", {
+        description: "Your password must be at least 8 characters long.",
+      });
+      return;
+    }
+
+    // 3. Check if passwords match
     if (password !== confirmPassword) {
       toast.error("Passwords do not match", {
-        description:
-          "Please make sure both passwords are identical.",
+        description: "Please make sure both passwords are identical.",
       });
       return;
     }
 
     try {
+      // Show a loading toast or disable button here if preferred
       await confirmPasswordReset({
         email,
         otp,
@@ -83,17 +100,13 @@ function ResetPasswordPage() {
       });
 
       toast.success("Password changed successfully", {
-        description:
-          "Please login with your new password.",
+        description: "Please login with your new password.",
       });
 
       router.push("/login");
     } catch (err) {
       toast.error("Reset failed", {
-        description:
-          err instanceof Error
-            ? err.message
-            : "Something went wrong.",
+        description: err instanceof Error ? err.message : "Something went wrong.",
       });
     }
   }
@@ -103,7 +116,11 @@ function ResetPasswordPage() {
   /* ----------------------------- */
 
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <Loading />
+      </div>
+    )
   }
 
   if (!email || !otp) {
@@ -116,28 +133,28 @@ function ResetPasswordPage() {
 
   if (!isValid) {
     return (
-        <>
-            <Navbar />
-                <p className="text-center min-h-[60vh] mt-20 text-red-600">
-                    Link expired or invalid
-                    <br />
-                    <Link
-                    href="/"
-                    className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:underline"
-                    >
-                    <Home size={20} />
-                    Home
-                    </Link>
-                </p>
-            <Footer/>
-        </>
+      <>
+        <Navbar />
+        <p className="text-center min-h-[60vh] mt-20 text-red-600">
+          Link expired or invalid
+          <br />
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:underline"
+          >
+            <Home size={20} />
+            Home
+          </Link>
+        </p>
+        <Footer />
+      </>
     );
   }
 
   return (
     <>
-       <div className="flex items-center justify-center min-h-[70vh] bg-gray-100 dark:bg-gray-900">
-        <div className="p-6 md:p-8 w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-xl">
+      <div className="flex items-center justify-center min-h-[70vh] bg-gray-100 dark:bg-gray-900">
+        <div className="m-2 p-6 md:p-8 w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-xl">
           <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-gray-100">
             Reset Password
           </h2>
