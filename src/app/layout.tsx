@@ -87,6 +87,7 @@ export default async function RootLayout({
   return (
     <html
     lang="en"
+    suppressHydrationWarning
     className={`${isDark ? "dark" : ""} ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
     >
       <head>
@@ -150,7 +151,7 @@ export default async function RootLayout({
 
         {/* Early theme hydration fix (safe) */}
 
-        {/* <Script
+        <Script
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -171,7 +172,7 @@ export default async function RootLayout({
               })();
             `,
           }}
-        /> */}
+        />
 
 
 

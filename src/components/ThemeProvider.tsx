@@ -74,17 +74,23 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     const saved = readTheme();
     setTheme(saved);
-    applyTheme(saved);
+    // applyTheme(saved);
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    // Only listen if the user has explicitly chosen "system"
     if (theme !== "system") return;
+
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => applyTheme("system");
+    const handler = () => {
+      // Re-verify we are still on system before applying
+      if (theme === "system") applyTheme("system");
+    };
+
     media.addEventListener("change", handler);
     return () => media.removeEventListener("change", handler);
-  }, [theme]);
+  }, [theme]); // theme is already in the dependency array, which is good!
 
   const cycleTheme = () => {
     if (spinning) return;
@@ -106,7 +112,8 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       <div className="fixed bottom-6 right-6 z-[100]">
         <button
           onClick={cycleTheme}
-          aria-label="Switch theme"
+          aria-label={`Switch theme (currently ${theme})`}
+          aria-live="polite"
           className={`
             relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300
             /* Light Mode Styles: Added clear border and off-white bg */
