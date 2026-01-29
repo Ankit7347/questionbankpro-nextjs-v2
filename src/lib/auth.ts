@@ -12,7 +12,10 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 1 day (in seconds)
+  },
 
   providers: [
     Credentials({
@@ -44,7 +47,7 @@ export const {
           isDeleted: false,
         })
           .select(
-            "uuid name email role uiMode passwordHash"
+            "uuid name email role uiMode passwordHash subExamId courseName"
           )
           .lean();
 
@@ -63,6 +66,10 @@ export const {
           email: user.email,
           role: user.role,
           uiMode: user.uiMode,
+          subExamId: Buffer.isBuffer(user.subExamId)
+            ? user.subExamId.toString("hex")
+            : user.subExamId?.toString(),
+          courseName: user.courseName,
         };
       },
     }),
@@ -75,6 +82,8 @@ export const {
         token.name = user.name;
         token.role = user.role;
         token.uiMode = user.uiMode;
+        token.subExamId = user.subExamId;
+        token.courseName = user.courseName;
       }
       return token;
     },
@@ -88,6 +97,8 @@ export const {
       session.user.name = token.name ?? "";
       session.user.role = token.role;
       session.user.uiMode = token.uiMode;
+      session.user.subExamId = token.subExamId;
+      session.user.courseName = token.courseName;
 
       return session;
     },
