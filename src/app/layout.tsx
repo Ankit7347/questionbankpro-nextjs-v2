@@ -149,34 +149,6 @@ export default async function RootLayout({
           }}
         />
 
-        {/* Early theme hydration fix (safe) */}
-
-        <Script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function () {
-                try {
-                  var theme = document.cookie.match(/(?:^|; )theme=([^;]+)/)?.[1];
-                  if (!theme) return;
-
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else if (theme === 'light') {
-                    document.documentElement.classList.remove('dark');
-                  } else if (theme === 'system') {
-                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                      document.documentElement.classList.add('dark');
-                    }
-                  }
-                } catch (_) {}
-              })();
-            `,
-          }}
-        />
-
-
-
-
       </head>
 
       <body className="antialiased bg-white dark:bg-gray-900 transition-colors duration-300">

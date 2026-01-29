@@ -53,6 +53,7 @@ function ThemeToggle() {
     const nextTheme = themes[nextIndex];
 
     setTheme(nextTheme);
+    document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`;
 
     setTimeout(() => setSpinning(false), 500);
   };
