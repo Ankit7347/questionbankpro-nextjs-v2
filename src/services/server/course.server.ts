@@ -1,10 +1,12 @@
 // src/services/server/course.server.ts
+import { auth } from "@/lib/auth";
 
 import dbConnect from "@/lib/mongodb";
 import Course from "@/models/mongoose/Course.schema";
 import SubExam from "@/models/mongoose/SubExam.schema";
 import { mapCourseAccessDTO } from "@/models/dto/courseAccess.mapper";
 import Exam from "@/models/mongoose/Exam.schema";
+import User from "@/models/mongoose/User.schema";
 
 import { getCurrentLang } from "@/lib/i18n";
 import {
@@ -196,21 +198,34 @@ import UserCourseAccess from "@/models/mongoose/UserCourseAccess.schema";
 import { DashboardCoursesDTO } from "@/models/dto/course.dto";
 
 export async function getDashboardCourses(): Promise<DashboardCoursesDTO> {
-  const userId = "69738bce5ccf5655b013cfba";
-  const subExamSlug = "gate-2026-cs-it";
-  if (!userId || !subExamSlug) {
-    throw BadRequest("Invalid request");
-  }
-
-
+  
   const lang = getCurrentLang();
   await dbConnect();
+  const session = await auth();
+
+  const userUuid = session?.user?.id;
+  const subExamId = session?.user?.subExamId;
+  if (!userUuid) {
+    throw NotFound("User not authenticated");
+  }
+  /* --------------------------------
+     Resolve User (UUID -> _id)
+  --------------------------------- */
+  const user = await User.findOne({
+    uuid: userUuid,
+    isDeleted: false,
+  }).select("_id");
+
+  if (!user) {
+    throw NotFound("User not found");
+  }
 
   /* --------------------------------
      Resolve SubExam
   --------------------------------- */
   const subExam = await SubExam.findOne({
-    slug: subExamSlug,
+    _id: subExamId,
+    isActive: true,
     isDeleted: false,
   }).lean();
 
@@ -231,7 +246,7 @@ export async function getDashboardCourses(): Promise<DashboardCoursesDTO> {
      Fetch user access
   --------------------------------- */
   const accesses = await UserCourseAccess.find({
-    userId,
+    userId: user._id,
     subExamId: subExam._id,
     isDeleted: false,
   }).lean();
