@@ -26,24 +26,15 @@ export const {
       },
 
       async authorize(credentials) {
-        if (!credentials) return null;
-
-        const email =
-          typeof credentials.email === "string"
-            ? credentials.email
-            : null;
-
-        const password =
-          typeof credentials.password === "string"
-            ? credentials.password
-            : null;
-
-        if (!email || !password) return null;
+        if (!credentials?.email || !credentials?.password) {
+          console.error("Missing credentials");
+          return null;
+        }
 
         await dbConnect();
 
         const user = await User.findOne({
-          email,
+          email: credentials.email,
           isDeleted: false,
         })
           .select(
@@ -51,14 +42,20 @@ export const {
           )
           .lean();
 
-        if (!user) return null;
+        if (!user) {
+          console.warn("User not found:", credentials.email);
+          return null;
+        }
 
         const valid = await bcrypt.compare(
-          password,
+          credentials.password as string,
           user.passwordHash
         );
 
-        if (!valid) return null;
+        if (!valid) {
+          console.warn("Invalid password for:", credentials.email);
+          return null;
+        }
 
         return {
           id: user.uuid,
