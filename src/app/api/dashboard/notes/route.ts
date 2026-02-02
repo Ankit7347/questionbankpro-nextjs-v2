@@ -1,5 +1,5 @@
 // src/app/api/dashboard/notes/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest,NextResponse } from 'next/server';
 
 interface NotesOverviewResponse {
   subjects: {

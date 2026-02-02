@@ -1,7 +1,7 @@
 // src/app/api/dashboard/notes/[subjectId]/[chapterId]/[topicId]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest,NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: Promise<{ subjectId: string; chapterId: string; topicId: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ subjectId: string; chapterId: string; topicId: string }> }) {
   try {
     const { topicId } = await params;
 
