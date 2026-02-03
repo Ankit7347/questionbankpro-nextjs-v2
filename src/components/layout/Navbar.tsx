@@ -15,7 +15,7 @@ import { fetchExamLanding } from "@/services/client/exam.client";
 import { FaUser } from "react-icons/fa";
 
 // Function to generate a consistent color based on a string (like username/email)
-const getAvatarColor = (name:string) => {
+const getAvatarColor = (name: string) => {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -38,7 +38,7 @@ const UserAvatar = ({ user }: UserAvatarProps) => {
   return (
     <div className="relative w-8 h-8 flex items-center justify-center rounded-full border overflow-hidden shrink-0">
       {/* Background Color + Icon (Fallback) */}
-      <div 
+      <div
         style={{ backgroundColor: bgColor }}
         className="absolute inset-0 flex items-center justify-center text-white"
       >
@@ -47,10 +47,10 @@ const UserAvatar = ({ user }: UserAvatarProps) => {
 
       {/* Image (Sits on top of the fallback if it exists) */}
       {user?.image && (
-        <img 
-          src={user.image} 
-          className="relative w-full h-full object-cover" 
-          alt={user.name || "user"} 
+        <img
+          src={user.image}
+          className="relative w-full h-full object-cover"
+          alt={user.name || "user"}
           onError={(e) => { (e.currentTarget.style.display = 'none') }}
         />
       )}
@@ -75,35 +75,34 @@ export default function Navbar() {
   }, []);
 
   const filtered = search
-    ? exams.flatMap((exam) => 
-        (exam.subExams || [])
-          .filter(c => 
-            exam.examName.toLowerCase().includes(search.toLowerCase()) || 
-            c.name.toLowerCase().includes(search.toLowerCase())
-          )
-          .map(course => ({ ...exam, targetCourse: course }))
-      )
+    ? exams.flatMap((exam) =>
+      (exam.subExams || [])
+        .filter(c =>
+          exam.examName.toLowerCase().includes(search.toLowerCase()) ||
+          c.name.toLowerCase().includes(search.toLowerCase())
+        )
+        .map(course => ({ ...exam, targetCourse: course }))
+    )
     : [];
 
   return (
     <nav className="sticky top-0 w-full z-50 bg-white dark:bg-gray-900 shadow">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
-        
+
         {/* Logo - Hide when search is open on mobile to save space */}
         {!isMobileSearchOpen && (
           <Link href="/" className="flex items-center gap-2 font-bold whitespace-nowrap">
-            <FaHome /> 
+            <FaHome />
             {/* Change this line below */}
-            <span className="inline">Exam Preparation</span> 
+            <span className="inline">Exam Preparation</span>
           </Link>
         )}
 
         {/* Desktop Search & Mobile Search Container */}
-        <div 
-          ref={searchRef} 
-          className={`${
-            isMobileSearchOpen ? "flex-1 px-2" : "hidden sm:block w-64"
-          } relative transition-all duration-300`}
+        <div
+          ref={searchRef}
+          className={`${isMobileSearchOpen ? "flex-1 px-2" : "hidden sm:block w-64"
+            } relative transition-all duration-300`}
         >
           <div className="flex items-center gap-2">
             <input
@@ -143,7 +142,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {/* Mobile Search Toggle Button */}
           {!isMobileSearchOpen && (
-            <button 
+            <button
               className="sm:hidden text-gray-600 dark:text-gray-300"
               onClick={() => setIsMobileSearchOpen(true)}
             >
@@ -170,14 +169,20 @@ export default function Navbar() {
             {session ? (
               <>
                 <p className="font-medium text-sm border-b pb-2 mb-2">{session.user?.name}</p>
+                <p className="font-medium text-sm border-b pb-2 mb-2"><a href="/dashboard">Go to dashboard</a></p>
                 <button onClick={() => signOut()} className="w-full flex items-center gap-2 text-red-500 text-sm py-2">
                   <FiLogOut /> Logout
                 </button>
               </>
             ) : (
-              <Link href="/login" className="w-full flex items-center gap-2 text-blue-600 text-sm py-2">
-                <FiLogIn /> Login
-              </Link>
+              <>
+                <Link href="/" className="w-full flex items-center gap-2 text-white-600 text-sm py-2">
+                  <FaHome/> Home
+                </Link>
+                <Link href="/login" className="w-full flex items-center gap-2 text-blue-600 text-sm py-2">
+                  <FiLogIn /> Login
+                </Link>
+              </>
             )}
           </div>
         )}
