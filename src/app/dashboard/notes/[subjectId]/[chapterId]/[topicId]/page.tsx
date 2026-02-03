@@ -15,7 +15,7 @@ export default async function TopicReaderPage({ params }: { params: Promise<{ su
   const data = await getTopicContent(subjectId, chapterId, topicId);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-24">
+    <div className="bg-slate-950 text-slate-200 pb-24">
       {/* Sticky Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-slate-900 z-50">
         <div className="h-full bg-cyan-400 w-[30%]" /> {/* Dynamic width based on scroll */}

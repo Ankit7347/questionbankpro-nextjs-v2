@@ -29,9 +29,7 @@ export default async function ExamPortalLayout({
   // 4. Return the layout with the user session passed down
   return (
     <StudentLayout user={session.user}>
-      <div className="min-h-[88vh] bg-gray-50 dark:bg-[#0B0F17]">
-        {children}
-      </div>
+      {children}
     </StudentLayout>
   );
 }

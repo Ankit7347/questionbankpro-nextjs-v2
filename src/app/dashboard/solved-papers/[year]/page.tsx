@@ -30,7 +30,7 @@ export default async function YearSolvedPapersPage({ params }: PageProps) {
   const metrics = json?.metrics ?? { avgDifficulty: 'Medium', solvedCount: papers.length };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
+    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
       <header className="mb-6">
         <Link href="/dashboard/solved-papers" className="inline-flex items-center text-slate-400 hover:text-cyan-300 transition-colors mb-4">
           <ChevronLeft className="w-4 h-4 mr-1" /> Back to Solved Papers

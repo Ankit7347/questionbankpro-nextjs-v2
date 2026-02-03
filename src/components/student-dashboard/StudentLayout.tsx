@@ -1,10 +1,9 @@
-// File: components/admin/ClientAdminLayout.tsx
 'use client';
 
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
-// Define the type for the user object based on your Auth setup
+
 interface StudentLayoutProps {
   children: React.ReactNode;
   user: {
@@ -16,25 +15,30 @@ interface StudentLayoutProps {
     image?: string | null;
   };
 }
+
 export default function StudentLayout({ children }: StudentLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
-      {/* Navbar on top always */}
-      <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 dark:bg-gray-950">
+      
+      {/* 🔥 Navbar ALWAYS on top — sticky */}
+      <header className="sticky top-0 z-50">
+        <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
+      </header>
 
-      {/* Body split: Sidebar on left (desktop), Content on right */}
-      <div className="flex flex-1">
-        {/* Sidebar (overlay on mobile, fixed on desktop) */}
+      {/* 🔥 Sidebar left + content right */}
+      <div className="flex flex-1 min-h-0">
+        
+        {/* Sidebar (unchanged) */}
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        {/* Main content */}
-        <main className="flex-1 p-4">
+        {/* 🔥 Main scroll area */}
+        <main className="flex-1 overflow-auto m-4">
           {children}
         </main>
+
       </div>
     </div>
   );
 }
-

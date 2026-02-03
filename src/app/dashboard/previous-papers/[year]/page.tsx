@@ -35,7 +35,7 @@ export default function YearSelectionPage({ params }: PageProps) {
   const { year } = params;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans">
+    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-sans">
       {/* --- Header & Navigation --- */}
       <header className="mb-8">
         <Link 

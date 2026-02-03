@@ -29,7 +29,7 @@ export default function PaperDetailPage({ params }: PageProps) {
   const { year, paperId } = params;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col font-sans">
+    <div className="bg-slate-950 text-slate-200 flex flex-col font-sans">
       {/* --- Top Bar --- */}
       <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">

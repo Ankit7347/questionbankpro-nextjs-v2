@@ -81,7 +81,7 @@ export default function SolvedPapersPage() {
   }, [data, query, subjectFilter]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
+    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
       {/* Header */}
       <header className="mb-6">
         <div className="flex items-start justify-between gap-4 flex-col md:flex-row">

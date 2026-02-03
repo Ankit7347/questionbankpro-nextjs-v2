@@ -28,7 +28,7 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<div className="flex flex-col items-center min-h-screen px-4 py-10 bg-white dark:bg-gray-900">
+		<div className="flex flex-col items-center px-4 py-10 bg-white dark:bg-gray-900">
 			<h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
 				Welcome to Dashboard
 			</h1>

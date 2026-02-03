@@ -33,7 +33,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ subjec
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-6 pb-24">
+    <div className="bg-slate-950 text-slate-200 p-4 md:p-6 pb-24">
       {/* Header */}
       <header className="mb-8">
         <Link href={`/dashboard/notes/${subjectId}`} className="inline-flex items-center text-sm text-slate-400 hover:text-cyan-400 mb-4 transition-colors">

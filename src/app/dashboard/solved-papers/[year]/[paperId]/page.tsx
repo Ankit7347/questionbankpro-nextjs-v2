@@ -39,7 +39,7 @@ export default async function SolvedPaperDetail({ params }: PageProps) {
 
   if (!paper) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-200 p-6 font-serif">
+      <div className="bg-slate-950 text-slate-200 p-6 font-serif">
         <Link href="/dashboard/solved-papers" className="text-slate-400 hover:text-cyan-300 inline-flex items-center gap-2 mb-4"> 
           <ChevronLeft className="w-4 h-4" /> Back
         </Link>
@@ -49,7 +49,7 @@ export default async function SolvedPaperDetail({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
+    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <Link href="/dashboard/solved-papers" className="text-slate-400 hover:text-cyan-300 inline-flex items-center gap-2 mb-2">
