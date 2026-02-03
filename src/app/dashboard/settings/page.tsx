@@ -1,106 +1,183 @@
-"use client";
-import React, { useEffect, useState } from "react";
+/**
+ * src/app/dashboard/settings/page.tsx
+ * Authored by Architect Pro
+ * Persona: Architect Pro (Senior)
+ */
 
-type SettingOption = {
-  key: string;
-  label: string;
-  description?: string;
-};
+'use client'
 
-const SETTINGS: SettingOption[] = [
-  {
-    key: "darkMode",
-    label: "Dark Mode",
-    description: "Enable or disable dark theme",
-  },
-  {
-    key: "notifications",
-    label: "Notifications",
-    description: "Receive notifications about updates",
-  },
-];
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { User, ChevronRight, Sun, Moon, Settings as Cog, Database } from 'lucide-react'
+import { toast } from 'sonner'
 
-const SettingToggle: React.FC<{
-  enabled: boolean;
-  onToggle: () => void;
-  label: string;
-  description?: string;
-}> = ({ enabled, onToggle, label, description }) => (
-  <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 min-w-[320px]">
-    <div>
-      <div className="font-medium text-gray-900 dark:text-white">{label}</div>
-      {description && (
-        <div className="text-sm text-gray-600 dark:text-gray-400">{description}</div>
-      )}
-    </div>
-    <button
-      onClick={onToggle}
-      className={`w-10 h-6 rounded-full relative transition-colors ${
-        enabled ? "bg-gray-900" : "bg-gray-400"
-      }`}
-      aria-pressed={enabled}
-    >
-      <span
-        className="block w-5 h-5 bg-white rounded-md shadow absolute top-0.5 left-0.5 transition-transform"
-        style={{
-          transform: enabled ? "translateX(16px)" : "translateX(0px)",
-        }}
-      />
-    </button>
-  </div>
-);
+interface UserProfile {
+  name: string
+  avatarUrl?: string
+  subscription?: string
+  storageUsedMB?: number
+  storageTotalMB?: number
+}
 
-const SettingsPage: React.FC = () => {
-  const [settings, setSettings] = useState({
-    darkMode: false,
-    notifications: true,
-    autoSave: false,
-  });
+type ThemeOption = 'dark' | 'light' | 'system'
+
+export default function SettingsPage() {
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [theme, setTheme] = useState<ThemeOption>('system')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // On mount, load theme from localStorage
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setSettings((prev) => ({ ...prev, darkMode: true }));
-      document.documentElement.classList.add("dark");
-    } else {
-      setSettings((prev) => ({ ...prev, darkMode: false }));
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const handleToggle = (key: string) => {
-    const newValue = !settings[key as keyof typeof settings];
-    setSettings((prev) => ({
-      ...prev,
-      [key]: newValue,
-    }));
-
-    if (key === "darkMode") {
-      if (newValue) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
+    const load = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/dashboard/settings')
+        if (!res.ok) throw new Error('Failed to load')
+        const { profile, preferences } = await res.json()
+        setProfile(profile)
+        setTheme((preferences?.theme as ThemeOption) || 'system')
+      } catch (err) {
+        toast.error('Unable to load settings')
+      } finally {
+        setLoading(false)
       }
     }
-  };
+    load()
+  }, [])
+
+  const setThemeSafe = async (t: ThemeOption) => {
+    setTheme(t)
+    try {
+      const res = await fetch('/api/dashboard/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: t }),
+      })
+      if (!res.ok) throw new Error('Save failed')
+      toast.success('Theme updated')
+    } catch (err) {
+      toast.error('Failed to save theme')
+    }
+  }
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-xl shadow text-gray-900 dark:text-white">
-      <h2 className="text-2xl font-bold mb-6">Settings</h2>
-      {SETTINGS.map((setting) => (
-        <SettingToggle
-          key={setting.key}
-          enabled={settings[setting.key as keyof typeof settings]}
-          onToggle={() => handleToggle(setting.key)}
-          label={setting.label}
-          description={setting.description}
-        />
-      ))}
-    </div>
-  );
-};
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 md:p-8">
+      <div className="max-w-3xl mx-auto">
+        <header className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Settings</h1>
+            <p className="text-sm text-slate-400">Manage account, preferences and notifications</p>
+          </div>
+        </header>
 
-export default SettingsPage;
+        {loading ? (
+          <div className="space-y-4">
+            <div className="h-20 rounded-lg bg-slate-900/40 animate-pulse"></div>
+            <div className="h-12 rounded-lg bg-slate-900/40 animate-pulse"></div>
+            <div className="h-12 rounded-lg bg-slate-900/40 animate-pulse"></div>
+          </div>
+        ) : (
+          <section className="space-y-6">
+            <div className="rounded-lg bg-slate-900/40 p-4 flex items-center gap-4">
+              <div className="rounded-full bg-slate-800 h-14 w-14 flex items-center justify-center overflow-hidden">
+                {profile?.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="avatar" className="h-14 w-14 object-cover" />
+                ) : (
+                  <User className="text-slate-300" />
+                )}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-medium">{profile?.name}</h2>
+                    <p className="text-xs text-slate-400">{profile?.subscription || 'Free'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-slate-900/40 p-1">
+              <h3 className="text-sm px-4 pt-3 text-slate-300">Preferences</h3>
+              <div className="divide-y divide-slate-800">
+                <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-900/60">
+                  <div className="flex items-center gap-3">
+                    <Cog className="text-cyan-400" />
+                    <div>
+                      <div className="text-sm">Appearance</div>
+                      <div className="text-xs text-slate-400">Theme and color mode</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setThemeSafe('dark')}
+                      className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-slate-800 text-cyan-400' : 'bg-transparent'}`}
+                    >
+                      <Moon size={16} />
+                    </button>
+                    <button
+                      onClick={() => setThemeSafe('light')}
+                      className={`px-2 py-1 rounded ${theme === 'light' ? 'bg-slate-800 text-cyan-400' : 'bg-transparent'}`}
+                    >
+                      <Sun size={16} />
+                    </button>
+                    <button
+                      onClick={() => setThemeSafe('system')}
+                      className={`px-2 py-1 rounded ${theme === 'system' ? 'bg-slate-800 text-cyan-400' : 'bg-transparent'}`}
+                    >
+                      <Database size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                <Link href="/dashboard/settings/notifications" className="flex items-center justify-between px-4 py-3 hover:bg-slate-900/60">
+                  <div className="flex items-center gap-3">
+                    <div className="text-cyan-400">🔔</div>
+                    <div>
+                      <div className="text-sm">Notifications</div>
+                      <div className="text-xs text-slate-400">Manage notification preferences</div>
+                    </div>
+                  </div>
+                  <ChevronRight />
+                </Link>
+
+                <Link href="/dashboard/settings/password" className="flex items-center justify-between px-4 py-3 hover:bg-slate-900/60">
+                  <div className="flex items-center gap-3">
+                    <div className="text-cyan-400">🔒</div>
+                    <div>
+                      <div className="text-sm">Password & Security</div>
+                      <div className="text-xs text-slate-400">Change password, 2FA, sessions</div>
+                    </div>
+                  </div>
+                  <ChevronRight />
+                </Link>
+
+                <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-900/60">
+                  <div className="flex items-center gap-3">
+                    <div className="text-rose-400">🗑️</div>
+                    <div>
+                      <div className="text-sm">Delete Account</div>
+                      <div className="text-xs text-slate-400">Remove your data permanently</div>
+                    </div>
+                  </div>
+                  <ChevronRight />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-slate-900/40 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-slate-300">Storage</div>
+                  <div className="text-xs text-slate-400">Notes & papers</div>
+                </div>
+                <div className="text-sm text-slate-200">{profile?.storageUsedMB ?? 0} / {profile?.storageTotalMB ?? 1000} MB</div>
+              </div>
+              <div className="w-full bg-slate-800 rounded h-2 mt-3 overflow-hidden">
+                <div style={{ width: `${Math.min(100, ((profile?.storageUsedMB || 0) / (profile?.storageTotalMB || 1000)) * 100)}%` }} className="h-2 bg-emerald-500" />
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
+    </main>
+  )
+}
