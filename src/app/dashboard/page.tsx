@@ -46,7 +46,14 @@ export default function DashboardPage() {
 			{/* Header Section */}
 			<div className="max-w-6xl mx-auto mb-10 text-left">
 				<h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white">
-					Welcome back, <span className="text-blue-600">{session?.user?.name || "Student"}</span>!
+					Welcome back,{" "}
+					<Link
+						href="/dashboard/profile"
+						className="text-blue-600 hover:text-blue-700 hover:underline decoration-2 underline-offset-4 transition-all"
+					>
+						{session?.user?.name || "Student"}
+					</Link>
+					!
 				</h1>
 				<p className="mt-2 text-gray-600 dark:text-gray-400 text-lg">
 					What would you like to study today?
