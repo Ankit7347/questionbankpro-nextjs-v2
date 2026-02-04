@@ -7,7 +7,7 @@ This module serves as the digital archive for past examination papers. It allows
 
 ## File Structure
 - `page.tsx`: Main dashboard UI. Displays stats, recent papers, and a grid of available academic years.
-- `route.ts`: (Located in `src/api/dashboard/previous-papers`) API endpoint to fetch dashboard statistics and metadata.
+- `route.ts`: (Located in `src/app/api/dashboard/previous-papers`) API endpoint to fetch dashboard statistics and metadata.
 
 ## Key Features
 - **Year Grid**: Visual navigation for academic years.
