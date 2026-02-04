@@ -3,18 +3,27 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import { 
+  BookOpen, 
+  FileText, 
+  CheckSquare, 
+  Layout, 
+  ClipboardList, 
+  GraduationCap 
+} from "lucide-react";
 
+// Added icons to the features array
 const features = [
-	{ title: "Courses", href: "/dashboard/courses", desc: "Browse and enroll in helpful courses" },
-	{ title: "Previous Year Papers", href: "/dashboard/previous-papers", desc: "Access board-wise past papers" },
-	{ title: "Solved Papers", href: "/dashboard/solved-papers", desc: "View solved papers with detailed answers" },
-	{ title: "Quizzes", href: "/dashboard/quiz", desc: "Practice topic-based MCQs and mock tests" },
-	{ title: "Notes", href: "/dashboard/notes", desc: "Get concise notes for quick revision" },
-	{ title: "Syllabus", href: "/dashboard/syllabus", desc: "Explore official board syllabus" },
+	{ title: "Courses", href: "/dashboard/courses", desc: "Browse and enroll in helpful courses", icon: GraduationCap, color: "text-blue-500" },
+	{ title: "Previous Year Papers", href: "/dashboard/previous-papers", desc: "Access board-wise past papers", icon: FileText, color: "text-purple-500" },
+	{ title: "Solved Papers", href: "/dashboard/solved-papers", desc: "View solved papers with detailed answers", icon: CheckSquare, color: "text-green-500" },
+	{ title: "Quizzes", href: "/dashboard/quiz", desc: "Practice topic-based MCQs and mock tests", icon: ClipboardList, color: "text-orange-500" },
+	{ title: "Notes", href: "/dashboard/notes", desc: "Get concise notes for quick revision", icon: BookOpen, color: "text-red-500" },
+	{ title: "Syllabus", href: "/dashboard/syllabus", desc: "Explore official board syllabus", icon: Layout, color: "text-cyan-500" },
 ];
 
 export default function DashboardPage() {
-	const { status } = useSession();
+	const { data: session, status } = useSession();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -24,24 +33,43 @@ export default function DashboardPage() {
 	}, [status, router]);
 
 	if (status === "loading") {
-		return <div className="flex justify-center items-center h-screen">Loading...</div>;
+		return (
+			<div className="flex flex-col justify-center items-center h-screen bg-white dark:bg-gray-900">
+				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+				<p className="text-gray-500 animate-pulse">Loading your dashboard...</p>
+			</div>
+		);
 	}
 
 	return (
-		<div className="flex flex-col items-center px-4 py-10 bg-white dark:bg-gray-900">
-			<h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
-				Welcome to Dashboard
-			</h1>
+		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-10 md:px-10">
+			{/* Header Section */}
+			<div className="max-w-6xl mx-auto mb-10 text-left">
+				<h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white">
+					Welcome back, <span className="text-blue-600">{session?.user?.name || "Student"}</span>!
+				</h1>
+				<p className="mt-2 text-gray-600 dark:text-gray-400 text-lg">
+					What would you like to study today?
+				</p>
+			</div>
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+			{/* Features Grid */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
 				{features.map((feature) => (
 					<Link
 						key={feature.href}
 						href={feature.href}
-						className="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow hover:shadow-md hover:scale-[1.02] transition-all"
+						className="group bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-1"
 					>
-						<h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h2>
-						<p className="text-gray-700 dark:text-gray-400">{feature.desc}</p>
+						<div className={`p-3 rounded-lg inline-block mb-4 bg-gray-50 dark:bg-gray-700/50 ${feature.color}`}>
+							<feature.icon size={28} />
+						</div>
+						<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors">
+							{feature.title}
+						</h2>
+						<p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
+							{feature.desc}
+						</p>
 					</Link>
 				))}
 			</div>
