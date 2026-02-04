@@ -42,7 +42,7 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-10 md:px-10">
+		<div className="bg-gray-50 dark:bg-gray-950 px-4 py-10 md:px-10">
 			{/* Header Section */}
 			<div className="max-w-6xl mx-auto mb-10 text-left">
 				<h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white">
