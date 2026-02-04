@@ -1,6 +1,5 @@
-// /home/ankit/Desktop/September/new-questionbank/questionbankpro-dev/src/app/dashboard/previous-papers/page.tsx
+// src/app/dashboard/previous-papers/page.tsx
 
-import React from 'react';
 import Link from 'next/link';
 import { Search, FileText, Calendar, Clock, Download, Filter } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-// /home/ankit/Desktop/September/new-questionbank/questionbankpro-dev/src/app/dashboard/previous-papers/previous-papers.md
+// src/app/dashboard/previous-papers/previous-papers.md
 
 # Previous Papers Module
 

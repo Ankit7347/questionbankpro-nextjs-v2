@@ -1,4 +1,4 @@
-// /home/ankit/Desktop/September/new-questionbank/questionbankpro-dev/src/app/dashboard/previous-papers/[year]/[paperId]/paper-detail.md
+// src/app/dashboard/previous-papers/[year]/[paperId]/paper-detail.md
 
 # Paper Detail Module
 

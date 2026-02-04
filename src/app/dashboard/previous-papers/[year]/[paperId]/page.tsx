@@ -1,4 +1,4 @@
-// /home/ankit/Desktop/September/new-questionbank/questionbankpro-dev/src/app/dashboard/previous-papers/[year]/[paperId]/page.tsx
+// src/app/dashboard/previous-papers/[year]/[paperId]/page.tsx
 
 import React from 'react';
 import Link from 'next/link';
