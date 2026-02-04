@@ -54,14 +54,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
 	return (
 		<>
-			{/* Overlay on mobile & tablet only */}
-			<div className={`fixed inset-0 z-30 bg-black/50 transition-opacity md:hidden ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} onClick={onClose} />
+	{/* Overlay on mobile & tablet only (hidden on large screens and above) */}
+		<div className={`fixed inset-0 z-30 bg-black/50 transition-opacity lg:hidden ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} onClick={onClose} />
 
 			{/* SIDEBAR */}
-			<aside className={`fixed top-0 left-0 z-40 h-full w-64 backdrop-blur-xl bg-white/40 dark:bg-[#0A1224]/40 border-r border-white/20 dark:border-white/10 shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:relative md:block`}>
-
-				{/* Mobile header */}
-				<div className="md:hidden p-4 flex justify-between items-center border-b border-white/20 dark:border-white/10">
+		<aside className={`fixed top-0 left-0 z-40 h-full w-64 backdrop-blur-xl bg-white/40 dark:bg-[#0A1224]/40 border-r border-white/20 dark:border-white/10 shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:relative lg:block`}>
+			{/* Mobile header (hidden at lg and above) */}
+			<div className="lg:hidden p-4 flex justify-between items-center border-b border-white/20 dark:border-white/10">
 					<h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Menu</h2>
 					<button onClick={onClose}>
 						<X className="w-6 h-6 text-gray-800 dark:text-gray-100" />

@@ -30,8 +30,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
 	return (
 		<header className="sticky top-0 z-[60] flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b dark:border-gray-700 shadow-sm">
 			<div className="flex items-center gap-4">
-				{/* Hamburger menu on mobile */}
-				<button onClick={onToggleSidebar} className="md:hidden">
+			{/* Hamburger menu on mobile & tablet */}
+			<button onClick={onToggleSidebar} className="lg:hidden">
 					<Menu className="w-6 h-6 text-gray-800 dark:text-white" />
 				</button>
 				<h1 className="text-lg font-bold text-gray-800 dark:text-white">Student Dashboard</h1>
