@@ -1,50 +1,66 @@
 // src/app/dashboard/previous-papers/page.tsx
+'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search, FileText, Calendar, Clock, Download, Filter } from 'lucide-react';
-
-// --- Interfaces ---
-
-interface YearData {
-  year: string;
-  paperCount: number;
-  isActive: boolean;
-}
-
-interface RecentPaper {
-  id: string;
-  subject: string;
-  code: string;
-  year: string;
-  session: string;
-  dateAdded: string;
-}
-
-// --- Mock Data (Replace with API fetch in production) ---
-
-const stats = {
-  totalPapers: 1250,
-  totalDownloads: 45000,
-  activeYears: 12,
-};
-
-const years: YearData[] = [
-  { year: '2024', paperCount: 45, isActive: true },
-  { year: '2023', paperCount: 120, isActive: true },
-  { year: '2022', paperCount: 115, isActive: true },
-  { year: '2021', paperCount: 98, isActive: true },
-  { year: '2020', paperCount: 85, isActive: true },
-  { year: '2019', paperCount: 90, isActive: true },
-];
-
-const recentPapers: RecentPaper[] = [
-  { id: 'p1', subject: 'Advanced Mathematics', code: 'MAT401', year: '2024', session: 'Summer', dateAdded: '2 days ago' },
-  { id: 'p2', subject: 'Data Structures', code: 'CS302', year: '2024', session: 'Summer', dateAdded: '3 days ago' },
-  { id: 'p3', subject: 'Digital Logic', code: 'EE205', year: '2023', session: 'Winter', dateAdded: '5 days ago' },
-  { id: 'p4', subject: 'Physics II', code: 'PHY102', year: '2023', session: 'Winter', dateAdded: '1 week ago' },
-];
+import {
+  getPreviousPapersStats,
+  getRecentPreviousPapers,
+  getYearsList,
+} from '@/services/client/previousPaper.client';
+import {
+  PreviousPapersStatsUIDTO,
+  RecentPreviousPaperUIDTO,
+  YearDataUIDTO,
+} from '@/dto/previousPaper.ui.dto';
 
 export default function PreviousPapersPage() {
+  const [stats, setStats] = useState<PreviousPapersStatsUIDTO | null>(null);
+  const [recentPapers, setRecentPapers] = useState<RecentPreviousPaperUIDTO[]>([]);
+  const [years, setYears] = useState<YearDataUIDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [statsData, recentData, yearsData] = await Promise.all([
+          getPreviousPapersStats(),
+          getRecentPreviousPapers(4),
+          getYearsList(),
+        ]);
+
+        setStats(statsData);
+        setRecentPapers(recentData);
+        setYears(yearsData);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load data');
+        console.error('Error loading previous papers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
+        <div className="text-center py-12">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
+        <div className="text-center py-12 text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
       {/* --- Header & Stats --- */}
@@ -66,7 +82,7 @@ export default function PreviousPapersPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-semibold">Total Papers</p>
-                <p className="text-xl font-bold text-foreground">{stats.totalPapers}</p>
+                <p className="text-xl font-bold text-foreground">{stats?.totalPapers || 0}</p>
               </div>
             </div>
             <div className="w-full sm:w-auto bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-3 min-h-16 shadow-sm hover:shadow-md transition">
@@ -75,7 +91,7 @@ export default function PreviousPapersPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-semibold">Downloads</p>
-                <p className="text-xl font-bold text-foreground">{stats.totalDownloads.toLocaleString()}</p>
+                <p className="text-xl font-bold text-foreground">{(stats?.totalDownloads || 0).toLocaleString()}</p>
               </div>
             </div>
           </div>

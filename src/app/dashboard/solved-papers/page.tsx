@@ -1,252 +1,176 @@
-"use client";
+// src/app/dashboard/solved-papers/page.tsx
+'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Search, Star, TrendingUp, BookOpen, Tag, Shuffle } from 'lucide-react';
-
-// --- Interfaces ---
-interface SolutionStep {
-  id: string;
-  title?: string;
-  body: string; // can contain LaTeX inline markers like $...$ or $$...$$
-}
-
-interface SolvedPaper {
-  id: string;
-  title: string;
-  subject: string;
-  year: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  views: number;
-  isVerified: boolean;
-  isPremium?: boolean;
-  shortDescription?: string;
-  questionCount: number;
-  sampleSteps?: SolutionStep[];
-}
-
-interface SubjectGroup {
-  subject: string;
-  papers: SolvedPaper[];
-}
-
-// --- Helper components ---
-const ExpertBadge: React.FC<{ verified?: boolean }> = ({ verified }) => (
-  <span className={`text-xs px-2 py-1 rounded-full text-slate-900 ${verified ? 'bg-emerald-400' : 'bg-slate-700'} font-semibold`}> 
-    {verified ? 'Verified Solutions' : "Community"}
-  </span>
-);
-
-const LatexInline: React.FC<{ latex: string }> = ({ latex }) => {
-  // NOTE: For production replace this with KaTeX/MathJax render.
-  return <code className="bg-slate-800/60 px-1 rounded text-cyan-300 font-mono">{latex}</code>;
-};
+import { Search, BookOpen, Calendar, Clock, Download, Filter } from 'lucide-react';
+import {
+  getSolvedPapersStats,
+  getRecentSolvedPapers,
+  getYearsList,
+} from '@/services/client/solvedPaper.client';
+import {
+  SolvedPapersStatsUIDTO,
+  RecentSolvedPaperUIDTO,
+  YearDataUIDTO,
+} from '@/dto/solvedPaper.ui.dto';
 
 export default function SolvedPapersPage() {
-  const [query, setQuery] = useState('');
-  const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
-  const [quality, setQuality] = useState<'detailed' | 'brief'>('detailed');
-  const [data, setData] = useState<{ stats: any; subjects: SubjectGroup[]; trending: SolvedPaper[] } | null>(null);
+  const [stats, setStats] = useState<SolvedPapersStatsUIDTO | null>(null);
+  const [recentPapers, setRecentPapers] = useState<RecentSolvedPaperUIDTO[]>([]);
+  const [years, setYears] = useState<YearDataUIDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-    async function load() {
+    const loadData = async () => {
       try {
-        const res = await fetch('/api/dashboard/solved-papers');
-        const json = await res.json();
-        if (mounted) setData(json);
-      } catch (err) {
-        console.error('Failed to load solved papers data', err);
+        const [statsData, recentData, yearsData] = await Promise.all([
+          getSolvedPapersStats(),
+          getRecentSolvedPapers(4),
+          getYearsList(),
+        ]);
+
+        setStats(statsData);
+        setRecentPapers(recentData);
+        setYears(yearsData);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load data');
+      } finally {
+        setLoading(false);
       }
-    }
-    load();
-    return () => { mounted = false };
+    };
+
+    loadData();
   }, []);
 
-  const subjectList = useMemo(() => data?.subjects.map(s => s.subject) ?? [], [data]);
+  if (loading) {
+    return (
+      <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
+        <div className="text-center py-12">Loading...</div>
+      </div>
+    );
+  }
 
-  const filteredSubjects = useMemo(() => {
-    if (!data) return [];
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      return data.subjects.map(s => ({
-        ...s,
-        papers: s.papers.filter(p => p.title.toLowerCase().includes(q) || (p.shortDescription || '').toLowerCase().includes(q)),
-      })).filter(s => s.papers.length > 0);
-    }
-    if (subjectFilter) {
-      return data.subjects.filter(s => s.subject === subjectFilter);
-    }
-    return data.subjects;
-  }, [data, query, subjectFilter]);
+  if (error) {
+    return (
+      <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
+        <div className="text-center py-12 text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
-      {/* Header */}
-      <header className="mb-6">
-        <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
+    <div className="text-foreground p-4 md:p-8 font-sans max-w-7xl mx-auto">
+      {/* --- Header & Stats --- */}
+      <header className="mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white flex items-center gap-3">
-              <BookOpen className="w-8 h-8 text-cyan-400" /> Solved Papers
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <BookOpen className="w-7 h-7 md:w-8 md:h-8 text-cyan-500" />
+              Solved Papers Archive
             </h1>
-            <p className="text-slate-400 mt-1 max-w-xl">Curated, step-by-step solutions and concept callouts to master exam papers. Toggle solution quality while browsing.</p>
+            <p className="text-slate-400">
+              Access step-by-step solutions with detailed explanations for exam papers.
+            </p>
           </div>
-
-          <div className="w-full md:w-auto mt-3 md:mt-0">
-            <div className="relative max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-500" />
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch">
+            <div className="w-full sm:w-auto bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-3 min-h-16 shadow-sm hover:shadow-md transition">
+              <div className="p-2 bg-cyan-500/10 rounded-md">
+                <BookOpen className="w-5 h-5 text-cyan-400" />
               </div>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by topic, question, or keyword..."
-                className="block w-full pl-10 pr-12 py-3 border border-slate-800 rounded-xl leading-5 bg-slate-900/60 text-slate-300 placeholder-slate-500 focus:outline-none sm:text-sm h-12"
-              />
-              <div className="absolute inset-y-0 right-0 pr-2 flex items-center gap-2">
-                <button
-                  onClick={() => setQuality(q => q === 'detailed' ? 'brief' : 'detailed')}
-                  className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm text-slate-200 hover:bg-slate-800 transition"
-                >
-                  {quality === 'detailed' ? 'Detailed' : 'Brief'}
-                </button>
-                <button
-                  onClick={() => { setQuery(''); setSubjectFilter(null); }}
-                  className="p-2 rounded-lg hover:bg-slate-800"
-                  title="Clear"
-                >
-                  <Shuffle className="w-4 h-4 text-slate-400" />
-                </button>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase font-semibold">Total Papers</p>
+                <p className="text-xl font-bold text-foreground">{stats?.totalPapers || 0}</p>
+              </div>
+            </div>
+            <div className="w-full sm:w-auto bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-3 min-h-16 shadow-sm hover:shadow-md transition">
+              <div className="p-2 bg-emerald-500/10 rounded-md">
+                <Download className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase font-semibold">Downloads</p>
+                <p className="text-xl font-bold text-foreground">{(stats?.totalDownloads || 0).toLocaleString()}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Stats & Trending */}
-        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex gap-4">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex items-center gap-3">
-              <div className="p-2 bg-cyan-500/10 rounded-lg">
-                <Star className="w-5 h-5 text-cyan-300" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 uppercase font-semibold">Solved Papers</p>
-                <p className="text-xl font-bold text-white">{data?.stats?.totalSolved ?? '—'}</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex items-center gap-3">
-              <div className="p-2 bg-amber-500/10 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-amber-300" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 uppercase font-semibold">Trending</p>
-                <p className="text-xl font-bold text-white">{data?.trending?.length ?? 0}</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 rounded-lg">
-                <Tag className="w-5 h-5 text-indigo-300" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 uppercase font-semibold">Subjects</p>
-                <p className="text-xl font-bold text-white">{subjectList.length}</p>
-              </div>
-            </div>
+        {/* --- Search Bar --- */}
+        <div className="relative w-full md:max-w-2xl">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-slate-400" />
           </div>
-
-          {/* Trending mini list */}
-          <div className="mt-4 md:mt-0 w-full md:w-1/3">
-            <h3 className="text-sm text-slate-400 mb-2">Most-Viewed Solutions</h3>
-            <div className="flex gap-2 overflow-x-auto">
-              {data?.trending?.map((t) => (
-                <Link
-                  key={t.id}
-                  href={`/dashboard/solved-papers/${t.year}/${t.id}`}
-                  className="min-w-[180px] bg-slate-900/40 border border-slate-800 rounded-xl p-3 hover:border-cyan-400/30 transition flex gap-3 items-start"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-semibold text-white truncate">{t.title}</h4>
-                      <span className="text-xs text-slate-400">{t.views} views</span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-1 truncate">{t.subject} • {t.year}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-12 py-3 border border-slate-200 dark:border-slate-800 rounded-xl leading-5 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-200 placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm transition-all h-12"
+            placeholder="Search by subject code or keyword..."
+          />
+          <div className="absolute inset-y-0 right-0 pr-2 flex items-center">
+             <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors h-10 w-10 flex items-center justify-center">
+                <Filter className="h-5 w-5 text-slate-500" />
+             </button>
           </div>
         </div>
       </header>
 
-      {/* Subjects List */}
-      <main className="space-y-8">
-        {filteredSubjects.length === 0 && (
-          <div className="p-6 bg-slate-900/30 border border-slate-800 rounded-xl text-slate-400">No results. Try a different query or select a subject.</div>
-        )}
-
-        {filteredSubjects.map((group) => (
-          <section key={group.subject} id={`subject-${group.subject}`} className="bg-slate-900/20 border border-slate-800 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-semibold text-white">{group.subject}</h2>
-                <ExpertBadge verified={group.papers.some(p => p.isVerified)} />
+      {/* --- Recently Added Section --- */}
+      <section className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground flex items-center gap-2">
+            <Clock className="w-5 h-5 text-amber-500" />
+            Recently Added
+          </h2>
+          <Link href="#" className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors h-12 flex items-center">
+            View All
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:flex overflow-x-auto gap-4 pb-4 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+          {recentPapers.map((paper) => (
+            <div
+              key={paper.id}
+              className="w-full sm:w-72 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-cyan-500 transition-all group cursor-pointer active:scale-95 shadow-sm hover:shadow-md"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-md font-mono">
+                  {paper.code}
+                </span>
+                <span className="text-xs text-muted-foreground">{paper.dateAdded}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSubjectFilter(prev => prev === group.subject ? null : group.subject)} className="text-sm text-slate-400 hover:text-white">{subjectFilter === group.subject ? 'Clear' : 'Filter'}</button>
-                <Link href={`/dashboard/solved-papers/${group.papers[0]?.year ?? ''}`} className="text-sm text-cyan-300 hover:underline">View by Year</Link>
-              </div>
+              <h3 className="text-gray-900 dark:text-white font-medium mb-1 group-hover:text-cyan-500 transition-colors">
+                {paper.title}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {paper.year} • {paper.session}
+              </p>
             </div>
+          ))}
+        </div>
+      </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {group.papers.map((paper) => (
-                <article key={paper.id} className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 hover:border-cyan-400/20 transition">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-white font-semibold truncate">{paper.title}</h3>
-                      <p className="text-xs text-slate-400 mt-1">{paper.subject} • {paper.year} • {paper.difficulty}</p>
-                    </div>
-                    <div className="text-right">
-                      {paper.isPremium && <span className="text-xs text-amber-300">Premium</span>}
-                      <div className="text-xs text-slate-400">Q: {paper.questionCount}</div>
-                    </div>
-                  </div>
-
-                  <p className="text-slate-300 text-sm mt-3">{paper.shortDescription}</p>
-
-                  {/* Quick peek steps */}
-                  <div className="mt-3 space-y-2">
-                    {(quality === 'detailed' ? paper.sampleSteps?.slice(0, 3) : paper.sampleSteps?.slice(0,1))?.map(s => (
-                      <div key={s.id} className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
-                        {s.title && <div className="text-xs text-slate-400 mb-1">{s.title}</div>}
-                        <div className="text-sm text-slate-200">
-                          {/* Primitive latex detection */}
-                          {s.body.includes('$') ? <LatexInline latex={s.body} /> : <span>{s.body}</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <Link href={`/dashboard/solved-papers/${paper.year}/${paper.id}`} className="text-sm text-cyan-300 hover:underline">Open Paper</Link>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400">{paper.views} views</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        ))}
-      </main>
-
-      {/* Floating Index Button */}
-      <div className="fixed right-4 bottom-6 md:right-8 md:bottom-8">
-        <a href="#top" className="bg-cyan-400 text-slate-900 p-3 rounded-full shadow-lg flex items-center gap-2 hover:scale-105 transition-transform">
-          Index
-        </a>
-      </div>
+      {/* --- Year Selection Grid --- */}
+      <section>
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-purple-500" />
+          Browse by Year
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          {years.map((item) => (
+            <Link
+              href={`/dashboard/solved-papers/${item.year}`}
+              key={item.year}
+              className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-4 md:p-6 flex flex-col items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-cyan-500/30 transition-all active:scale-95 group min-h-28"
+            >
+              <span className="text-2xl md:text-3xl font-bold text-foreground group-hover:text-cyan-500 mb-2">
+                {item.year}
+              </span>
+              <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-200 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-colors">
+                {item.paperCount} Papers
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
