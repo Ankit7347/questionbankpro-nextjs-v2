@@ -21,7 +21,7 @@ export default function ProfileLayout({
   const { data: session } = useSession();
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-950">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="flex items-center space-x-5 mb-8">
