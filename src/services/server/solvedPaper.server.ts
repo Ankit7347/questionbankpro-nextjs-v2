@@ -5,7 +5,7 @@
  * Only this layer imports Mongoose
  */
 
-import { SolvedPaper } from '@/models/mongoose/SolvedPaper.schema';
+import SolvedPaper from '@/models/mongoose/SolvedPaper.schema';
 import {
   SolvedPaperServerDTO,
   CreateSolvedPaperServerDTO,

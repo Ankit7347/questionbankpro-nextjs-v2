@@ -5,7 +5,7 @@
  * Never returns raw mongo documents, always maps to server DTO
  */
 
-import { PreviousPaper } from '@/models/mongoose/PreviousPaper.schema';
+import PreviousPaper from '@/models/mongoose/PreviousPaper.schema';
 import {
   PreviousPaperServerDTO,
   CreatePreviousPaperServerDTO,
@@ -15,6 +15,7 @@ import {
 } from '@/models/dto/previousPaper.dto';
 import { mapPreviousPaperToServerDTO, mapPreviousPapersToServerDTOs } from '@/models/dto/previousPaper.mapper';
 import { ApiError } from '@/lib/apiError';
+import dbConnect from '@/lib/mongodb';
 
 /**
  * Get all previous papers (paginated)
@@ -68,6 +69,7 @@ export async function getPreviousPapers(
  */
 export async function getPreviousPaperById(id: string): Promise<PreviousPaperServerDTO> {
   try {
+    await dbConnect();
     const paper = await PreviousPaper.findById(id)
       .populate('examId', 'name slug')
       .populate('subjectId', 'name')
@@ -110,6 +112,7 @@ export async function getPreviousPapersByYear(year: number): Promise<PreviousPap
  */
 export async function getRecentPreviousPapers(limit: number = 10): Promise<PreviousPaperServerDTO[]> {
   try {
+    await dbConnect();
     const papers = await PreviousPaper.find({
       status: 'PUBLISHED',
       isDeleted: false,

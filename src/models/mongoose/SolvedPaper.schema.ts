@@ -499,5 +499,4 @@ SolvedPaperSchema.index({ totalRatings: -1 }); // For best-rated papers
 SolvedPaperSchema.index({ difficulty: 1, subject: 1 }); // For filtering
 SolvedPaperSchema.index({ isFeatured: 1, publishedAt: -1 }); // For featured section
 
-export const SolvedPaper =
-  models.SolvedPaper || model("SolvedPaper", SolvedPaperSchema);
+export default models.SolvedPaper || model("SolvedPaper", SolvedPaperSchema);

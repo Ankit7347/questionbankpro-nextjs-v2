@@ -331,5 +331,4 @@ PreviousPaperSchema.index({ createdAt: -1 });
 PreviousPaperSchema.index({ views: -1 }); // For sorting by popularity
 PreviousPaperSchema.index({ year: -1, session: 1 }); // For chronological browsing
 
-export const PreviousPaper =
-  models.PreviousPaper || model("PreviousPaper", PreviousPaperSchema);
+export default models.PreviousPaper || model("PreviousPaper", PreviousPaperSchema);

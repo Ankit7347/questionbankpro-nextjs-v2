@@ -4,7 +4,7 @@
  * Converts raw database documents to server DTOs
  */
 
-import { PreviousPaper } from '@/models/mongoose/PreviousPaper.schema';
+import PreviousPaper from '@/models/mongoose/PreviousPaper.schema';
 import { PreviousPaperServerDTO } from './previousPaper.dto';
 
 export function mapPreviousPaperToServerDTO(

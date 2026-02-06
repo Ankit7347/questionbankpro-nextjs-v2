@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const result = await getRecentPreviousPapers(Math.min(limit, 50)); // Max 50
     return NextResponse.json(ok(result), { status: 200 });
   } catch (error: any) {
+    console.log('Error fetching recent previous papers:', error);
     if (error instanceof ApiError) {
       return NextResponse.json(
         fail(error.message),
