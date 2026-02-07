@@ -498,5 +498,13 @@ SolvedPaperSchema.index({ views: -1 }); // For trending papers
 SolvedPaperSchema.index({ totalRatings: -1 }); // For best-rated papers
 SolvedPaperSchema.index({ difficulty: 1, subject: 1 }); // For filtering
 SolvedPaperSchema.index({ isFeatured: 1, publishedAt: -1 }); // For featured section
+SolvedPaperSchema.index(
+  {
+    title: "text",
+    paperCode: "text",
+    searchText: "text",
+    keywords: "text",
+  }
+);
 
 export default models.SolvedPaper || model("SolvedPaper", SolvedPaperSchema);

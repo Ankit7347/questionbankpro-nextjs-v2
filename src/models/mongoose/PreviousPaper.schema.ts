@@ -330,5 +330,13 @@ PreviousPaperSchema.index({ isVerified: 1, isPremium: 1 });
 PreviousPaperSchema.index({ createdAt: -1 });
 PreviousPaperSchema.index({ views: -1 }); // For sorting by popularity
 PreviousPaperSchema.index({ year: -1, session: 1 }); // For chronological browsing
+PreviousPaperSchema.index(
+  {
+    title: "text",
+    paperCode: "text",
+    searchText: "text",
+    keywords: "text",
+  }
+);
 
 export default models.PreviousPaper || model("PreviousPaper", PreviousPaperSchema);
