@@ -11,6 +11,7 @@ import "@/models/mongoose/Subject.schema";
 import "@/models/mongoose/Course.schema";
 import "@/models/mongoose/SubExam.schema";
 import "@/models/mongoose/Chapter.schema";
+import "@/models/mongoose/Subject.schema";
 
 import {
   SolvedPaperServerDTO,
@@ -21,6 +22,7 @@ import {
 } from '@/models/dto/solvedPaper.dto';
 import { mapSolvedPaperToServerDTO, mapSolvedPapersToServerDTOs } from '@/models/dto/solvedPaper.mapper';
 import { ApiError } from '@/lib/apiError';
+import dbConnect from '@/lib/mongodb';
 
 /**
  * Utility: Generate URL-friendly slug
@@ -57,6 +59,7 @@ export async function getSolvedPapers(
     if (filters?.subjectId) query.subjectId = filters.subjectId;
     if (filters?.difficulty) query.difficulty = filters.difficulty;
     if (filters?.isVerified !== undefined) query.isVerified = filters.isVerified;
+    await dbConnect();
 
     const papers: any[] = await SolvedPaper.find(query)
       .skip(skip)
@@ -85,6 +88,8 @@ export async function getSolvedPapers(
  */
 export async function getSolvedPaperById(id: string): Promise<SolvedPaperServerDTO> {
   try {
+    await dbConnect();
+
     const paper: any = await SolvedPaper.findById(id)
       .populate('examId', 'name slug')
       .populate('subjectId', 'name')
@@ -106,6 +111,8 @@ export async function getSolvedPaperById(id: string): Promise<SolvedPaperServerD
  */
 export async function getSolvedPapersByYear(year: number): Promise<SolvedPaperServerDTO[]> {
   try {
+    await dbConnect();
+
     const papers: any[] = await SolvedPaper.find({ year, isDeleted: false, status: 'PUBLISHED' })
       .sort({ createdAt: -1 })
       .populate('examId', 'name slug')
@@ -123,6 +130,8 @@ export async function getSolvedPapersByYear(year: number): Promise<SolvedPaperSe
  */
 export async function getRecentSolvedPapers(limit: number = 4): Promise<SolvedPaperServerDTO[]> {
   try {
+    await dbConnect();
+
     const papers: any[] = await SolvedPaper.find({ isDeleted: false, status: 'PUBLISHED' })
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -141,6 +150,7 @@ export async function getRecentSolvedPapers(limit: number = 4): Promise<SolvedPa
  */
 export async function getSolvedPapersStats(): Promise<SolvedPapersStatsDTO> {
   try {
+    await dbConnect();
     const [totalDocs, stats, recent] = await Promise.all([
       SolvedPaper.countDocuments({ isDeleted: false, status: 'PUBLISHED' }),
       SolvedPaper.aggregate([
@@ -184,6 +194,7 @@ export async function createSolvedPaper(
 ): Promise<SolvedPaperServerDTO> {
   try {
     const slug = generateSlug(data.title);
+    await dbConnect();
 
     // Check for duplicate
     const existing = await SolvedPaper.findOne({ slug });
@@ -221,6 +232,8 @@ export async function updateSolvedPaper(
   userId: string
 ): Promise<SolvedPaperServerDTO> {
   try {
+    await dbConnect();
+
     const paper = await SolvedPaper.findById(id);
     if (!paper) {
       throw new ApiError('Paper not found', 404);
@@ -248,6 +261,8 @@ export async function updateSolvedPaper(
  */
 export async function deleteSolvedPaper(id: string, userId: string): Promise<void> {
   try {
+    await dbConnect();
+
     const result = await SolvedPaper.findByIdAndUpdate(
       id,
       {
@@ -271,6 +286,8 @@ export async function deleteSolvedPaper(id: string, userId: string): Promise<voi
  */
 export async function trackSolvedPaperView(id: string): Promise<void> {
   try {
+    await dbConnect();
+
     await SolvedPaper.findByIdAndUpdate(
       id,
       { $inc: { views: 1 } },
@@ -286,6 +303,8 @@ export async function trackSolvedPaperView(id: string): Promise<void> {
  */
 export async function trackSolvedPaperDownload(id: string): Promise<void> {
   try {
+    await dbConnect();
+
     await SolvedPaper.findByIdAndUpdate(
       id,
       { $inc: { downloads: 1 } },
@@ -305,6 +324,8 @@ export async function searchSolvedPapers(
   limit: number = 20
 ): Promise<SolvedPapersListResponseDTO> {
   try {
+    await dbConnect();
+
     const skip = (page - 1) * limit;
 
     // Execute text search with proper model

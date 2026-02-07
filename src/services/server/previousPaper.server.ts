@@ -37,6 +37,7 @@ export async function getPreviousPapers(
   }
 ): Promise<PreviousPapersListResponseDTO> {
   try {
+    await dbConnect();
     const query: any = {
       status: 'PUBLISHED',
       isDeleted: false,
@@ -97,6 +98,7 @@ export async function getPreviousPaperById(id: string): Promise<PreviousPaperSer
  */
 export async function getPreviousPapersByYear(year: number): Promise<PreviousPaperServerDTO[]> {
   try {
+    await dbConnect();
     const papers = await PreviousPaper.find({
       year,
       status: 'PUBLISHED',
@@ -140,6 +142,7 @@ export async function getRecentPreviousPapers(limit: number = 10): Promise<Previ
  */
 export async function getPreviousPapersStats(): Promise<PreviousPapersStatsDTO> {
   try {
+    await dbConnect();
     const totalPapers = await PreviousPaper.countDocuments({
       status: 'PUBLISHED',
       isDeleted: false,
@@ -211,6 +214,7 @@ export async function createPreviousPaper(
   userId: string
 ): Promise<PreviousPaperServerDTO> {
   try {
+    await dbConnect();
     // Generate slug
     const slug = data.title
       .toLowerCase()
@@ -254,6 +258,7 @@ export async function updatePreviousPaper(
   userId: string
 ): Promise<PreviousPaperServerDTO> {
   try {
+    await dbConnect();
     const paper = await PreviousPaper.findById(id);
     if (!paper) {
       throw new ApiError('Paper not found', 404);
@@ -281,6 +286,7 @@ export async function updatePreviousPaper(
  */
 export async function deletePreviousPaper(id: string, userId: string): Promise<void> {
   try {
+    await dbConnect();
     const result = await PreviousPaper.findByIdAndUpdate(
       id,
       {
@@ -304,6 +310,7 @@ export async function deletePreviousPaper(id: string, userId: string): Promise<v
  */
 export async function trackPreviousPaperView(id: string): Promise<void> {
   try {
+    await dbConnect();
     await PreviousPaper.findByIdAndUpdate(
       id,
       { $inc: { views: 1 } },
@@ -319,6 +326,7 @@ export async function trackPreviousPaperView(id: string): Promise<void> {
  */
 export async function trackPreviousPaperDownload(id: string): Promise<void> {
   try {
+    await dbConnect();
     await PreviousPaper.findByIdAndUpdate(
       id,
       { $inc: { downloads: 1 } },
@@ -338,6 +346,7 @@ export async function searchPreviousPapers(
   limit: number = 20
 ): Promise<PreviousPapersListResponseDTO> {
   try {
+    await dbConnect();
     const searchQuery = {
       $text: { $search: query },
       status: 'PUBLISHED',

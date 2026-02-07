@@ -8,6 +8,8 @@ const GATE_CS_SOLVED = [
   {
     paperCode: "GATE-CS-2024-SOLVED",
     title: "GATE 2024 Computer Science - Complete Solutions",
+    year: 2024,
+    questionCount: 65,
     difficulty: "Medium",
     totalMarks: 100,
     duration: 180,
@@ -49,6 +51,8 @@ const GATE_CS_SOLVED = [
   {
     paperCode: "GATE-CS-2023-SOLVED",
     title: "GATE 2023 Computer Science - Expert Solutions",
+    year: 2023,
+    questionCount: 65,
     difficulty: "Hard",
     totalMarks: 100,
     duration: 180,
@@ -90,6 +94,8 @@ const GATE_CS_SOLVED = [
   {
     paperCode: "GATE-CS-2022-SOLVED",
     title: "GATE 2022 Computer Science - Solution Archive",
+    year: 2022,
+    questionCount: 65,
     difficulty: "Hard",
     totalMarks: 100,
     duration: 180,
@@ -131,6 +137,8 @@ const GATE_CS_SOLVED = [
   {
     paperCode: "GATE-CS-2021-SOLVED",
     title: "GATE 2021 Computer Science - Solved Questions",
+    year: 2021,
+    questionCount: 65,
     difficulty: "Medium",
     totalMarks: 100,
     duration: 180,
@@ -194,6 +202,8 @@ async function seedSolvedPapers() {
       { slug: { $regex: /cs.*it|it.*cs/ }, isDeleted: false },
       { slug: "computer-science", isDeleted: false },
       { "name.en": { $regex: /computer.*science|cs|it/ }, isDeleted: false },
+      { slug: "operating-systems", isDeleted: false },
+      { slug: "dbms", isDeleted: false },
     ];
 
     for (const query of subjectOptions) {
@@ -234,6 +244,8 @@ async function seedSolvedPapers() {
         slug,
         examId: gateExam._id,
         subjectId: csSubject._id,
+        year: paper.year,
+        questionCount: paper.questionCount,
         difficulty: paper.difficulty,
         totalMarks: paper.totalMarks,
         duration: paper.duration,
