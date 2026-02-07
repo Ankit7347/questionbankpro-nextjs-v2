@@ -6,6 +6,12 @@
  */
 
 import SolvedPaper from '@/models/mongoose/SolvedPaper.schema';
+import "@/models/mongoose/Exam.schema";
+import "@/models/mongoose/Subject.schema";
+import "@/models/mongoose/Course.schema";
+import "@/models/mongoose/SubExam.schema";
+import "@/models/mongoose/Chapter.schema";
+
 import {
   SolvedPaperServerDTO,
   CreateSolvedPaperServerDTO,
