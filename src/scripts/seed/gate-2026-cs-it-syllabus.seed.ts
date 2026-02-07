@@ -1,9 +1,6 @@
 /**
  * Seed syllabus structure for:
  * /exams/gate-exam/gate-2026-cs-it
- *
- * Model chain:
- * SubExam → OfficialSyllabus → SubjectMap → ChapterMap → TopicMap
  */
 
 import { initSeed, closeSeed } from "./_helpers";
@@ -25,39 +22,23 @@ export async function seedGate2026CSITSyllabus() {
   console.log("🚀 Seeding syllabus: GATE 2026 CS & IT");
 
   await initSeed();
-  console.log("🔌 DB connected");
 
-  /* -------------------------------------------------
-   * 1. SubExam
-   * ------------------------------------------------- */
   const subExam = await SubExam.findOne({
     slug: "gate-2026-cs-it",
     isActive: true,
+    isDeleted: false,
   });
 
-  if (!subExam) {
-    throw new Error("SubExam gate-2026-cs-it not found");
-  }
+  if (!subExam) throw new Error("SubExam not found");
 
-  console.log("✅ SubExam found");
-
-  /* -------------------------------------------------
-   * 2. Official Syllabus
-   * ------------------------------------------------- */
   const syllabus = await OfficialSyllabus.findOne({
     subExamId: subExam._id,
     isActive: true,
+    isDeleted: false,
   });
 
-  if (!syllabus) {
-    throw new Error("Official syllabus not found");
-  }
+  if (!syllabus) throw new Error("Official syllabus not found");
 
-  console.log("✅ Official syllabus found");
-
-  /* -------------------------------------------------
-   * 3. Syllabus Tree
-   * ------------------------------------------------- */
   const syllabusTree = [
     {
       subject: { name: "Operating Systems", slug: "operating-systems" },
@@ -95,24 +76,19 @@ export async function seedGate2026CSITSyllabus() {
     },
   ];
 
-  /* -------------------------------------------------
-   * 4. Insert & Map
-   * ------------------------------------------------- */
-  for (const s of syllabusTree) {
-    console.log(`📘 Subject: ${s.subject.name}`);
+  let subjectOrder = 1;
 
-    /* ---------- Subject ---------- */
+  for (const s of syllabusTree) {
     const subject = await Subject.findOneAndUpdate(
       { slug: s.subject.slug },
       {
         name: { en: s.subject.name },
         slug: s.subject.slug,
-        isActive: true,
+        isDeleted: false,
       },
       { upsert: true, new: true }
     );
 
-    /* ---------- SubjectMap ---------- */
     const subjectMap = await SubjectMap.findOneAndUpdate(
       {
         syllabusId: syllabus._id,
@@ -121,6 +97,8 @@ export async function seedGate2026CSITSyllabus() {
       {
         syllabusId: syllabus._id,
         subjectId: subject._id,
+        order: subjectOrder++,
+        isDeleted: false,
         validFrom: SYLLABUS_YEAR,
       },
       { upsert: true, new: true }
@@ -129,20 +107,16 @@ export async function seedGate2026CSITSyllabus() {
     let chapterOrder = 1;
 
     for (const c of s.chapters) {
-      console.log(`  📗 Chapter: ${c.name}`);
-
-      /* ---------- Chapter ---------- */
       const chapter = await Chapter.findOneAndUpdate(
         { slug: c.slug },
         {
           name: { en: c.name },
           slug: c.slug,
-          isActive: true,
+          isDeleted: false,
         },
         { upsert: true, new: true }
       );
 
-      /* ---------- ChapterMap ---------- */
       const chapterMap = await ChapterMap.findOneAndUpdate(
         {
           subjectMapId: subjectMap._id,
@@ -154,6 +128,7 @@ export async function seedGate2026CSITSyllabus() {
           order: chapterOrder++,
           isOptional: false,
           isRemoved: false,
+          isDeleted: false,
           validFrom: SYLLABUS_YEAR,
         },
         { upsert: true, new: true }
@@ -164,18 +139,16 @@ export async function seedGate2026CSITSyllabus() {
       for (const topicName of c.topics) {
         const slug = topicName.toLowerCase().replace(/\s+/g, "-");
 
-        /* ---------- Topic ---------- */
         const topic = await Topic.findOneAndUpdate(
           { slug },
           {
             name: { en: topicName },
             slug,
-            isActive: true,
+            isDeleted: false,
           },
           { upsert: true, new: true }
         );
 
-        /* ---------- TopicMap ---------- */
         await TopicMap.findOneAndUpdate(
           {
             chapterMapId: chapterMap._id,
@@ -185,24 +158,20 @@ export async function seedGate2026CSITSyllabus() {
             chapterMapId: chapterMap._id,
             topicId: topic._id,
             order: topicOrder++,
+            isDeleted: false,
             validFrom: SYLLABUS_YEAR,
           },
           { upsert: true }
         );
-
-        console.log(`    • Topic: ${topicName}`);
       }
     }
   }
 
   await closeSeed();
-  console.log("🏁 Syllabus seed completed successfully");
+  console.log("🏁 Syllabus seed completed");
 }
 
-/* -------------------------------------------------
- * Execute
- * ------------------------------------------------- */
-seedGate2026CSITSyllabus().catch((err) => {
-  console.error("❌ seedGate2026CSITSyllabus failed", err);
+seedGate2026CSITSyllabus().catch(err => {
+  console.error("❌ Seed failed", err);
   process.exit(1);
 });
