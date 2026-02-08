@@ -1,135 +1,128 @@
-// src/app/dashboard/syllabus/page.tsx
-/**
- * Dashboard → Syllabus Page
- * ========================
- *
- * Responsibility:
- * - Display syllabus structure (subjects list)
- *
- * Data source:
- * - fetchDashboardSyllabus()
- * - DTO: SyllabusSubjectDTO (server/domain owned)
- */
-
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { BookOpen, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Eye, BookOpen } from 'lucide-react'
 
 import { fetchDashboardSyllabus } from '@/services/client/syllabus.client'
-import { SyllabusSubjectDTO } from '@/models/dto/syllabusSubject.dto'
+import { SyllabusDTO } from '@/dto/syllabus.ui.dto'
 
 export default function DashboardSyllabusPage() {
-  const [items, setItems] = useState<SyllabusSubjectDTO[]>([])
+  const [data, setData] = useState<SyllabusDTO | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
-
     async function loadSyllabus() {
       try {
-        setLoading(true)
-
         const res = await fetchDashboardSyllabus()
-
-        if (!res.success || !res.data) {
-          console.error('Failed to fetch syllabus:', res.error)
-          return
-        }
-
-        if (mounted) {
-          setItems(res.data)
+        if (res?.success && res.data && mounted) {
+          setData(res.data)
         }
       } catch (err) {
-        console.error('Unexpected syllabus error:', err)
+        console.error('Syllabus fetch failed:', err)
       } finally {
         if (mounted) setLoading(false)
       }
     }
-
     loadSyllabus()
-
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [])
 
-  return (
-    <main className="p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto space-y-8">
+  if (loading) {
+    // Kept skeleton structure but reduced spacing to match new layout
+    return (
+      <main className="bg-white dark:bg-slate-950 px-6 py-8 animate-pulse">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <header className="space-y-2">
+            <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+            <div className="h-8 w-3/4 bg-slate-200 dark:bg-slate-800 rounded" />
+          </header>
+          <div className="space-y-8">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-24 bg-slate-100 dark:bg-slate-900 rounded" />
+            ))}
+          </div>
+        </div>
+      </main>
+    )
+  }
 
+  if (!data || !data.subjects.length) {
+    return (
+      <main className="flex items-center justify-center min-h-[60vh] text-slate-500">
+        <p className="text-lg font-medium">No syllabus available.</p>
+      </main>
+    )
+  }
+
+  return (
+    <main className="bg-white dark:bg-slate-950 px-6 py-8 transition-colors duration-300">
+      <div className="max-w-4xl mx-auto space-y-8"> {/* Reduced from space-y-12 */}
         {/* Header */}
         <header>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-            Syllabus
+          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium text-xs uppercase tracking-wider">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{data.exam.title}</span>
+          </div>
+          <h1 className="text-2xl font-bold mt-1 text-slate-900 dark:text-white"> {/* Reduced text size and mt */}
+            {data.subExam.title}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Official syllabus for your enrolled exam
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            Official syllabus outline (read-only).
           </p>
         </header>
 
-        {/* Loading */}
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="h-40 rounded-2xl bg-slate-200 dark:bg-slate-800 animate-pulse"
-              />
-            ))}
-          </div>
-        )}
+        {/* Subjects Loop */}
+        <div className="space-y-10"> {/* Reduced from space-y-16 */}
+          {data.subjects.map((subject) => (
+            <section key={subject.slug} className="space-y-6"> {/* Reduced from space-y-10 */}
+              {/* Subject Title */}
+              <div className="border-b border-slate-100 dark:border-slate-800 pb-1">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {subject.title}
+                </h2>
+              </div>
 
-        {/* Empty */}
-        {!loading && items.length === 0 && (
-          <div className="py-20 text-center text-slate-500">
-            No syllabus content found.
-          </div>
-        )}
+              {/* Chapters Stacked */}
+              <div className="space-y-6"> {/* Reduced from space-y-10 */}
+                {subject.chapters.map((chapter, index) => (
+                  <div key={chapter.id} className="space-y-2"> {/* Reduced from space-y-3 */}
+                    <h3 className="text-md font-semibold text-slate-700 dark:text-slate-300">
+                      Unit {index + 1}: {chapter.title}
+                    </h3>
 
-        {/* Syllabus Subjects */}
-        {!loading && items.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
-              Subjects ({items.length})
-            </h2>
+                    <ul className="divide-y divide-slate-50 dark:divide-slate-900/50">
+                      {chapter.topics.map((topic) => (
+                        <li
+                          key={topic.id}
+                          className="group flex items-center justify-between py-2 px-1 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 rounded transition-all"
+                        >
+                          <span className="text-slate-600 dark:text-slate-400 text-sm group-hover:text-blue-600 transition-colors">
+                            {topic.title}
+                          </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {items.map(item => (
-                <SyllabusItemCard key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
-        )}
+                          <a
+                            href={topic.url}
+                            className="p-1 text-slate-400 hover:text-blue-600 transition-all"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <footer className="pt-6 border-t border-slate-100 dark:border-slate-900 text-[10px] text-slate-400 flex justify-between items-center">
+          <span>Official Structure</span>
+          <span>Last updated {new Date().getFullYear()}</span>
+        </footer>
       </div>
     </main>
-  )
-}
-
-/* =========================================================
-   Card Component
-========================================================= */
-
-function SyllabusItemCard({ item }: { item: SyllabusSubjectDTO }) {
-  return (
-    <div className="flex flex-col bg-white dark:bg-slate-900 border rounded-2xl p-5">
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-        {item.title}
-      </h3>
-
-      <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-        <BookOpen size={14} />
-        {item.chaptersCount} Chapters
-      </div>
-
-      <Link
-        href={`/dashboard/syllabus/${item.slug}`}
-        className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition"
-      >
-        Open
-        <ChevronRight size={16} />
-      </Link>
-    </div>
   )
 }

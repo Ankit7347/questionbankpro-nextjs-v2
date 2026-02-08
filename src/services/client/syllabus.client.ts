@@ -16,7 +16,7 @@
  */
 
 import { ApiResponseUI } from "@/dto/apiResponse.ui.dto"
-import { SyllabusSubjectDTO } from "@/models/dto/syllabusSubject.dto"
+import { SyllabusDTO } from "@/dto/syllabus.ui.dto"
 
 /**
  * Dashboard → Syllabus
@@ -28,7 +28,7 @@ import { SyllabusSubjectDTO } from "@/models/dto/syllabusSubject.dto"
  * - SubjectMap
  */
 export async function fetchDashboardSyllabus(): Promise<
-  ApiResponseUI<SyllabusSubjectDTO[]>
+  ApiResponseUI<SyllabusDTO>
 > {
   try {
     const res = await fetch("/api/dashboard/syllabus")
