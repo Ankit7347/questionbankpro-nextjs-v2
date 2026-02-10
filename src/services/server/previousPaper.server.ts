@@ -347,17 +347,22 @@ export async function searchPreviousPapers(
 ): Promise<PreviousPapersListResponseDTO> {
   try {
     await dbConnect();
+    const safeSearch = query ? query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+
     const searchQuery = {
-      $text: { $search: query },
       status: 'PUBLISHED',
       isDeleted: false,
+      title: { $regex: '', $options: 'i' }, // default to match all
     };
 
-    const total = await PreviousPaper.countDocuments(searchQuery);
+    // 2. Only apply regex if safeSearch is not empty
+    if (safeSearch) {
+      searchQuery.title = { $regex: safeSearch, $options: 'i' };
+    }
     const skip = (page - 1) * limit;
 
     const papers = await PreviousPaper.find(searchQuery)
-      .sort({ score: { $meta: 'textScore' } })
+      .sort({ title: 1 })
       .skip(skip)
       .limit(limit)
       .populate('examId', 'name slug')
@@ -366,10 +371,10 @@ export async function searchPreviousPapers(
 
     return {
       data: mapPreviousPapersToServerDTOs(papers),
-      total,
+      total: papers.length,
       page,
       pageSize: limit,
-      hasMore: skip + limit < total,
+      hasMore: skip + limit < papers.length,
     };
   } catch (error: any) {
     throw new ApiError('Failed to search papers: ' + (error.message || 'Unknown error'), 500);
