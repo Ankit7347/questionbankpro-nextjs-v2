@@ -13,8 +13,8 @@ const PreviousPaperSchema = new Schema(
 
     // Relations
     examId: { type: Types.ObjectId, ref: "Exam", required: true, index: true },
+    subExamId: { type: Types.ObjectId, ref: "SubExam", required: true, index: true },
     subjectId: { type: Types.ObjectId, ref: "Subject", required: true, index: true },
-    courseId: { type: Types.ObjectId, ref: "Course", required: true, index: true },
 
     year: { type: Number, required: true, index: true },
     session: { type: String, index: true , default: null}, // e.g., "semseter1", "semester2", "annual"
@@ -45,6 +45,10 @@ const PreviousPaperSchema = new Schema(
     metaDescription: { type: String },
     keywords: [{ type: String, lowercase: true }],
     tags: [{ type: String, lowercase: true }],
+
+    //Owner & Source
+    createdBy: { type: String, required: true }, // UUID of the user who created the paper
+    source: { type: String, default: "USER_UPLOAD" }, // e.g., "USER_UPLOAD", "PARTNER_PROVIDED", "SCRAPED"
   },
   { ...BaseSchemaOptions }
 );
