@@ -1,26 +1,100 @@
-import React from 'react';
-import Link from 'next/link';
-import { ChevronLeft, Play } from 'lucide-react';
+// src/app/dashboard/previous-papers/[year]/[paperId]/page.tsx
+import { notFound } from 'next/navigation';
+import PaperView from '@/components/student-dashboard/papers/PaperView';
 
-interface SolutionStep {
-  id: string;
-  title?: string;
-  body: string; // may contain LaTeX markers
-  callout?: string; // concept callout
-}
+// --- MOCK DATA (JSON AT TOP) ---
 
-interface PaperData {
-  id: string;
-  title: string;
-  subject: string;
-  year: string;
-  isVerified: boolean;
-  isPremium?: boolean;
-  videoLink?: string;
-  questions: Array<{ qid: string; questionText: string }>;
-  solutionSteps: SolutionStep[];
-  conclusion?: string;
-}
+// ✅ ACTIVE PAPER (With Questions)
+const MOCK_PAPER = {
+  "_id": "7",
+  "title": {
+    "en": "Advanced Engineering Mathematics",
+    "hi": "उन्नत इंजीनियरिंग गणित"
+  },
+  "paperCode": "MATH-2026",
+  "year": 2026,
+  "session": "Semester 1",
+  "contentType": "BOTH",
+  "paperUrl": "/pdf/dummy.pdf",
+  "difficulty": "Hard",
+  "isVerified": true,
+  "isPremium": false,
+  "views": 1240,
+  "downloads": 450,
+  "questions": [
+    {
+      "_id": "2",
+      "content": {
+        "en": "Evaluate the integral ∫₀^π sin(x) dx.",
+        "hi": "समाकल ∫₀^π sin(x) dx का मान ज्ञात कीजिए।"
+      },
+      "marks": 5,
+      "explanation": {
+        "en": "Apply fundamental theorem of calculus.",
+        "hi": "कलन के मौलिक प्रमेय का प्रयोग करें।"
+      }
+    },
+    {
+      "_id": "5",
+      "content": {
+        "en": "Find eigenvalues of matrix [[2,1],[1,2]].",
+        "hi": "मैट्रिक्स [[2,1],[1,2]] के स्वमान ज्ञात करें।"
+      },
+      "marks": 8,
+      "explanation": {
+        "en": "Solve characteristic equation det(A − λI) = 0.",
+        "hi": "विशेषता समीकरण det(A − λI) = 0 हल करें।"
+      }
+    },
+    {
+      "_id": "9",
+      "content": {
+        "en": "Solve dy/dx + y = e^x.",
+        "hi": "dy/dx + y = e^x को हल करें।"
+      },
+      "marks": 10,
+      "explanation": {
+        "en": "Use integrating factor method.",
+        "hi": "इंटीग्रेटिंग फैक्टर विधि का प्रयोग करें।"
+      }
+    }
+  ]
+};
+
+/*
+// ❌ ALTERNATIVE PAPER (With paperUrl but NO Questions)
+const MOCK_PAPER = {
+  "_id": "3",
+  "title": {
+    "en": "Advanced Engineering Mathematics",
+    "hi": "उन्नत इंजीनियरिंग गणित"
+  },
+  "paperCode": "MATH-2026",
+  "year": 2026,
+  "session": "Semester 1",
+  "contentType": "BOTH",
+  "paperUrl": "/pdf/dummy.pdf",
+  "difficulty": "Hard",
+  "isVerified": true,
+  "isPremium": false,
+  "views": 980,
+  "downloads": 320
+};
+*/
+
+// Solution aligned with paper _id: "7"
+const MOCK_SOLUTION = {
+  _id: "4",
+  previousPaperId: "7",
+  fullExplanation: {
+    en: "The solution involves integrating the function and applying limits. For the differential equation, use integrating factor e^x.",
+    hi: "समाधान में फ़ंक्शन का समाकलन और सीमाओं का उपयोग शामिल है। अवकल समीकरण के लिए e^x समाकलन कारक का प्रयोग करें।"
+  },
+  videoSolutionUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  solutionQuality: "EXPERT_VERIFIED",
+  totalLikes: 89,
+  isPremium: true
+};
 
 interface PageProps {
   params: Promise<{
@@ -29,91 +103,24 @@ interface PageProps {
   }>;
 }
 
-export default async function SolvedPaperDetail({ params }: PageProps) {
+export default async function PaperDetailPage({ params }: PageProps) {
   const { year, paperId } = await params;
 
-  // Fetch the paper data from API
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/dashboard/solved-papers/${year}/${paperId}`, { cache: 'no-store' });
-  const json = await res.json();
-  const paper: PaperData = json?.paper;
+  // Updated validation for _id "7"
+  const isValid = year === "2026" && paperId === "7";
 
-  if (!paper) {
-    return (
-      <div className="bg-slate-950 text-slate-200 p-6 font-serif">
-        <Link href="/dashboard/solved-papers" className="text-slate-400 hover:text-cyan-300 inline-flex items-center gap-2 mb-4"> 
-          <ChevronLeft className="w-4 h-4" /> Back
-        </Link>
-        <div className="p-6 bg-slate-900/30 border border-slate-800 rounded-xl">Paper not found.</div>
-      </div>
-    );
+  if (!isValid) {
+    notFound();
   }
 
+  const isSolvedRoute = true;
+
   return (
-    <div className="bg-slate-950 text-slate-200 p-4 md:p-8 font-serif">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <Link href="/dashboard/solved-papers" className="text-slate-400 hover:text-cyan-300 inline-flex items-center gap-2 mb-2">
-            <ChevronLeft className="w-4 h-4" /> Back
-          </Link>
-          <h1 className="text-3xl font-extrabold text-white">{paper.title}</h1>
-          <p className="text-xs text-slate-400 mt-1">{paper.subject} • {paper.year} {paper.isVerified && <span className="ml-2 inline-block px-2 py-0.5 bg-emerald-400 text-slate-900 text-xs rounded">Verified</span>}</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {paper.videoLink && (
-            <a href={paper.videoLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-cyan-400 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:opacity-95">
-              <Play className="w-4 h-4" /> Video Solution
-            </a>
-          )}
-        </div>
-      </div>
-
-      {/* Split view: Question | Solution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Questions */}
-        <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-3">Question Paper</h2>
-          <ol className="list-decimal ml-5 space-y-3 text-slate-200">
-            {paper.questions.map(q => (
-              <li key={q.qid} className="text-sm">{q.questionText}</li>
-            ))}
-          </ol>
-        </div>
-
-        {/* Right: Solutions */}
-        <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-3">Solution (Step-by-step)</h2>
-          <div className="space-y-4">
-            {paper.solutionSteps.map(step => (
-              <div key={step.id} className="bg-slate-900/50 border border-slate-800 rounded-lg p-4">
-                {step.title && <div className="text-xs text-slate-400 mb-1">{step.title}</div>}
-                <div className="text-slate-200 text-sm">
-                  {/* Simple latex placeholder; replace with KaTeX for real rendering */}
-                  {step.body.includes('$') ? (
-                    <code className="bg-slate-800/60 px-1 rounded text-cyan-300 font-mono">{step.body}</code>
-                  ) : (
-                    <span>{step.body}</span>
-                  )}
-                </div>
-                {step.callout && <div className="mt-3 text-xs text-slate-400 bg-slate-800/40 rounded p-2">{step.callout}</div>}
-              </div>
-            ))}
-
-            {paper.conclusion && (
-              <div className="mt-2 p-4 bg-slate-900/60 border border-cyan-400 rounded-lg">
-                <div className="text-xs text-slate-300">Final Answer</div>
-                <div className="text-white font-semibold mt-1">{paper.conclusion}</div>
-              </div>
-            )}
-
-            {paper.isPremium && (
-              <div className="mt-4 p-4 bg-amber-900/10 border border-amber-700 rounded-lg text-amber-300">
-                This is a premium solution. Subscribe to view interactive steps and full derivations.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <PaperView 
+      paper={MOCK_PAPER} 
+      solution={MOCK_SOLUTION}
+      mode={isSolvedRoute ? 'solved' : 'previous'}
+      year={year}
+    />
   );
 }

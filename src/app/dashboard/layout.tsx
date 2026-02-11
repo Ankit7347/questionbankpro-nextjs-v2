@@ -1,4 +1,4 @@
-// File: app/exams/layout.tsx 
+// File: app/dashboard/layout.tsx 
 import { auth } from "@/lib/auth"; // Import the auth function from your v5 config
 import { redirect } from "next/navigation";
 import StudentLayout from "@/components/student-dashboard/StudentLayout";

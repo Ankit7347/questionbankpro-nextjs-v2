@@ -1,55 +1,35 @@
-import { Schema, model, models } from "mongoose";
-import {
-  BaseSchemaFields,
-  BaseSchemaOptions,
-} from "./base.schema";
+import { Schema, model, models, Types } from "mongoose";
+import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const QuestionSchema = new Schema(
   {
-    topicId: {
-      type: Schema.Types.ObjectId,
-      ref: "Topic",
-      required: true,
-      index: true,
-    },
-
-    type: {
-      type: String,
-      enum: ["mcq", "numerical", "true_false"],
-      required: true,
-    },
-
-    questionText: {
-      type: String,
-      required: true,
-    },
-
-    options: [
-      {
-        type: String,
-      },
-    ],
-
-    correctAnswer: {
-      type: String,
-      required: true,
-    },
-
-    difficulty: {
-      type: String,
-      enum: ["easy", "medium", "hard"],
-      required: true,
-    },
-
-    isPreviousYear: {
-      type: Boolean,
-      default: false,
-    },
-
     ...BaseSchemaFields,
+    content: { 
+      en: { type: String, required: true },
+      hi: { type: String } 
+    },
+    type: { type: String, enum: ["MCQ", "SUBJECTIVE", "TRUE_FALSE"], default: "MCQ" },
+    options: [{
+      text: { 
+        en: { type: String, required: true },
+        hi: { type: String }
+      },
+      isCorrect: { type: Boolean, default: false }
+    }],
+    explanation: { 
+      en: { type: String },
+      hi: { type: String }
+    },
+    marks: { type: Number, default: 1 },
+    difficulty: { type: String, enum: ["Easy", "Medium", "Hard"], default: "Medium" },
+    displayOrder: { type: Number, default: 0 },
+    
+    subjectId: { type: Types.ObjectId, ref: "Subject", index: true },
+    chapterId: { type: Types.ObjectId, ref: "Chapter", index: true },
+    topicId: { type: Types.ObjectId, ref: "Topic", index: true },
+    images: [{ type: String }], 
   },
-  BaseSchemaOptions
+  { ...BaseSchemaOptions }
 );
 
-export const QuestionModel =
-  models.Question || model("Question", QuestionSchema);
+export default models.Question || model("Question", QuestionSchema);

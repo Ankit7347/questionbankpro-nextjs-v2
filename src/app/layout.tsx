@@ -14,6 +14,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 // ⛔ chartSetup is side-effectful → keep it server-safe
 import "@/lib/chartSetup";
+import { auth } from "@/lib/auth";
 
 // Fonts
 const geistSans = Geist({
@@ -81,7 +82,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const headerStore = await headers();
   const theme = cookieStore.get("theme")?.value;
-
+  const session = await auth();
   const isDark = theme === "dark"||(theme === "system" && headerStore.get("sec-ch-prefers-color-scheme") === "dark");
 
   return (
@@ -152,7 +153,7 @@ export default async function RootLayout({
       </head>
 
       <body className="antialiased bg-white dark:bg-gray-900 transition-colors duration-300">
-        <SessionProvider>
+        <SessionProvider session={session}>
             {/* GTM noscript */}
             <noscript>
               <iframe
