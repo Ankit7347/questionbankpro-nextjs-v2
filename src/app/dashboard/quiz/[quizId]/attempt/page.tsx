@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect,use } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function QuizAttempt({ params }: { params: { quizId: string } }) {
+export default function QuizAttempt({ params }: { params: Promise<{ quizId: string }> }) {
   const router = useRouter();
+  const resolvedParams = use(params);
+  const quizId = resolvedParams.quizId;
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
@@ -53,11 +55,11 @@ export default function QuizAttempt({ params }: { params: { quizId: string } }) 
 
   const submitQuiz = () => {
     // In a real app, POST to API here
-    router.push(`/dashboard/quiz/${params.quizId}/result`);
+    router.push(`/dashboard/quiz/${quizId}/result`);
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    <div className="flex flex-col bg-gray-50 overflow-hidden">
       {/* Sticky Header */}
       <header className="bg-white border-b px-4 py-3 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div className={`font-mono text-xl font-bold ${timeLeft < 300 ? 'text-red-600 animate-pulse' : 'text-gray-800'}`}>

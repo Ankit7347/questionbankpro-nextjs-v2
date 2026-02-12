@@ -16,7 +16,7 @@ export default function QuizResult({ params }: { params: { quizId: string } }) {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto space-y-6 pb-10">
+    <div className="p-4 mx-auto space-y-6 pb-10">
       <div className="text-center mt-6">
         <h1 className="text-2xl font-bold text-gray-900">Quiz Complete!</h1>
         <p className="text-gray-500">Here is how you performed</p>
