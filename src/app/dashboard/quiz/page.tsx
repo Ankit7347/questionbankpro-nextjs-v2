@@ -7,7 +7,7 @@ export default function QuizDashboard() {
   const [activeCategory, setActiveCategory] = useState('All');
 
   return (
-    <div className="p-4 space-y-6 max-w-md mx-auto pb-20">
+    <div className="p-4 space-y-6 x-auto pb-20">
       {/* Performance Analytics Card */}
       <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg text-white bg-gradient-to-br from-indigo-500 to-purple-600">
         <h2 className="text-lg font-semibold mb-4">Your Performance</h2>

@@ -8,7 +8,7 @@ export default function QuizHistory() {
   ];
 
   return (
-    <div className="p-4 space-y-4 max-w-md mx-auto">
+    <div className="p-4 space-y-4 mx-auto">
       <div className="flex items-center mb-4">
         <Link href="/dashboard/quiz" className="mr-4 text-gray-600">← Back</Link>
         <h1 className="text-xl font-bold">Quiz History</h1>

@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState,use } from 'react';
 
-export default function QuizLobby({ params }: { params: { quizId: string } }) {
+export default function QuizLobby({ params }: { params: Promise<{ quizId: string }> }) {
   const [isReady, setIsReady] = useState(false);
-
+  const resolvedParams = use(params);
+  const quizId = resolvedParams.quizId;
   useEffect(() => {
     // Simulate hardware check
     const timer = setTimeout(() => setIsReady(true), 1500);
@@ -13,7 +14,7 @@ export default function QuizLobby({ params }: { params: { quizId: string } }) {
   }, []);
 
   return (
-    <div className="p-6 max-w-md mx-auto flex flex-col h-screen bg-white">
+    <div className="p-6 mx-auto flex flex-col bg-white">
       <div className="flex-1">
         <Link href="/dashboard/quiz/upcoming" className="text-gray-500 text-sm mb-4 block">← Cancel</Link>
         <h1 className="text-2xl font-bold mb-2 text-gray-900">Quiz Instructions</h1>
@@ -64,7 +65,7 @@ export default function QuizLobby({ params }: { params: { quizId: string } }) {
       </div>
 
       <div className="py-4 bg-white">
-        <Link href={`/dashboard/quiz/${params.quizId}/attempt`} className={`block w-full text-center py-4 rounded-xl font-bold text-lg shadow-lg transition-all ${isReady ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none'}`}>
+        <Link href={`/dashboard/quiz/${quizId}/attempt`} className={`block w-full text-center py-4 rounded-xl font-bold text-lg shadow-lg transition-all ${isReady ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none'}`}>
           Start Quiz
         </Link>
       </div>
