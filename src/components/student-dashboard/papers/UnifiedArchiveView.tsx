@@ -1,11 +1,11 @@
 // src/components/student-dashboard/papers/UnifiedArchiveView.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  Search, FileText, Calendar, Clock, Download, 
-  X, Star, Eye, ChevronRight, BookOpen, Zap 
+  Search, FileText, Calendar, Clock, 
+  X, ChevronRight, BookOpen, Zap 
 } from 'lucide-react';
 
 // --- Interfaces ---
@@ -33,9 +33,9 @@ interface YearItem {
 
 interface UnifiedArchiveProps {
   mode: 'previous' | 'solved';
-  stats: Stats;
-  recentPapers: PaperItem[];
-  years: YearItem[];
+  stats?: Stats; // Made optional for loading state
+  recentPapers?: PaperItem[]; // Made optional for loading state
+  years?: YearItem[]; // Made optional for loading state
   onSearch: (query: string) => Promise<PaperItem[]>;
 }
 
@@ -52,6 +52,38 @@ export default function UnifiedArchiveView({
   const [loading, setLoading] = useState(false);
 
   const isSolved = mode === 'solved';
+
+  // --- FLASH CARD LOADING STATE ---
+  if (!stats || !recentPapers || !years) {
+    return (
+      <div className="p-3 md:p-8 max-w-7xl mx-auto space-y-10 animate-pulse">
+        <div className="space-y-6">
+          <div className="flex flex-col gap-4">
+            <div className="w-64 h-10 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+            <div className="flex gap-3">
+              <div className="w-36 h-14 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800" />
+              <div className="w-36 h-14 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800" />
+            </div>
+          </div>
+          <div className="w-full h-12 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800" />
+        </div>
+        <div className="space-y-4">
+          <div className="w-40 h-4 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="flex gap-4 overflow-hidden -mx-1 px-1">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="min-w-[280px] md:min-w-[320px] h-40 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800" />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-4 pt-4">
+          <div className="w-40 h-4 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-20 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,11 +115,7 @@ export default function UnifiedArchiveView({
         <div className="flex flex-col gap-4">
           <div>
             <h1 className="text-2xl md:text-4xl font-black tracking-tight flex items-center gap-2">
-              {isSolved ? (
-                <BookOpen className="text-amber-500 w-6 h-6 md:w-10 md:h-10" />
-              ) : (
-                <FileText className="text-blue-500 w-6 h-6 md:w-10 md:h-10" />
-              )}
+              {isSolved ? <BookOpen className="text-amber-500 w-6 h-6 md:w-10 md:h-10" /> : <FileText className="text-blue-500 w-6 h-6 md:w-10 md:h-10" />}
               {isSolved ? "Solved Papers" : "Question Bank"}
             </h1>
             <p className="text-[11px] md:text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
@@ -96,22 +124,11 @@ export default function UnifiedArchiveView({
           </div>
 
           <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
-            <StatCard 
-              label="Total" 
-              value={stats.totalPapers} 
-              color={isSolved ? "text-amber-500" : "text-blue-500"}
-              bgColor={isSolved ? "bg-amber-500/10" : "bg-blue-500/10"} 
-            />
-            <StatCard 
-              label={isSolved ? "Views" : "Downloads"} 
-              value={isSolved ? (stats.totalViews || 0) : (stats.totalDownloads || 0)} 
-              color="text-emerald-500"
-              bgColor="bg-emerald-500/10" 
-            />
+            <StatCard label="Total" value={stats.totalPapers} color={isSolved ? "text-amber-500" : "text-blue-500"} bgColor={isSolved ? "bg-amber-500/10" : "bg-blue-500/10"} />
+            <StatCard label={isSolved ? "Views" : "Downloads"} value={isSolved ? (stats.totalViews || 0) : (stats.totalDownloads || 0)} color="text-emerald-500" bgColor="bg-emerald-500/10" />
           </div>
         </div>
 
-        {/* --- Search Bar --- */}
         <form onSubmit={handleSearch} className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
           <input
@@ -122,11 +139,7 @@ export default function UnifiedArchiveView({
             className="w-full pl-10 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 h-12 transition-all"
           />
           {isSearching && (
-            <button 
-              type="button" 
-              onClick={clearSearch} 
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-            >
+            <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
               <X className="w-4 h-4 text-slate-400" />
             </button>
           )}
@@ -135,16 +148,14 @@ export default function UnifiedArchiveView({
 
       <main className="space-y-8">
         {isSearching ? (
-          /* --- Search Results View --- */
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-black uppercase tracking-widest text-slate-500">Search Results</h2>
               <button onClick={clearSearch} className="text-xs font-bold text-blue-500">Back to Archive</button>
             </div>
-            
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map(i => <div key={i} className="h-32 bg-slate-100 dark:bg-slate-900 animate-pulse rounded-2xl" />)}
+                {[1, 2, 3, 4, 5, 6].map(i => <PaperSkeleton key={i} />)}
               </div>
             ) : searchResults.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -179,11 +190,7 @@ export default function UnifiedArchiveView({
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 {years.map((item) => (
-                  <Link
-                    href={`/dashboard/${mode}-papers/${item.year}`}
-                    key={item.year}
-                    className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center active:scale-95 hover:border-blue-500/50 transition-all"
-                  >
+                  <Link href={`/dashboard/${mode}-papers/${item.year}`} key={item.year} className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center active:scale-95 hover:border-blue-500/50 transition-all">
                     <span className="text-xl md:text-2xl font-black">{item.year}</span>
                     <span className="text-[9px] font-bold text-slate-500 uppercase">{item.paperCount} Items</span>
                   </Link>
@@ -197,55 +204,52 @@ export default function UnifiedArchiveView({
   );
 }
 
-// --- Internal Helper: Stat Card ---
-function StatCard({ label, value, color, bgColor }: { label: string, value: number, color: string, bgColor: string }) {
-  return (
-    <div className="flex-shrink-0 flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 min-w-[140px]">
-      <div className={`p-2 rounded-lg ${bgColor} ${color}`}>
-        <Zap className="w-4 h-4 fill-current" />
+// --- Helpers (PaperSkeleton, StatCard, PaperCard) remain the same as previous response ---
+function PaperSkeleton() {
+    return (
+      <div className="p-4 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl animate-pulse">
+        <div className="flex justify-between items-start mb-3">
+          <div className="w-12 h-4 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="w-16 h-3 bg-slate-100 dark:bg-slate-800 rounded" />
+        </div>
+        <div className="w-3/4 h-5 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
+        <div className="flex items-center gap-2"><div className="w-8 h-3 bg-slate-100 dark:bg-slate-800 rounded" /><div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800" /><div className="w-20 h-3 bg-slate-100 dark:bg-slate-800 rounded" /></div>
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+          <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" /><div className="w-24 h-2 bg-slate-100 dark:bg-slate-800 rounded" /></div>
+          <div className="w-3.5 h-3.5 bg-slate-100 dark:bg-slate-800 rounded" />
+        </div>
       </div>
-      <div>
-        <p className="text-[9px] font-black text-slate-500 uppercase leading-none mb-1">{label}</p>
-        <p className="text-sm font-bold truncate leading-none">{value.toLocaleString()}</p>
-      </div>
-    </div>
-  );
+    );
 }
 
-// --- Internal Helper: Paper Card ---
-function PaperCard({ paper, mode }: { paper: PaperItem, mode: 'previous' | 'solved' }) {
-  const isSolved = mode === 'solved';
-  return (
-    <Link 
-      href={`/dashboard/${mode}-papers/${paper.year}/${paper.id}`}
-      className="block p-4 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-blue-500/50 active:scale-[0.98] transition-all h-full"
-    >
-      <div className="flex justify-between items-start mb-3">
-        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-[8px] font-black rounded text-slate-500 border border-slate-200 dark:border-slate-700 uppercase">
-          {paper.code}
-        </span>
-        <span className="text-[9px] text-slate-400 font-bold">{paper.dateAdded}</span>
+function StatCard({ label, value, color, bgColor }: { label: string, value: number, color: string, bgColor: string }) {
+    return (
+      <div className="flex-shrink-0 flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 min-w-[140px]">
+        <div className={`p-2 rounded-lg ${bgColor} ${color}`}><Zap className="w-4 h-4 fill-current" /></div>
+        <div><p className="text-[9px] font-black text-slate-500 uppercase leading-none mb-1">{label}</p><p className="text-sm font-bold truncate leading-none">{value.toLocaleString()}</p></div>
       </div>
-      
-      <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1 mb-1 leading-tight">
-        {paper.title || paper.subject}
-      </h3>
-      
-      <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
-        <span>{paper.year}</span>
-        <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-        <span className="truncate">{paper.session}</span>
-      </div>
+    );
+}
 
-      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <div className={`w-1.5 h-1.5 rounded-full ${isSolved ? 'bg-amber-500' : 'bg-blue-500'}`} />
-          <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400">
-            {isSolved ? 'Verified Solution' : 'Question Bank'}
-          </span>
+function PaperCard({ paper, mode }: { paper: PaperItem, mode: 'previous' | 'solved' }) {
+    const isSolved = mode === 'solved';
+    return (
+      <Link href={`/dashboard/${mode}-papers/${paper.year}/${paper.id}`} className="block p-4 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-blue-500/50 active:scale-[0.98] transition-all h-full">
+        <div className="flex justify-between items-start mb-3">
+          <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-[8px] font-black rounded text-slate-500 border border-slate-200 dark:border-slate-700 uppercase">{paper.code}</span>
+          <span className="text-[9px] text-slate-400 font-bold">{paper.dateAdded}</span>
         </div>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-      </div>
-    </Link>
-  );
+        <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1 mb-1 leading-tight">{paper.title || paper.subject}</h3>
+        <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+          <span>{paper.year}</span><span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" /><span className="truncate">{paper.session}</span>
+        </div>
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className={`w-1.5 h-1.5 rounded-full ${isSolved ? 'bg-amber-500' : 'bg-blue-500'}`} />
+            <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400">{isSolved ? 'Verified Solution' : 'Question Bank'}</span>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+        </div>
+      </Link>
+    );
 }

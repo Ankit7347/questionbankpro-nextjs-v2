@@ -23,18 +23,14 @@ export default function SolvedArchive() {
     })();
   }, []);
 
-  if (!data) return (
-    <div className="p-10 animate-pulse text-slate-500 font-black uppercase text-[10px] tracking-[0.2em]">
-      Loading Solved Archive...
-    </div>
-  );
-
+  // Removed the "Loading Solved Archive..." text div 
+  // UnifiedArchiveView will now handle the skeleton state internally
   return (
     <UnifiedArchiveView 
       mode="solved"
-      stats={data.stats}
-      recentPapers={data.recent}
-      years={data.years}
+      stats={data?.stats}
+      recentPapers={data?.recent}
+      years={data?.years}
       onSearch={async (q) => {
         const res: any = await searchSolvedPapers(q);
         
