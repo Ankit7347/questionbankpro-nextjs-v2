@@ -27,6 +27,16 @@ import { PreviousPaperServerDTO, PreviousPapersStatsDTO } from '@/models/dto/pre
 /**
  * Get all previous papers with filters
  */
+// internal helper: try public API URL first, fallback to base URL or localhost
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:3000/api';
+
+async function clientFetch(endpoint: string, opts?: RequestInit) {
+  const url = API_BASE ? `${API_BASE}${endpoint}` : endpoint;
+  return fetch(url, opts);
+}
+
 export async function getPreviousPapers(
   page: number = 1,
   limit: number = 20,
@@ -46,7 +56,7 @@ export async function getPreviousPapers(
   if (filters?.subjectId) params.append('subjectId', filters.subjectId);
   if (filters?.difficulty) params.append('difficulty', filters.difficulty);
 
-  const response = await fetch(`/api/previous-papers?${params.toString()}`);
+  const response = await clientFetch(`/previous-papers?${params.toString()}`);
   const data: ApiResponse<any> = await response.json();
 
   if (!data.success) {
@@ -60,7 +70,7 @@ export async function getPreviousPapers(
  * Get single paper by ID
  */
 export async function getPreviousPaperById(id: string): Promise<PreviousPaperUIDTO> {
-  const response = await fetch(`/api/previous-papers/${id}`);
+  const response = await clientFetch(`/previous-papers/${id}`);
   const data: ApiResponse<PreviousPaperServerDTO> = await response.json();
 
   if (!data.success || !data.data) {
@@ -74,9 +84,8 @@ export async function getPreviousPaperById(id: string): Promise<PreviousPaperUID
  * Get papers by year
  */
 export async function getPreviousPapersByYear(year: number): Promise<PreviousPaperCardUIDTO[]> {
-  const response = await fetch(`/api/previous-papers/year/${year}`);
+  const response = await clientFetch(`/previous-papers/year/${year}`);
   const data: ApiResponse<PreviousPaperServerDTO[]> = await response.json();
-
   if (!data.success || !data.data) {
     throw new Error(data.error || 'Failed to fetch papers');
   }
@@ -88,7 +97,7 @@ export async function getPreviousPapersByYear(year: number): Promise<PreviousPap
  * Get recent papers
  */
 export async function getRecentPreviousPapers(limit: number = 4): Promise<RecentPreviousPaperUIDTO[]> {
-  const response = await fetch(`/api/previous-papers/recent?limit=${limit}`);
+  const response = await clientFetch(`/previous-papers/recent?limit=${limit}`);
   const data: ApiResponse<PreviousPaperServerDTO[]> = await response.json();
 
   if (!data.success || !data.data) {
@@ -105,7 +114,7 @@ export async function getRecentPreviousPapers(limit: number = 4): Promise<Recent
  * Get dashboard stats
  */
 export async function getPreviousPapersStats(): Promise<PreviousPapersStatsUIDTO> {
-  const response = await fetch('/api/previous-papers/stats');
+  const response = await clientFetch('/previous-papers/stats');
   const data: ApiResponse<PreviousPapersStatsDTO> = await response.json();
 
   if (!data.success || !data.data) {
@@ -130,7 +139,7 @@ export async function searchPreviousPapers(
   params.append('q', query);
   params.append('page', page.toString());
 
-  const response = await fetch(`/api/previous-papers/search?${params.toString()}`);
+  const response = await clientFetch(`/previous-papers/search?${params.toString()}`);
   const data: ApiResponse<any> = await response.json();
 
   if (!data.success) {
@@ -145,7 +154,7 @@ export async function searchPreviousPapers(
  */
 export async function trackPreviousPaperView(id: string): Promise<void> {
   try {
-    await fetch(`/api/previous-papers/${id}/track-view`, {
+    await clientFetch(`/previous-papers/${id}/track-view`, {
       method: 'POST',
     });
   } catch (error) {
@@ -159,7 +168,7 @@ export async function trackPreviousPaperView(id: string): Promise<void> {
  */
 export async function trackPreviousPaperDownload(id: string): Promise<void> {
   try {
-    await fetch(`/api/previous-papers/${id}/track-download`, {
+    await clientFetch(`/previous-papers/${id}/track-download`, {
       method: 'POST',
     });
   } catch (error) {
@@ -173,7 +182,7 @@ export async function trackPreviousPaperDownload(id: string): Promise<void> {
  * (Derived from stats data)
  */
 export async function getYearsList(): Promise<YearDataUIDTO[]> {
-  const response = await fetch('/api/previous-papers/stats');
+  const response = await clientFetch('/previous-papers/stats');
   const data: ApiResponse<PreviousPapersStatsDTO> = await response.json();
 
   if (!data.success || !data.data) {

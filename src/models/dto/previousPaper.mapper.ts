@@ -4,24 +4,54 @@
  * Converts raw database documents to server DTOs
  */
 
-import PreviousPaper from '@/models/mongoose/PreviousPaper.schema';
 import { PreviousPaperServerDTO } from './previousPaper.dto';
+type Lang = "en" | "hi";
+
+function resolveText(
+  text: { en: string; hi?: string } | string,
+  lang: Lang
+): string {
+  // if text is already a string, just return it (fallback)
+  if (typeof text === 'string') return text;
+  return text[lang] ?? text.en;
+}
+
+function extractId(value: any): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    if (value._id) return value._id.toString();
+    if (value.id) return value.id.toString();
+    // if object has custom toString that isn't [object Object]
+    if (value.toString && typeof value.toString === 'function') {
+      const s = value.toString();
+      if (s && s !== '[object Object]') return s;
+    }
+    return '';
+  }
+  if (value.toString && typeof value.toString === 'function') {
+    const s = value.toString();
+    if (s && s !== '[object Object]') return s;
+  }
+  return '';
+}
 
 export function mapPreviousPaperToServerDTO(
-  mongoDocument: any
+  mongoDocument: any,
+  lang: Lang
 ): PreviousPaperServerDTO {
   return {
     _id: mongoDocument._id?.toString() || '',
-    title: mongoDocument.title,
+    title: resolveText(mongoDocument.title, lang),
     slug: mongoDocument.slug,
     paperCode: mongoDocument.paperCode,
 
     // Relations
-    examId: mongoDocument.examId?.toString() || '',
-    subExamId: mongoDocument.subExamId?.toString(),
-    courseId: mongoDocument.courseId?.toString(),
-    subjectId: mongoDocument.subjectId?.toString() || '',
-    chapterId: mongoDocument.chapterId?.toString(),
+    examId: extractId(mongoDocument.examId),
+    subExamId: extractId(mongoDocument.subExamId),
+    courseId: extractId(mongoDocument.courseId),
+    subjectId: extractId(mongoDocument.subjectId),
+    chapterId: extractId(mongoDocument.chapterId),
 
     // Paper Details
     year: mongoDocument.year,
@@ -97,7 +127,8 @@ export function mapPreviousPaperToServerDTO(
  * Map array of documents
  */
 export function mapPreviousPapersToServerDTOs(
-  mongoDocuments: any[]
+  mongoDocuments: any[],
+  lang: Lang
 ): PreviousPaperServerDTO[] {
-  return mongoDocuments.map(mapPreviousPaperToServerDTO);
+  return mongoDocuments.map(doc => mapPreviousPaperToServerDTO(doc, lang));
 }

@@ -23,7 +23,8 @@ import {
 import { mapSolvedPaperToServerDTO, mapSolvedPapersToServerDTOs } from '@/models/dto/solvedPaper.mapper';
 import { ApiError } from '@/lib/apiError';
 import dbConnect from '@/lib/mongodb';
-
+import { getCurrentLang } from '@/lib/i18n';
+const lang = await getCurrentLang();
 /**
  * Utility: Generate URL-friendly slug
  */
@@ -72,7 +73,7 @@ export async function getSolvedPapers(
     const total: number = await SolvedPaper.countDocuments(query);
 
     return {
-      data: mapSolvedPapersToServerDTOs(papers),
+      data: mapSolvedPapersToServerDTOs(papers,lang),
       total,
       page,
       pageSize: limit,
@@ -99,7 +100,7 @@ export async function getSolvedPaperById(id: string): Promise<SolvedPaperServerD
       throw new ApiError('Solved paper not found', 404);
     }
 
-    return mapSolvedPaperToServerDTO(paper);
+    return mapSolvedPaperToServerDTO(paper,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to fetch paper: ' + (error.message || 'Unknown error'), 500);
@@ -119,7 +120,7 @@ export async function getSolvedPapersByYear(year: number): Promise<SolvedPaperSe
       .populate('subjectId', 'name')
       .lean();
 
-    return mapSolvedPapersToServerDTOs(papers);
+    return mapSolvedPapersToServerDTOs(papers,lang);
   } catch (error: any) {
     throw new ApiError('Failed to fetch papers by year: ' + (error.message || 'Unknown error'), 500);
   }
@@ -139,7 +140,7 @@ export async function getRecentSolvedPapers(limit: number = 4): Promise<SolvedPa
       .populate('subjectId', 'name')
       .lean();
 
-    return mapSolvedPapersToServerDTOs(papers);
+    return mapSolvedPapersToServerDTOs(papers,lang);
   } catch (error: any) {
     throw new ApiError('Failed to fetch recent papers: ' + (error.message || 'Unknown error'), 500);
   }
@@ -178,7 +179,7 @@ export async function getSolvedPapersStats(): Promise<SolvedPapersStatsDTO> {
       totalDownloads,
       activeYears: stats.length,
       papersByYear: stats.map((item: any) => ({ year: item._id, count: item.count })),
-      recentPapers: mapSolvedPapersToServerDTOs(recent),
+      recentPapers: mapSolvedPapersToServerDTOs(recent,lang),
     };
   } catch (error: any) {
     throw new ApiError('Failed to fetch stats: ' + (error.message || 'Unknown error'), 500);
@@ -216,7 +217,7 @@ export async function createSolvedPaper(
       .populate('subjectId', 'name')
       .lean();
 
-    return mapSolvedPaperToServerDTO(populated);
+    return mapSolvedPaperToServerDTO(populated,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to create paper: ' + (error.message || 'Unknown error'), 500);
@@ -249,7 +250,7 @@ export async function updateSolvedPaper(
       .populate('subjectId', 'name')
       .lean();
 
-    return mapSolvedPaperToServerDTO(updated);
+    return mapSolvedPaperToServerDTO(updated,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to update paper: ' + (error.message || 'Unknown error'), 500);
@@ -347,7 +348,7 @@ export async function searchSolvedPapers(
     });
 
     return {
-      data: mapSolvedPapersToServerDTOs(papers),
+      data: mapSolvedPapersToServerDTOs(papers,lang),
       total,
       page,
       pageSize: limit,

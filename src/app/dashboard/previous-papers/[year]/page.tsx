@@ -1,45 +1,45 @@
 // src/app/dashboard/previous-papers/[year]/page.tsx
+import React from 'react';
 import YearPaperList from '@/components/student-dashboard/papers/YearPaperList';
 import { notFound } from 'next/navigation';
-
-const MOCK_PAPERS = [
-  // --- Semester 3 (College) ---
-  { id: 'p1', title: 'Data Structures & Algorithms', subjectCode: 'CS301', session: 'Semester 3', difficulty: 'Hard', isVerified: true, views: 5420 },
-  { id: 'p2', title: 'Operating Systems', subjectCode: 'CS302', session: 'Semester 3', difficulty: 'Medium', isVerified: true, views: 3210 },
-  { id: 'p3', title: 'Computer Networks', subjectCode: 'CS303', session: 'Semester 3', difficulty: 'Hard', isVerified: true, views: 4100 },
-
-  // --- Semester 1 (College) ---
-  { id: 'p4', title: 'Engineering Mathematics-I', subjectCode: 'MA101', session: 'Semester 1', difficulty: 'Hard', isVerified: true, views: 8900 },
-  { id: 'p5', title: 'Applied Physics', subjectCode: 'PH101', session: 'Semester 1', difficulty: 'Medium', isVerified: false, views: 2300 },
-  { id: 'p6', title: 'Programming in C', subjectCode: 'CS101', session: 'Semester 1', difficulty: 'Easy', isVerified: true, views: 12400 },
-
-  // --- Annual Exam (School/Board) ---
-  { id: 'p7', title: 'Science (Physics & Chemistry)', subjectCode: 'SCI-X', session: 'Annual Exam', difficulty: 'Medium', isVerified: true, views: 15600 },
-  { id: 'p8', title: 'Social Science', subjectCode: 'SST-X', session: 'Annual Exam', difficulty: 'Easy', isVerified: true, views: 9800 },
-
-  // --- Competitive/Shift Exams ---
-  { id: 'p9', title: 'General Awareness (Morning Shift)', subjectCode: 'GK-SHIFT1', session: 'Competitive Shift', difficulty: 'Medium', isVerified: true, views: 7200 },
-  { id: 'p10', title: 'Quantitative Aptitude (Evening Shift)', subjectCode: 'QA-SHIFT2', session: 'Competitive Shift', difficulty: 'Hard', isVerified: true, views: 6500 },
-];
+import { getPreviousPapersByYear } from '@/services/client/previousPaper.client';
+import type { PreviousPaperCardUIDTO } from '@/dto/previousPaper.ui.dto';
 
 interface PageProps {
   params: Promise<{ year: string }>;
 }
 
-export default async function SolvedYearPage({ params }: PageProps) {
-  // NEXT.JS 15: Await params
+export default async function PreviousYearPage({ params }: PageProps){
   const { year } = await params;
 
-  // For testing, we only allow 2026. Change this when connecting to DB.
-  if (year !== "2026") {
+  // validate year param
+  const numericYear = parseInt(year, 10);
+  if (isNaN(numericYear)) {
     return notFound();
   }
 
-  return (
-    <YearPaperList 
-      year={year} 
-      papers={MOCK_PAPERS} 
-      mode="previous" 
-    />
-  );
+  // fetch data through client helper (works on server since it uses fetch)
+  let cards: PreviousPaperCardUIDTO[] = [];
+  try {
+    cards = await getPreviousPapersByYear(numericYear);
+  } catch (err) {
+    console.error('Error loading previous papers for year', year, err);
+    // keep cards empty
+  }
+
+  // if there are no papers and you want 404, uncomment below
+  // if (!cards.length) return notFound();
+
+  // map to the shape YearPaperList expects
+  const papers = cards.map((c): any => ({
+    id: c.id,
+    title: c.title,
+    subjectCode: c.paperCode,  // UI list uses subjectCode for display
+    session: c.session,
+    difficulty: c.difficulty || '',
+    isVerified: c.isVerified,
+    views: c.views,
+  }));
+
+  return <YearPaperList year={year} papers={papers} mode="previous" />;
 }

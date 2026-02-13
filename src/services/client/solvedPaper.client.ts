@@ -24,6 +24,16 @@ import {
 } from '@/dto/solvedPaper.ui.mapper';
 import { SolvedPaperServerDTO, SolvedPapersStatsDTO } from '@/models/dto/solvedPaper.dto';
 
+// helper for absolute path (makes server-side fetches work)
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:3000/api';
+
+async function clientFetch(endpoint: string, opts?: RequestInit) {
+  const url = API_BASE ? `${API_BASE}${endpoint}` : endpoint;
+  return fetch(url, opts);
+}
+
 /**
  * Get all solved papers with filters
  */
@@ -48,7 +58,7 @@ export async function getSolvedPapers(
   if (filters?.difficulty) params.append('difficulty', filters.difficulty);
   if (filters?.isVerified !== undefined) params.append('isVerified', filters.isVerified.toString());
 
-  const response = await fetch(`/api/solved-papers?${params.toString()}`);
+  const response = await clientFetch(`/solved-papers?${params.toString()}`);
   const data: ApiResponse<any> = await response.json();
 
   if (!data.success) {
@@ -62,7 +72,7 @@ export async function getSolvedPapers(
  * Get single solved paper by ID
  */
 export async function getSolvedPaperById(id: string): Promise<SolvedPaperUIDTO> {
-  const response = await fetch(`/api/solved-papers/${id}`);
+  const response = await clientFetch(`/solved-papers/${id}`);
   const data: ApiResponse<SolvedPaperServerDTO> = await response.json();
 
   if (!data.success || !data.data) {
@@ -76,7 +86,7 @@ export async function getSolvedPaperById(id: string): Promise<SolvedPaperUIDTO> 
  * Get solved papers by year
  */
 export async function getSolvedPapersByYear(year: number): Promise<SolvedPaperCardUIDTO[]> {
-  const response = await fetch(`/api/solved-papers/year/${year}`);
+  const response = await clientFetch(`/solved-papers/year/${year}`);
   const data: ApiResponse<SolvedPaperServerDTO[]> = await response.json();
 
   if (!data.success || !data.data) {
@@ -90,7 +100,7 @@ export async function getSolvedPapersByYear(year: number): Promise<SolvedPaperCa
  * Get recent solved papers
  */
 export async function getRecentSolvedPapers(limit: number = 4): Promise<RecentSolvedPaperUIDTO[]> {
-  const response = await fetch(`/api/solved-papers/recent?limit=${limit}`);
+  const response = await clientFetch(`/solved-papers/recent?limit=${limit}`);
   const data: ApiResponse<SolvedPaperServerDTO[]> = await response.json();
 
   if (!data.success || !data.data) {
@@ -107,7 +117,7 @@ export async function getRecentSolvedPapers(limit: number = 4): Promise<RecentSo
  * Get dashboard stats
  */
 export async function getSolvedPapersStats(): Promise<SolvedPapersStatsUIDTO> {
-  const response = await fetch('/api/solved-papers/stats');
+  const response = await clientFetch('/solved-papers/stats');
   const data: ApiResponse<SolvedPapersStatsDTO> = await response.json();
 
   if (!data.success || !data.data) {
@@ -132,7 +142,7 @@ export async function searchSolvedPapers(
   params.append('q', query);
   params.append('page', page.toString());
 
-  const response = await fetch(`/api/solved-papers/search?${params.toString()}`);
+  const response = await clientFetch(`/solved-papers/search?${params.toString()}`);
   const data: ApiResponse<any> = await response.json();
 
   if (!data.success) {
@@ -147,7 +157,7 @@ export async function searchSolvedPapers(
  */
 export async function trackSolvedPaperView(id: string): Promise<void> {
   try {
-    await fetch(`/api/solved-papers/${id}/track-view`, {
+    await clientFetch(`/solved-papers/${id}/track-view`, {
       method: 'POST',
     });
   } catch (error) {
@@ -161,7 +171,7 @@ export async function trackSolvedPaperView(id: string): Promise<void> {
  */
 export async function trackSolvedPaperDownload(id: string): Promise<void> {
   try {
-    await fetch(`/api/solved-papers/${id}/track-download`, {
+    await clientFetch(`/solved-papers/${id}/track-download`, {
       method: 'POST',
     });
   } catch (error) {
@@ -175,7 +185,7 @@ export async function trackSolvedPaperDownload(id: string): Promise<void> {
  * (Derived from stats data)
  */
 export async function getYearsList(): Promise<YearDataUIDTO[]> {
-  const response = await fetch('/api/solved-papers/stats');
+  const response = await clientFetch('/solved-papers/stats');
   const data: ApiResponse<SolvedPapersStatsDTO> = await response.json();
 
   if (!data.success || !data.data) {

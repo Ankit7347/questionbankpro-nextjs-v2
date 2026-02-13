@@ -71,6 +71,7 @@ export function mapToCardUIDTO(
     title: dto.title,
     code: dto.paperCode,
     year: dto.year,
+    session: dto.session,
     subject: subjectName || 'Subject',
     exam: examName || 'Exam',
     totalMarks: dto.totalMarks,
@@ -78,6 +79,7 @@ export function mapToCardUIDTO(
     isVerified: dto.isVerified,
     rating: dto.rating,
     downloadCount: dto.downloadCount,
+    views: dto.viewCount || 0,
   };
 }
 

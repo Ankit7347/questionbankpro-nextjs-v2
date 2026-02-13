@@ -48,6 +48,7 @@ export interface SolvedPaperCardUIDTO {
   title: string;
   code: string;
   year: number;
+  session: string;  // for YearPaperList
   subject: string;
   exam: string;
   totalMarks: number;
@@ -55,6 +56,7 @@ export interface SolvedPaperCardUIDTO {
   isVerified: boolean;
   rating?: number;
   downloadCount: number;
+  views: number;  // for analytics/display
 }
 
 /**

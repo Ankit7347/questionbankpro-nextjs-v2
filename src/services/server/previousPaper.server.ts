@@ -22,6 +22,8 @@ import {
 import { mapPreviousPaperToServerDTO, mapPreviousPapersToServerDTOs } from '@/models/dto/previousPaper.mapper';
 import { ApiError } from '@/lib/apiError';
 import dbConnect from '@/lib/mongodb';
+import { getCurrentLang } from '@/lib/i18n';
+const lang = await getCurrentLang();
 
 /**
  * Get all previous papers (paginated)
@@ -60,7 +62,7 @@ export async function getPreviousPapers(
       .lean();
 
     return {
-      data: mapPreviousPapersToServerDTOs(papers),
+      data: mapPreviousPapersToServerDTOs(papers,lang),
       total,
       page,
       pageSize: limit,
@@ -86,7 +88,7 @@ export async function getPreviousPaperById(id: string): Promise<PreviousPaperSer
       throw new ApiError('Previous paper not found', 404);
     }
 
-    return mapPreviousPaperToServerDTO(paper);
+    return mapPreviousPaperToServerDTO(paper,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to fetch paper: ' + (error.message || 'Unknown error'), 500);
@@ -109,7 +111,7 @@ export async function getPreviousPapersByYear(year: number): Promise<PreviousPap
       .populate('subjectId', 'name')
       .lean();
 
-    return mapPreviousPapersToServerDTOs(papers);
+    return mapPreviousPapersToServerDTOs(papers,lang);
   } catch (error: any) {
     throw new ApiError('Failed to fetch papers by year: ' + (error.message || 'Unknown error'), 500);
   }
@@ -131,7 +133,7 @@ export async function getRecentPreviousPapers(limit: number = 10): Promise<Previ
       .populate('subjectId', 'name')
       .lean();
 
-    return mapPreviousPapersToServerDTOs(papers);
+    return mapPreviousPapersToServerDTOs(papers,lang);
   } catch (error: any) {
     throw new ApiError('Failed to fetch recent papers: ' + (error.message || 'Unknown error'), 500);
   }
@@ -199,7 +201,7 @@ export async function getPreviousPapersStats(): Promise<PreviousPapersStatsDTO> 
         year: item._id,
         count: item.count,
       })),
-      recentPapers: mapPreviousPapersToServerDTOs(recentPapers),
+      recentPapers: mapPreviousPapersToServerDTOs(recentPapers,lang),
     };
   } catch (error: any) {
     throw new ApiError('Failed to fetch stats: ' + (error.message || 'Unknown error'), 500);
@@ -242,7 +244,7 @@ export async function createPreviousPaper(
       .populate('subjectId', 'name')
       .lean();
 
-    return mapPreviousPaperToServerDTO(populated);
+    return mapPreviousPaperToServerDTO(populated,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to create paper: ' + (error.message || 'Unknown error'), 500);
@@ -274,7 +276,7 @@ export async function updatePreviousPaper(
       .populate('subjectId', 'name')
       .lean();
 
-    return mapPreviousPaperToServerDTO(updated);
+    return mapPreviousPaperToServerDTO(updated,lang);
   } catch (error: any) {
     if (error instanceof ApiError) throw error;
     throw new ApiError('Failed to update paper: ' + (error.message || 'Unknown error'), 500);
@@ -370,7 +372,7 @@ export async function searchPreviousPapers(
       .lean();
 
     return {
-      data: mapPreviousPapersToServerDTOs(papers),
+      data: mapPreviousPapersToServerDTOs(papers,lang),
       total: papers.length,
       page,
       pageSize: limit,
