@@ -15,6 +15,7 @@ import { Analytics } from "@vercel/analytics/next";
 // ⛔ chartSetup is side-effectful → keep it server-safe
 import "@/lib/chartSetup";
 import { auth } from "@/lib/auth";
+import GlobalProgressBar from "@/components/GlobalProgressBar";
 
 // Fonts
 const geistSans = Geist({
@@ -166,6 +167,7 @@ export default async function RootLayout({
 
             <ThemeProvider>
               <div className="min-h-screen flex flex-col">
+                <GlobalProgressBar/>
                 {children}
               </div>
             </ThemeProvider>

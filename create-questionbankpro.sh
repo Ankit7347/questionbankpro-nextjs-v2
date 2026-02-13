@@ -58,6 +58,7 @@ EOF
 #############################################
 # mongodb pinned to ^6.10 for Auth.js adapter compatibility
 yarn add \
+  nextjs-toploader \
   mongoose \
   next-auth@beta \
   @auth/mongodb-adapter \
