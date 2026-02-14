@@ -190,7 +190,7 @@ export default function UnifiedArchiveView({
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 {years.map((item) => (
-                  <Link href={`/dashboard/${mode}-papers/${item.year}`} key={item.year} className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center active:scale-95 hover:border-blue-500/50 transition-all">
+                  <Link href={`/dashboard/${mode}-papers/${item.year}`} key={item.year} className="p-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-xl flex flex-col items-center justify-center active:scale-95 hover:border-blue-500/50 transition-all shadow-sm">
                     <span className="text-xl md:text-2xl font-black">{item.year}</span>
                     <span className="text-[9px] font-bold text-slate-500 uppercase">{item.paperCount} Items</span>
                   </Link>
@@ -224,7 +224,7 @@ function PaperSkeleton() {
 
 function StatCard({ label, value, color, bgColor }: { label: string, value: number, color: string, bgColor: string }) {
     return (
-      <div className="flex-shrink-0 flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 min-w-[140px]">
+      <div className="flex-shrink-0 flex items-center gap-3 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md min-w-[140px] shadow-sm">
         <div className={`p-2 rounded-lg ${bgColor} ${color}`}><Zap className="w-4 h-4 fill-current" /></div>
         <div><p className="text-[9px] font-black text-slate-500 uppercase leading-none mb-1">{label}</p><p className="text-sm font-bold truncate leading-none">{value.toLocaleString()}</p></div>
       </div>
@@ -234,7 +234,7 @@ function StatCard({ label, value, color, bgColor }: { label: string, value: numb
 function PaperCard({ paper, mode }: { paper: PaperItem, mode: 'previous' | 'solved' }) {
     const isSolved = mode === 'solved';
     return (
-      <Link href={`/dashboard/${mode}-papers/${paper.year}/${paper.id}`} className="block p-4 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-blue-500/50 active:scale-[0.98] transition-all h-full">
+      <Link href={`/dashboard/${mode}-papers/${paper.year}/${paper.id}`} className="block p-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl hover:border-blue-500/50 active:scale-[0.98] transition-all h-full shadow-sm hover:shadow-md">
         <div className="flex justify-between items-start mb-3">
           <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-[8px] font-black rounded text-slate-500 border border-slate-200 dark:border-slate-700 uppercase">{paper.code}</span>
           <span className="text-[9px] text-slate-400 font-bold">{paper.dateAdded}</span>

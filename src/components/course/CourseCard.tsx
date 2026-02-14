@@ -3,6 +3,13 @@
 
 import { CourseUI } from "@/dto/course.ui.dto";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function CourseCard({ course }: { course: CourseUI }) {
   const { name, type, price, access, flags, examSlug, subExamSlug, slug,id } = course;
@@ -11,7 +18,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   const isExpired = access.status === "EXPIRED";
   const isExpiring = access.status === "EXPIRING";
   const isActive = access.status === "ACTIVE" || access.status === "LIFETIME";
-  const btnBase = "flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-bold transition shadow-sm";
+  const btnBase = "flex w-full items-center justify-center rounded-xl px-3 py-2 text-sm font-bold transition shadow-sm backdrop-blur-sm";
   /* -----------------------------
      CTA Resolver (Logic remains yours)
   ------------------------------ */
@@ -22,7 +29,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         return (
           <a
             href={`/exams/${examSlug}/${subExamSlug}/study/${slug}`}
-            className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700 shadow-sm shadow-blue-200"
+            className="flex w-full items-center justify-center rounded-xl bg-blue-600/90 backdrop-blur-sm px-3 py-2 text-sm font-bold text-white transition hover:bg-blue-700 shadow-sm shadow-blue-200/50"
           >
             Go to Course
           </a>
@@ -30,14 +37,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
 
       case "EXPIRING":
         return (
-          <button className="w-full rounded-xl bg-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-amber-600 transition shadow-sm shadow-amber-200">
+          <button className="w-full rounded-xl bg-amber-500/90 backdrop-blur-sm px-3 py-2 text-sm font-bold text-white hover:bg-amber-600 transition shadow-sm shadow-amber-200/50">
             Renew Access
           </button>
         );
 
       case "EXPIRED":
         return (
-          <div className="w-full rounded-xl bg-gray-100 px-4 py-3 text-center text-sm font-bold text-gray-500 border border-gray-200">
+          <div className="w-full rounded-xl bg-gray-100/80 backdrop-blur-sm px-3 py-2 text-center text-sm font-bold text-gray-500 border border-gray-200/60">
             Expired
           </div>
         );
@@ -48,7 +55,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         return (
           <Link
             href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}&courseId=${id}`}
-            className={`${btnBase} ${isFree ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-900 hover:bg-black"} text-white`}
+            className={`${btnBase} ${isFree ? "bg-emerald-600/90 hover:bg-emerald-700" : "bg-gray-900/90 hover:bg-black"} text-white`}
           >
             {isFree ? "Enroll Free" : "Buy Now"}
           </Link>
@@ -57,15 +64,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   }
 
   return (
-    <div
-      className={`group relative flex flex-col h-full rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-        ${isExpired ? "opacity-75 grayscale-[0.5] border-gray-200" : "border-gray-100 shadow-sm"}
+    <Card className={`group relative flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl bg-white/60 dark:bg-gray-950/60 backdrop-blur-xl border-gray-200/50 dark:border-gray-800/50 shadow-sm
+        ${isExpired ? "opacity-75 grayscale-[0.5]" : ""}
         ${isExpiring ? "border-l-4 border-l-amber-400" : ""}
         ${isActive ? "border-l-4 border-l-blue-500" : ""}
       `}
     >
       {/* 1. Header & Tags */}
-      <div className="mb-3 flex items-start justify-between gap-4">
+      <CardHeader className="p-3 pb-1 space-y-0">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="inline-block rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
@@ -77,14 +83,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
               </span>
             )}
           </div>
-          <h3 className="line-clamp-2 text-lg font-bold leading-tight text-gray-900 group-hover:text-blue-600 transition-colors">
+          <CardTitle className="line-clamp-2 text-lg font-bold leading-tight text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">
             {name}
-          </h3>
+          </CardTitle>
         </div>
-      </div>
+      </CardHeader>
 
       {/* 2. Pricing/Status Info (Pushed to middle) */}
-      <div className="flex-grow flex flex-col justify-end mb-5">
+      <CardContent className="p-3 pt-1 flex-grow flex flex-col justify-end">
         {!isExpired && (
           <div className="mt-2">
             {flags.isFree ? (
@@ -92,7 +98,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
             ) : (
               price && (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-black text-gray-900">
+                  <span className="text-xl font-black text-gray-900 dark:text-white">
                     ₹{price.final.toLocaleString()}
                   </span>
                   {price.discountPercent && (
@@ -112,12 +118,12 @@ export default function CourseCard({ course }: { course: CourseUI }) {
             {isExpired ? "Access ended" : `Expires: ${new Date(access.expiresAt).toLocaleDateString()}`}
           </p>
         )}
-      </div>
+      </CardContent>
 
       {/* 3. Action (Pinned to bottom) */}
-      <div className="mt-auto">
+      <CardFooter className="p-3 pt-0 mt-auto">
         {renderCTA()}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
