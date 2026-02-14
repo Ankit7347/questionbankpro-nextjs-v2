@@ -19,6 +19,10 @@ export const mapUser = (doc: any): UserDTO => {
     uiMode: doc.uiMode || "light",
     image: doc.image || "",
 
+    // preferences & dashboard
+    preferences: (doc.preferences as any) || { theme: doc.uiMode || "system" },
+    dashboard: (doc.dashboard as any) || {},
+
     // education
     educationLevel: doc.educationLevel,
     examType: doc.examType,

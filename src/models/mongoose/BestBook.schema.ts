@@ -58,5 +58,4 @@ const BestBookSchema = new Schema(
   BaseSchemaOptions
 );
 
-export const BestBookModel =
-  models.BestBook || model("BestBook", BestBookSchema);
+export default models.BestBook || model("BestBook", BestBookSchema);

@@ -16,9 +16,16 @@ export const createUserSchema = z.object({
   competition: z.string().optional(),
   stateId: z.string().optional(),
   districtId: z.string().optional(),
+  preferences: z.object({
+    theme: z.enum(["light","dark","system"]).optional(),
+  }).optional(),
 });
 
 export const updateUserSchema =
   createUserSchema.partial().omit({
     password: true,
   });
+
+export const updatePreferencesSchema = z.object({
+  theme: z.enum(["light","dark","system"]),
+});

@@ -31,4 +31,19 @@ export interface UserDTO extends BaseDTO {
 
   // system
   isActive: boolean;
+
+  // dynamic preferences stored on user
+  preferences?: {
+    theme?: "light" | "dark" | "system";
+    [key: string]: any;
+  };
+
+  // lightweight dashboard summaries
+  dashboard?: {
+    notes?: { total: number; lastTopicId?: string };
+    bookmarksCount?: number;
+    historySummary?: { lastViewedAt?: string; lastItem?: string };
+    performanceSummary?: { quizzesTaken?: number; bestScore?: number };
+    [key: string]: any;
+  };
 }

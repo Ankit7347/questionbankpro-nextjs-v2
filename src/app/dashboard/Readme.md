@@ -77,6 +77,61 @@ This is **navigation logic**, not UI design.
 
 ---
 
+## 5. `/dashboard/bookmarks`
+
+**Role**
+- List items the user has bookmarked for later review
+
+**Links TO**
+- (depending on itemType) corresponding notes/quiz/paper pages
+
+**Linked FROM**
+- Header/bookmark buttons throughout the app
+- Dashboard home tile
+
+---
+
+## 6. `/dashboard/history`
+
+**Role**
+- Chronological view of user activity (notes viewed, quizzes taken)
+
+**Links TO**
+- Relevant content pages based on activity entries
+
+**Linked FROM**
+- Dashboard home tile
+
+---
+
+## 7. `/dashboard/performance`
+
+**Role**
+- Show quiz attempt summaries and trends
+
+**Links TO**
+- Individual quiz result pages
+
+**Linked FROM**
+- Dashboard home tile
+
+---
+
+## 8. `/dashboard/settings`
+
+**Role**
+- Preferences, account management, theme selection
+
+**Links TO**
+- Sub‑routes for notifications, password, etc.
+
+**Linked FROM**
+- Sidebar → Settings
+- Profile dropdown
+
+
+---
+
 ## 5. `/dashboard/quiz`
 
 **Role**

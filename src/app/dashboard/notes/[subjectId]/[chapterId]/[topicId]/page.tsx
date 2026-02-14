@@ -2,6 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ChevronRight, ChevronLeft, Bookmark } from 'lucide-react';
+import { auth } from '@/lib/auth';
+import dbConnect from '@/lib/mongodb';
+import { logActivity } from '@/services/server/activityLog.service';
+import { upsertProgress } from '@/services/server/progress.service';
 
 async function getTopicContent(subjectId: string, chapterId: string, topicId: string) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -13,6 +17,20 @@ async function getTopicContent(subjectId: string, chapterId: string, topicId: st
 export default async function TopicReaderPage({ params }: { params: Promise<{ subjectId: string; chapterId: string; topicId: string }> }) {
   const { subjectId, chapterId, topicId } = await params;
   const data = await getTopicContent(subjectId, chapterId, topicId);
+
+  // record user activity + progress in background
+  try {
+    await dbConnect();
+    const session = await auth();
+    const headerUuid = undefined; // optionally read from cookie/header if available
+    const userUuid = session?.user?.id || headerUuid;
+    if (userUuid) {
+      logActivity(userUuid, 'note_view', { subjectId, chapterId, topicId });
+      upsertProgress(userUuid, { subjectId, chapterId, topicId, progress: 100 }).catch(() => {});
+    }
+  } catch (e) {
+    console.error('tracking failure', e);
+  }
 
   return (
     <div className="bg-slate-950 text-slate-200 pb-24">

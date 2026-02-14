@@ -51,6 +51,35 @@ const UserSchema = new Schema(
       default: "light",
     },
 
+    // user preferences (stored under user document for quick access)
+    preferences: {
+      type: {
+        theme: { type: String, enum: ["light", "dark", "system"], default: "system" },
+        // additional keys can be added as needed (notifications, language, etc.)
+      },
+      default: {},
+    },
+
+    // dashboard summary fields used by various panels; kept small
+    dashboard: {
+      type: {
+        notes: {
+          total: { type: Number, default: 0 },
+          lastTopicId: { type: String, default: "" },
+        },
+        bookmarksCount: { type: Number, default: 0 },
+        historySummary: {
+          lastViewedAt: { type: Date },
+          lastItem: { type: String },
+        },
+        performanceSummary: {
+          quizzesTaken: { type: Number, default: 0 },
+          bestScore: { type: Number, default: 0 },
+        },
+      },
+      default: {},
+    },
+
     /* =========================
        Location (ID + Snapshot)
     ========================== */

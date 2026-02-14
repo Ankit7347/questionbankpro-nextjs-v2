@@ -9,7 +9,10 @@ import {
   CheckSquare, 
   Layout, 
   ClipboardList, 
-  GraduationCap 
+  GraduationCap,
+  Settings,
+  Clock,
+  Bookmark,
 } from "lucide-react";
 
 // Added icons to the features array
@@ -20,6 +23,10 @@ const features = [
 	{ title: "Quizzes", href: "/dashboard/quiz", desc: "Practice topic-based MCQs and mock tests", icon: ClipboardList, color: "text-orange-500" },
 	{ title: "Notes", href: "/dashboard/notes", desc: "Get concise notes for quick revision", icon: BookOpen, color: "text-red-500" },
 	{ title: "Syllabus", href: "/dashboard/syllabus", desc: "Explore official board syllabus", icon: Layout, color: "text-cyan-500" },
+	{ title: "Bookmarks", href: "/dashboard/bookmarks", desc: "View your saved topics and materials", icon: Bookmark, color: "text-pink-500" },
+	{ title: "History", href: "/dashboard/history", desc: "See what you have viewed recently", icon: Clock, color: "text-yellow-500" },
+	{ title: "Performance", href: "/dashboard/performance", desc: "Check your quiz scores and trends", icon: CheckSquare, color: "text-indigo-500" },
+	{ title: "Settings", href: "/dashboard/settings", desc: "Manage your account preferences", icon: Settings, color: "text-gray-500" },
 ];
 
 export default function DashboardPage() {
