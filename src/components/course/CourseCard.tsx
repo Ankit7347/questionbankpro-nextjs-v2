@@ -12,24 +12,23 @@ import {
 } from "@/components/ui/card";
 
 export default function CourseCard({ course }: { course: CourseUI }) {
-  const { name, type, price, access, flags, examSlug, subExamSlug, slug,id } = course;
+  const { name, type, price, access, flags, examSlug, subExamSlug, slug, id } = course;
 
-  // Visual status config
   const isExpired = access.status === "EXPIRED";
   const isExpiring = access.status === "EXPIRING";
   const isActive = access.status === "ACTIVE" || access.status === "LIFETIME";
-  const btnBase = "flex w-full items-center justify-center rounded-xl px-3 py-2 text-sm font-bold transition shadow-sm backdrop-blur-sm";
-  /* -----------------------------
-     CTA Resolver (Logic remains yours)
-  ------------------------------ */
+
   function renderCTA() {
+    // Compact button with smaller text and padding
+    const btnBase = "flex w-full items-center justify-center rounded-lg px-2 py-1.5 text-xs font-bold transition-all duration-300 backdrop-blur-xl border border-white/20 shadow-sm active:scale-95";
+
     switch (access.status) {
       case "LIFETIME":
       case "ACTIVE":
         return (
           <a
             href={`/exams/${examSlug}/${subExamSlug}/study/${slug}`}
-            className="flex w-full items-center justify-center rounded-xl bg-blue-600/90 backdrop-blur-sm px-3 py-2 text-sm font-bold text-white transition hover:bg-blue-700 shadow-sm shadow-blue-200/50"
+            className={`${btnBase} bg-blue-500/30 text-blue-900 dark:text-blue-100 hover:bg-blue-500/50 border-blue-400/30`}
           >
             Go to Course
           </a>
@@ -37,14 +36,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
 
       case "EXPIRING":
         return (
-          <button className="w-full rounded-xl bg-amber-500/90 backdrop-blur-sm px-3 py-2 text-sm font-bold text-white hover:bg-amber-600 transition shadow-sm shadow-amber-200/50">
-            Renew Access
+          <button className={`${btnBase} bg-amber-500/30 text-amber-900 dark:text-amber-100 hover:bg-amber-500/50 border-amber-400/30`}>
+            Renew
           </button>
         );
 
       case "EXPIRED":
         return (
-          <div className="w-full rounded-xl bg-gray-100/80 backdrop-blur-sm px-3 py-2 text-center text-sm font-bold text-gray-500 border border-gray-200/60">
+          <div className={`${btnBase} bg-gray-400/10 text-gray-500 border-white/5 cursor-not-allowed`}>
             Expired
           </div>
         );
@@ -55,7 +54,11 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         return (
           <Link
             href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}&courseId=${id}`}
-            className={`${btnBase} ${isFree ? "bg-emerald-600/90 hover:bg-emerald-700" : "bg-gray-900/90 hover:bg-black"} text-white`}
+            className={`${btnBase} ${
+              isFree 
+                ? "bg-emerald-500/30 text-emerald-900 dark:text-emerald-100 hover:bg-emerald-500/50" 
+                : "bg-gray-900/60 text-white hover:bg-black"
+            }`}
           >
             {isFree ? "Enroll Free" : "Buy Now"}
           </Link>
@@ -64,46 +67,57 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   }
 
   return (
-    <Card className={`group relative flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl bg-white/60 dark:bg-gray-950/60 backdrop-blur-xl border-gray-200/50 dark:border-gray-800/50 shadow-sm
-        ${isExpired ? "opacity-75 grayscale-[0.5]" : ""}
-        ${isExpiring ? "border-l-4 border-l-amber-400" : ""}
-        ${isActive ? "border-l-4 border-l-blue-500" : ""}
+    <Card 
+      className={`
+        group relative flex flex-col h-fit max-w-sm rounded-xl overflow-hidden transition-all duration-500 
+        hover:shadow-xl hover:-translate-y-1
+        
+        /* Crystal Core */
+        bg-white/15 dark:bg-slate-900/40 
+        backdrop-blur-xl backdrop-saturate-150
+        border border-white dark:border-white/10
+        
+        /* State styles */
+        ${isExpired ? "opacity-60 grayscale-[0.2]" : ""}
+        ${isExpiring ? "border-l-2 border-l-amber-400/80" : ""}
+        ${isActive ? "border-l-2 border-l-blue-500/80" : ""}
       `}
     >
-      {/* 1. Header & Tags */}
-      <CardHeader className="p-3 pb-1 space-y-0">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="inline-block rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+      {/* Surface Reflection */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none" />
+      
+      <CardHeader className="p-3 pb-1 relative z-10">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <span className="rounded bg-white/40 dark:bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-tight text-gray-600 dark:text-gray-400 border border-white/10">
               {type}
             </span>
             {flags.isFree && (
-              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-100">
+              <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/10">
                 FREE
               </span>
             )}
           </div>
-          <CardTitle className="line-clamp-2 text-lg font-bold leading-tight text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">
+          <CardTitle className="line-clamp-1 text-sm font-bold tracking-tight text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
             {name}
           </CardTitle>
         </div>
       </CardHeader>
 
-      {/* 2. Pricing/Status Info (Pushed to middle) */}
-      <CardContent className="p-3 pt-1 flex-grow flex flex-col justify-end">
+      <CardContent className="p-3 pt-1 flex-grow flex flex-col justify-end relative z-10">
         {!isExpired && (
-          <div className="mt-2">
+          <div className="flex items-center justify-between">
             {flags.isFree ? (
-              <div className="text-xl font-black text-emerald-600">₹0</div>
+              <div className="text-lg font-black text-emerald-600 drop-shadow-sm">₹0</div>
             ) : (
               price && (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-black text-gray-900 dark:text-white">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg font-black text-gray-900 dark:text-white tracking-tighter">
                     ₹{price.final.toLocaleString()}
                   </span>
                   {price.discountPercent && (
-                    <span className="text-xs font-bold text-red-500">
-                      {price.discountPercent}% OFF
+                    <span className="text-[9px] font-bold text-red-500">
+                      -{price.discountPercent}%
                     </span>
                   )}
                 </div>
@@ -112,16 +126,14 @@ export default function CourseCard({ course }: { course: CourseUI }) {
           </div>
         )}
 
-        {/* Status Text */}
         {access.expiresAt && (
-          <p className={`mt-1 text-[11px] font-medium ${isExpiring ? "text-amber-600" : "text-gray-400"}`}>
-            {isExpired ? "Access ended" : `Expires: ${new Date(access.expiresAt).toLocaleDateString()}`}
+          <p className={`mt-1 text-[10px] font-medium ${isExpiring ? "text-amber-600" : "text-gray-400"}`}>
+             {isExpired ? "Expired" : `Ends: ${new Date(access.expiresAt).toLocaleDateString()}`}
           </p>
         )}
       </CardContent>
 
-      {/* 3. Action (Pinned to bottom) */}
-      <CardFooter className="p-3 pt-0 mt-auto">
+      <CardFooter className="p-3 pt-0 mt-1 relative z-10">
         {renderCTA()}
       </CardFooter>
     </Card>
