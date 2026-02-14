@@ -1,19 +1,23 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
-import { 
-  BookOpen, 
-  FileText, 
-  CheckSquare, 
-  Layout, 
-  ClipboardList, 
-  GraduationCap,
-  Settings,
-  Clock,
-  Bookmark,
+import {
+	BookOpen,
+	FileText,
+	CheckSquare,
+	Layout,
+	ClipboardList,
+	GraduationCap,
+	Settings,
+	Clock,
+	Bookmark,
 } from "lucide-react";
+import {
+	Card,
+	CardTitle,
+	CardDescription,
+} from "@/components/ui/card";
 
 // Added icons to the features array
 const features = [
@@ -31,59 +35,99 @@ const features = [
 
 export default function DashboardPage() {
 	const { data: session, status } = useSession();
-	const router = useRouter();
-
-	useEffect(() => {
-		if (status === "unauthenticated") {
-			router.push("/login");
-		}
-	}, [status, router]);
 
 	if (status === "loading") {
 		return (
-			<div className="flex flex-col justify-center items-center h-screen bg-white dark:bg-gray-900">
-				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-				<p className="text-gray-500 animate-pulse">Loading your dashboard...</p>
+			<div className="px-4 py-10 md:px-10 max-w-7xl mx-auto">
+				{/* Header Skeleton */}
+				<div className="mb-10 rounded-2xl p-6 md:p-8 bg-gradient-to-br from-emerald-400/40 to-green-500/40 animate-pulse">
+					<div className="space-y-4 max-w-xl">
+						<div className="h-3 w-1/4 bg-white/50 rounded" />
+						<div className="h-8 w-2/3 bg-white/60 rounded" />
+						<div className="h-4 w-1/2 bg-white/50 rounded" />
+					</div>
+				</div>
+
+				{/* Feature Cards Skeleton Grid */}
+				<div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+					{Array.from({ length: 10 }).map((_, i) => (
+						<div key={i} className="rounded-xl border p-6 animate-pulse bg-gray-100 dark:bg-gray-800 flex flex-col justify-between">
+							<div className="flex flex-col items-center space-y-3">
+								<div className="w-12 aspect-square rounded-lg bg-gray-300 dark:bg-gray-700" />
+								<div className="h-4 w-2/3 bg-gray-300 dark:bg-gray-700 rounded" />
+							</div>
+
+							<div className="mt-6 space-y-2">
+								<div className="h-3 w-full bg-gray-300 dark:bg-gray-700 rounded" />
+								<div className="h-3 w-3/4 bg-gray-300 dark:bg-gray-700 rounded" />
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="bg-gray-50 dark:bg-gray-950 px-4 py-10 md:px-10">
+		<div className="px-4 py-10 md:px-10 max-w-7xl mx-auto">
 			{/* Header Section */}
-			<div className="max-w-6xl mx-auto mb-10 text-left">
-				<h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white">
-					Welcome back,{" "}
-					<Link
-						href="/dashboard/profile"
-						className="text-blue-600 hover:text-blue-700 hover:underline decoration-2 underline-offset-4 transition-all"
-					>
-						{session?.user?.name || "Student"}
-					</Link>
-					!
-				</h1>
-				<p className="mt-2 text-gray-600 dark:text-gray-400 text-lg">
-					What would you like to study today?
-				</p>
+			<div className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/70 to-green-600/70 backdrop-blur-xl border border-white/20 p-6 md:p-8 shadow-xl">
+
+				{/* Glass highlight overlay */}
+				<div className="absolute inset-0 bg-white/10 backdrop-blur-2xl" />
+
+				<div className="relative z-10 max-w-2xl">
+					<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/20 text-white text-xs font-medium mb-4">
+						<span className="relative flex h-2 w-2">
+							<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-300 opacity-75"></span>
+							<span className="relative inline-flex rounded-full h-2 w-2 bg-lime-400"></span>
+						</span>
+						Ready to learn
+					</div>
+
+					<h1 className="text-2xl md:text-4xl font-bold text-white leading-snug">
+						Welcome back,{" "}
+						<Link
+							href="/dashboard/profile"
+							className="text-lime-200 hover:text-white transition-colors underline decoration-white/40 underline-offset-4"
+						>
+							{session?.user?.name?.split(" ")[0] || "Student"}
+						</Link>
+						!
+					</h1>
+
+					<p className="mt-3 text-green-100 text-sm md:text-base max-w-lg">
+						You've made progress this week. What’s your focus today?
+					</p>
+
+					<div className="mt-5">
+						<div className="px-3 py-1.5 rounded-lg bg-white/15 border border-white/20 text-white text-xs backdrop-blur-sm inline-block">
+							<span className="opacity-70">Current Goal:</span> Exam Prep 2026
+						</div>
+					</div>
+				</div>
 			</div>
 
 			{/* Features Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+			<div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 				{features.map((feature) => (
-					<Link
-						key={feature.href}
-						href={feature.href}
-						className="group bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-1"
-					>
-						<div className={`p-3 rounded-lg inline-block mb-4 bg-gray-50 dark:bg-gray-700/50 ${feature.color}`}>
-							<feature.icon size={28} />
-						</div>
-						<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors">
-							{feature.title}
-						</h2>
-						<p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
-							{feature.desc}
-						</p>
+					<Link key={feature.href} href={feature.href} className="block h-full group" >
+						<Card className="h-full flex flex-col p-4 text-center items-center justify-between transition-all duration-300 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-500 hover:-translate-y-1 min-h-[160px] md:min-h-[180px]">
+							{/* Top Section: Icon and Title */}
+							<div className="flex flex-col items-center w-full">
+								<div className={`p-2.5 rounded-lg mb-3 bg-gray-50 dark:bg-gray-800 ${feature.color} group-hover:scale-110 transition-transform`}>
+									<feature.icon size={24} />
+								</div>
+								<CardTitle className="text-sm md:text-base font-bold group-hover:text-blue-600 transition-colors line-clamp-1">
+									{feature.title}
+								</CardTitle>
+							</div>
+
+							{/* Bottom Section: Description */}
+							<CardDescription className="text-[10px] md:text-xs mt-2 line-clamp-2 text-gray-500 dark:text-gray-400">
+								{feature.desc}
+							</CardDescription>
+						</Card>
 					</Link>
 				))}
 			</div>
