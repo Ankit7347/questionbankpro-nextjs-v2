@@ -8,6 +8,9 @@ import {
     CheckCircle2, Loader2, FileText, HelpCircle,
     BookOpen, Layout, Globe, Video
 } from "lucide-react";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function CheckoutPage() {
     const searchParams = useSearchParams();
@@ -108,7 +111,8 @@ export default function CheckoutPage() {
                     </h1>
 
                     {/* Main Course Card */}
-                    <div className="mt-6 flex flex-col gap-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                    <GlassCard className="mt-6 rounded-2xl p-6">
+                      <div className="flex flex-col gap-6">
                         <div className="flex items-center gap-4">
                             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
                                 <Video className="h-7 w-7" />
@@ -135,7 +139,8 @@ export default function CheckoutPage() {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                      </div>
+                    </GlassCard>
 
                     <div className="mt-6 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-4 border border-blue-100 dark:border-blue-900/30">
                         <p className="text-xs font-medium text-blue-800 dark:text-blue-300 leading-relaxed">
@@ -146,14 +151,14 @@ export default function CheckoutPage() {
 
                 {/* 4. Right Side: Order Summary */}
                 <div className="lg:col-span-5">
-                    <div className="sticky top-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl shadow-slate-200/10 dark:shadow-none">
+                    <GlassCard className="sticky top-6 rounded-2xl p-6 shadow-xl shadow-slate-200/10 dark:shadow-none">
                         <h3 className="mb-6 font-bold text-slate-900 dark:text-white text-lg">Order Summary</h3>
 
                         {/* Coupon Section */}
                         <div className="mb-6 space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Promo Code</label>
                             <div className="flex gap-2">
-                                <input
+                                <Input
                                     type="text"
                                     placeholder="CODE2026"
                                     value={coupon}
@@ -161,14 +166,14 @@ export default function CheckoutPage() {
                                         setCoupon(e.target.value.toUpperCase()); // Forces letters to Caps
                                         setInvalidCoupon(false); // Reset error while typing
                                     }}
-                                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                    className="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 h-auto text-sm font-bold focus-visible:ring-blue-500 dark:text-white"
                                 />
-                                <button
+                                <Button
                                     onClick={handleApplyCoupon}
-                                    className="rounded-xl bg-slate-900 dark:bg-slate-100 px-5 py-2 text-sm font-bold text-white dark:text-slate-900 hover:opacity-90 transition-opacity"
+                                    className="rounded-xl bg-slate-900 dark:bg-slate-100 px-5 py-2 h-auto text-sm font-bold text-white dark:text-slate-900 hover:opacity-90 hover:bg-slate-800 dark:hover:bg-slate-200 transition-opacity"
                                 >
                                     Apply
-                                </button>
+                                </Button>
                             </div>
 
                             {appliedCoupon && (
@@ -206,23 +211,23 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        <button
+                        <Button
                             onClick={handleAction}
                             disabled={loading}
-                            className="mt-8 flex w-full items-center justify-center rounded-xl bg-blue-600 py-4 font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.97] disabled:bg-slate-300 dark:disabled:bg-slate-800 shadow-lg shadow-blue-500/20"
+                            className="mt-8 w-full rounded-xl bg-blue-600 py-4 h-auto font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.97] disabled:bg-slate-300 dark:disabled:bg-slate-800 shadow-lg shadow-blue-500/20"
                         >
                             {loading ? (
                                 <Loader2 className="h-5 w-5 animate-spin" />
                             ) : (
                                 appliedCoupon || type === 'enroll' ? 'Confirm Enrollment' : 'Proceed to Payment'
                             )}
-                        </button>
+                        </Button>
 
                         <div className="mt-6 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                             <ShieldCheck className="h-4 w-4 text-emerald-500" />
                             Secure 256-bit SSL Payment
                         </div>
-                    </div>
+                    </GlassCard>
                 </div>
             </div>
         </div>
