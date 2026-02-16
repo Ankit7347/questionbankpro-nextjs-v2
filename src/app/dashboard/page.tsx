@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
 	if (status === "loading") {
 		return (
-			<div className="px-4 py-10 md:px-10 max-w-7xl mx-auto">
+			<div className="px-4 py-10 md:px-10 max-w-8xl mx-auto">
 				{/* Header Skeleton */}
 				<div className="mb-10 rounded-2xl p-6 md:p-8 bg-gradient-to-br from-emerald-400/40 to-green-500/40 animate-pulse">
 					<div className="space-y-4 max-w-xl">
@@ -69,7 +69,7 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<div className="px-4 py-10 md:px-10 max-w-7xl mx-auto">
+		<div className="px-4 py-10 md:px-10 max-w-8xl mx-auto">
 			{/* Header Section */}
 			<div className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/70 to-green-600/70 backdrop-blur-xl border border-white/20 p-6 md:p-8 shadow-xl">
 

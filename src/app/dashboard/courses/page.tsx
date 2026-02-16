@@ -74,26 +74,26 @@ export default function CoursesPage() {
         </TabsList>
 
         <TabsContent value="my-learning" className="space-y-10 focus-visible:outline-none focus-visible:ring-0">
-            {/* Auto-hiding sections: If length is 0, they render nothing */}
-            <Section title="Active Now" items={data.myCourses.active} />
-            <Section title="Expiring Soon" items={data.myCourses.expiring} />
-            <Section title="Course History" items={data.myCourses.expired} />
-            
-            {/* Fallback if ALL 3 sub-sections are empty */}
-            {data.myCourses.active.length === 0 && 
-             data.myCourses.expiring.length === 0 && 
-             data.myCourses.expired.length === 0 && (
+          {/* Auto-hiding sections: If length is 0, they render nothing */}
+          <Section title="Active Now" items={data.myCourses.active} />
+          <Section title="Expiring Soon" items={data.myCourses.expiring} />
+          <Section title="Course History" items={data.myCourses.expired} />
+
+          {/* Fallback if ALL 3 sub-sections are empty */}
+          {data.myCourses.active.length === 0 &&
+            data.myCourses.expiring.length === 0 &&
+            data.myCourses.expired.length === 0 && (
               <EmptyState message="You haven't enrolled in any courses yet." />
             )}
         </TabsContent>
 
         <TabsContent value="explore" className="space-y-10 focus-visible:outline-none focus-visible:ring-0">
-            <Section title="Featured Paid Courses" items={data.explore.paid} />
-            <Section title="Free Resources" items={data.explore.free} />
-            
-            {data.explore.paid.length === 0 && data.explore.free.length === 0 && (
-              <EmptyState message="No new courses to explore right now." />
-            )}
+          <Section title="Featured Paid Courses" items={data.explore.paid} />
+          <Section title="Free Resources" items={data.explore.free} />
+
+          {data.explore.paid.length === 0 && data.explore.free.length === 0 && (
+            <EmptyState message="No new courses to explore right now." />
+          )}
         </TabsContent>
       </Tabs>
     </div>
@@ -114,7 +114,7 @@ function Section({ title, items }: { title: string; items: any[] }) {
           {items.length}
         </span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
         {items.map((course) => (
           <CourseCard key={course.id} course={course} />
         ))}

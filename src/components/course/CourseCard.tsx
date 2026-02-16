@@ -4,12 +4,12 @@
 import { CourseUI } from "@/dto/course.ui.dto";
 import Link from "next/link";
 import {
-  Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/GlassCard";
 
 export default function CourseCard({ course }: { course: CourseUI }) {
   const { name, type, price, access, flags, examSlug, subExamSlug, slug, id } = course;
@@ -67,7 +67,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
   }
 
   return (
-    <Card 
+    <GlassCard 
       className={`
         group relative flex flex-col h-fit max-w-sm rounded-xl overflow-hidden transition-all duration-500 
         hover:shadow-xl hover:-translate-y-1
@@ -84,9 +84,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
       `}
     >
       {/* Surface Reflection */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none" />
-      
-      <CardHeader className="p-3 pb-1 relative z-10">
+      <CardHeader className="p-3 pb-1">
         <div className="space-y-1">
           <div className="flex items-center gap-1.5">
             <span className="rounded bg-white/40 dark:bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-tight text-gray-600 dark:text-gray-400 border border-white/10">
@@ -104,7 +102,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-3 pt-1 flex-grow flex flex-col justify-end relative z-10">
+      <CardContent className="p-3 pt-1 flex-grow flex flex-col justify-end">
         {!isExpired && (
           <div className="flex items-center justify-between">
             {flags.isFree ? (
@@ -133,9 +131,9 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         )}
       </CardContent>
 
-      <CardFooter className="p-3 pt-0 mt-1 relative z-10">
+      <CardFooter className="p-3 pt-0 mt-1">
         {renderCTA()}
       </CardFooter>
-    </Card>
+    </GlassCard>
   );
 }

@@ -20,8 +20,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 dark:bg-gray-950">
-      
+<div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-slate-100 to-blue-100 dark:from-slate-950 dark:via-blue-950/30 dark:to-slate-950">      
       {/* 🔥 Navbar ALWAYS on top — sticky */}
       <header className="sticky top-0 z-50">
         <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
