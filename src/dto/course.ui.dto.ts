@@ -54,3 +54,14 @@ export interface DashboardCoursesUI {
     paid: CourseUI[];
   };
 }
+
+/**
+ * Checkout Page
+ */
+export interface CourseCheckoutData {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  isFree: boolean;
+}

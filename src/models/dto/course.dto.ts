@@ -49,3 +49,13 @@ export interface DashboardCoursesDTO {
         paid: CourseAccessDTO[];
     };
 }
+/*
+Checkout page
+*/
+export interface CourseCheckoutData {
+  id: string;
+  name: string;
+  slug: string;
+  price: number; // The "minus" result (basePrice - salePrice)
+  isFree: boolean;
+}

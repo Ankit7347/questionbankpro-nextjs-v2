@@ -19,7 +19,7 @@
  */
 
 import { ApiResponseUI } from "@/dto/apiResponse.ui.dto";
-import { DashboardCoursesUI } from "@/dto/course.ui.dto";
+import { CourseCheckoutData, DashboardCoursesUI } from "@/dto/course.ui.dto";
 import { ExamCourseOverviewDTO } from "@/dto/examCourse.dto";
 
 /**
@@ -85,3 +85,35 @@ export async function fetchCourseOverview(
     };
   }
 }
+/*
+
+dashboard/checkout page
+*/
+export const getCourseBySlug = async (slug: string): Promise<ApiResponseUI<CourseCheckoutData>> => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+  const res = await fetch(`${baseUrl}/course/byslug`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug }),
+  })
+  try {
+    if (!res.ok) {
+      return {
+        success: false,
+        data: null,
+        error: `Failed to fetch course details`,
+        statusCode: res.status,
+      };
+    }
+
+    return await res.json();
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      error: error instanceof Error ? error.message : "An unknown error occurred",
+      statusCode: 500,
+    };
+  }
+};

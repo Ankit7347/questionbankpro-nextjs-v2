@@ -13,7 +13,7 @@ import {
   BadRequest,
   NotFound,
 } from "@/lib/apiError";
-import { mapCourseDTO } from "@/models/dto/course.mapper";
+import { mapCourseCheckoutDTO, mapCourseDTO } from "@/models/dto/course.mapper";
 
 /* =========================================================
    LIST ALL COURSES (Admin)
@@ -73,7 +73,27 @@ export async function getCourseById(courseId: string) {
 
   return mapCourseDTO(course, lang);
 }
+/* =========================================================
+   GET COURSE BY SLUG (Admin)
+========================================================= */
+export async function getCourseBySlug(slug: string): Promise<CourseCheckoutData> {
+  // 1. Get current language (ensure this helper is imported)
+  const lang = getCurrentLang();
+  await dbConnect();
 
+  // 2. Use findOne to get the raw course document
+  const course = await Course.findOne({
+    slug,
+    isDeleted: { $ne: true }
+  }).lean();
+
+  if (!course) {
+    throw new Error("Course not found");
+  }
+
+  // 3. Pass the single object to the mapper
+  return mapCourseCheckoutDTO(course, lang);
+}
 /* =========================================================
    UPDATE COURSE (Admin)
 ========================================================= */
@@ -196,9 +216,10 @@ export async function toggleCourseActive(payload: {
 
 import UserCourseAccess from "@/models/mongoose/UserCourseAccess.schema";
 import { DashboardCoursesDTO } from "@/models/dto/course.dto";
+import { CourseCheckoutData } from "@/dto/course.ui.dto";
 
 export async function getDashboardCourses(): Promise<DashboardCoursesDTO> {
-  
+
   const lang = getCurrentLang();
   await dbConnect();
   const session = await auth();

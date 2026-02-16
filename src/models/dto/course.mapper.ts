@@ -1,7 +1,7 @@
 // src/models/dto/course.mapper.ts
 
 import { mapBaseFields } from "./base.mapper";
-import { CourseDTO } from "./course.dto";
+import { CourseCheckoutData, CourseDTO } from "./course.dto";
 
 type Lang = "en" | "hi";
 
@@ -57,5 +57,32 @@ export interface DashboardCoursesDTO {
   explore: {
     free: CourseAccessDTO[];
     paid: CourseAccessDTO[];
+  };
+}
+
+export function mapCourseCheckoutDTO(
+  course: any,
+  lang: Lang
+): CourseCheckoutData {
+  // 1. Get the values from DB (defaulting to 0 if totally missing)
+  const base = course.basePrice || 0;
+  const sale = course.salePrice;
+
+  /** * Logic: 
+   * If sale is null, undefined, or 0, use base price.
+   * Otherwise, use sale price.
+   */
+  const finalPrice = (sale && sale > 0) ? sale : base;
+
+  return {
+    id: course._id.toString(),
+    name: resolveText(course.name, lang),
+    slug: course.slug,
+    
+    // Final price used for checkout
+    price: finalPrice, 
+    
+    // It's only free if the final calculated price is 0
+    isFree: finalPrice === 0,
   };
 }
