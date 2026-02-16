@@ -53,7 +53,7 @@ export default function CourseCard({ course }: { course: CourseUI }) {
         const isFree = flags.isFree;
         return (
           <Link
-            href={`/dashboard/courses/checkout?slug=${slug}&type=${isFree ? 'enroll' : 'buy'}&courseId=${id}`}
+            href={`/dashboard/courses/checkout?slug=${slug}`}
             className={`${btnBase} ${
               isFree 
                 ? "bg-emerald-500/30 text-emerald-900 dark:text-emerald-100 hover:bg-emerald-500/50" 
