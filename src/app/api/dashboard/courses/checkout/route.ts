@@ -190,10 +190,11 @@ export async function POST(req: NextRequest) {
 
       // create razorpay order for paid course
       const amountInPaise = Math.round(finalPrice * 100);
+      const shortReceipt = `${course._id.toString().slice(-10)}_${userExists._id.toString().slice(-10)}`;
       const order = await razorpay.orders.create({
         amount: amountInPaise,
         currency: "INR",
-        receipt: `rcpt_${course._id}_${userExists._id}`,
+        receipt: shortReceipt,
       });
 
       return NextResponse.json({ success: true, order });
