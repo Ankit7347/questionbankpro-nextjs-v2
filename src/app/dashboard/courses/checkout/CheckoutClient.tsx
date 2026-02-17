@@ -4,16 +4,31 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    ArrowLeft, Zap, X, CheckCircle2, Loader2, 
-    FileText, HelpCircle, BookOpen, Layout, Video, ShieldCheck
+  ArrowLeft,
+  Zap,
+  X,
+  CheckCircle2,
+  Loader2,
+  FileText,
+  HelpCircle,
+  BookOpen,
+  Layout,
+  Video,
+  ShieldCheck,
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CourseCheckoutData } from "@/dto/course.ui.dto";
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export default function CheckoutClient({ course }: { course: CourseCheckoutData }) {
-    const router = useRouter();
+  const router = useRouter();
     const { name, slug, price, isFree } = course;
     const features = [
         { icon: <BookOpen className="h-5 w-5 text-blue-500" />, label: "Full Subject Coverage", desc: "All core modules included" },
@@ -23,54 +38,131 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
     ];
     const type = isFree ? 'enroll' : 'buy';
 
-    const [showCouponAlert, setShowCouponAlert] = useState(true);
+  const [showCouponAlert, setShowCouponAlert] = useState(true);
     const [loading, setLoading] = useState(false);
     const [coupon, setCoupon] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(false);
-    const [invalidCoupon, setInvalidCoupon] = useState(false);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [couponMessage, setCouponMessage] = useState<string | null>(null);
+    const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+  const [orderData, setOrderData] = useState<any>(null);
 
-    const handleApplyCoupon = () => {
-        if (coupon.toUpperCase() === "FREE2026") {
-            setAppliedCoupon(true);
-            setInvalidCoupon(false);
-        } else {
-            setAppliedCoupon(false);
-            setInvalidCoupon(true);
-        }
-    };
+  // load razorpay script once
+    const handleApplyCoupon = async () => {
+        if (!coupon.trim()) return;
+        setVerifyingCoupon(true);
+        setAppliedCoupon(false);
+        setCouponMessage(null);
+        setDiscountAmount(0);
 
-    useEffect(() => {
-        const timer = setTimeout(() => setShowCouponAlert(false), 5000);
-        return () => clearTimeout(timer);
-    }, []);
-
-    const handleAction = async () => {
-        setLoading(true);
         try {
-            const response = await fetch("/api/dashboard/courses/checkout", {
+            const res = await fetch("/api/dashboard/coupon", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    slug: slug,
-                    coupon: appliedCoupon ? coupon : null,
-                }),
+                body: JSON.stringify({ code: coupon, courseSlug: slug }),
             });
- 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || "Enrollment failed");
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setAppliedCoupon(true);
+                setDiscountAmount(data.data.discountAmount);
+                setCouponMessage(data.message || "Coupon applied successfully");
+            } else {
+                                setCouponMessage(data.message || "Invalid coupon code");
             }
-
-            router.push(`/dashboard/courses`);
-        } catch (err: any) {
-            alert(err.message);
+        } catch (error) {
+            console.error(error);
         } finally {
-            setLoading(false);
+            setVerifyingCoupon(false);
         }
     };
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
-    const getIcon = (label: string) => {
+  const effectivePrice = isFree ? 0 : Math.max(0, price - (appliedCoupon ? discountAmount : 0));
+
+  const handleAction = async () => {
+    setLoading(true);
+    try {
+      // step‑1: ask server for order (unless free/enroll)
+      if (effectivePrice > 0) {
+        const resp = await fetch("/api/dashboard/courses/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: slug,
+            coupon: appliedCoupon ? coupon : null,
+          }),
+        });
+        const json = await resp.json();
+        if (!resp.ok) throw new Error(json.message || "Order creation failed");
+        
+        if (json.success && !json.order) {
+             router.push(`/dashboard/courses`);
+             return;
+        }
+
+        setOrderData(json.order);
+        // open razorpay checkout
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: json.order.amount,
+          currency: json.order.currency,
+          order_id: json.order.id,
+          name,
+          description: "Course purchase",
+          handler: async (paymentResp: any) => {
+            // confirm payment
+            const confirmResp = await fetch("/api/dashboard/courses/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                slug: slug,
+                coupon: appliedCoupon ? coupon : null,
+                razorpayPaymentId: paymentResp.razorpay_payment_id,
+                razorpayOrderId: paymentResp.razorpay_order_id,
+                razorpaySignature: paymentResp.razorpay_signature,
+              }),
+            });
+            const confirmJson = await confirmResp.json();
+            if (!confirmResp.ok) throw new Error(confirmJson.message);
+            router.push(`/dashboard/courses`);
+          },
+          prefill: {
+            // optionally fill from session
+          },
+          theme: { color: "#3399cc" },
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        // free/coupon case – just call server directly and enroll
+        const response = await fetch("/api/dashboard/courses/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: slug,
+            coupon: appliedCoupon ? coupon : null,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        router.push(`/dashboard/courses`);
+      }
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIcon = (label: string) => {
         if (label.includes("Subject")) return <BookOpen className="h-5 w-5 text-blue-500" />;
         if (label.includes("PDF")) return <FileText className="h-5 w-5 text-emerald-500" />;
         if (label.includes("Question")) return <HelpCircle className="h-5 w-5 text-purple-500" />;
@@ -157,27 +249,32 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                                     value={coupon}
                                     onChange={(e) => {
                                         setCoupon(e.target.value.toUpperCase());
-                                        setInvalidCoupon(false);
+                                        setAppliedCoupon(false);
+                                        setCouponMessage(null);
+                                        setDiscountAmount(0);
                                     }}
                                     className="w-full rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 h-auto text-sm font-bold focus-visible:ring-blue-500 dark:text-white"
                                 />
                                 <Button
                                     onClick={handleApplyCoupon}
+                                    disabled={verifyingCoupon || !coupon}
                                     className="rounded-xl bg-slate-900 dark:bg-slate-100 px-5 py-2 h-auto text-sm font-bold text-white dark:text-slate-900 hover:opacity-90 hover:bg-slate-800 dark:hover:bg-slate-200 transition-opacity"
                                 >
-                                    Apply
+                                    {verifyingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
                                 </Button>
                             </div>
 
-                            {appliedCoupon && (
-                                <p className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in">
-                                    <CheckCircle2 className="h-3 w-3" /> 100% Discount Applied!
-                                </p>
-                            )}
-
-                            {invalidCoupon && (
-                                <p className="text-xs font-bold text-red-500 flex items-center gap-1 animate-in shake-in">
-                                    <X className="h-3 w-3" /> Invalid Coupon Code
+                            {couponMessage && (
+                                <p className={`text-xs font-bold flex items-center gap-1 animate-in ${
+                                    appliedCoupon
+                                        ? "text-emerald-500"
+                                        : "text-red-500 shake-in"
+                                }`}>
+                                    {appliedCoupon ? (
+                                        <CheckCircle2 className="h-3 w-3" />
+                                    ) : (
+                                        <X className="h-3 w-3" />
+                                    )}{" "}{couponMessage}
                                 </p>
                             )}
                         </div>
@@ -185,21 +282,21 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                         <div className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
                             <div className="flex justify-between text-sm text-slate-500">
                                 <span>Subject Price</span>
-                                <span className={appliedCoupon || type === 'enroll' ? 'line-through' : ''}>₹{price}</span>
+                                <span>₹{price}</span>
                             </div>
                             <div className="flex justify-between text-sm text-slate-500">
                                 <span>GST (18%)</span>
-                                <span>{appliedCoupon || type === 'enroll' ? '₹0' : 'Included'}</span>
+                                <span>Included</span>
                             </div>
-                            {(appliedCoupon || type === 'enroll') && (
+                            {(appliedCoupon) && (
                                 <div className="flex justify-between text-sm text-emerald-500 font-bold">
                                     <span>Coupon Savings</span>
-                                    <span>- ₹{price}</span>
+                                    <span>- ₹{discountAmount}</span>
                                 </div>
                             )}
                             <div className="flex justify-between pt-2 text-2xl font-black text-slate-900 dark:text-white">
                                 <span>Total</span>
-                                <span>{appliedCoupon || type === 'enroll' ? '₹0' : `₹${price}`}</span>
+                                <span>{effectivePrice === 0 ? '₹0' : `₹${effectivePrice}`}</span>
                             </div>
                         </div>
 
@@ -211,7 +308,7 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                             {loading ? (
                                 <Loader2 className="h-5 w-5 animate-spin" />
                             ) : (
-                                appliedCoupon || type === 'enroll' ? 'Confirm Enrollment' : 'Proceed to Payment'
+                                effectivePrice === 0 ? 'Confirm Enrollment' : 'Proceed to Payment'
                             )}
                         </Button>
 
