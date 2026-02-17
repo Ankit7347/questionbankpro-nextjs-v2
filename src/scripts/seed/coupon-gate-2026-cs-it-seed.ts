@@ -36,7 +36,7 @@ async function seedCoupons() {
     {
       code: "FREE2026",
       discountType: "PERCENT",
-      discountValue: 100,    // 100% off
+      discountValue: 99,    // 100% off
       maxDiscount: null,
       minOrderAmount: null,
       validFrom: new Date("2025-01-01"),
@@ -46,7 +46,7 @@ async function seedCoupons() {
       isActive: true,
     },
     {
-      code: "GATE50",
+      code: "FLAT50",
       discountType: "PERCENT",
       discountValue: 50,
       maxDiscount: 10000,

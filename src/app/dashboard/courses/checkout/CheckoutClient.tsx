@@ -4,17 +4,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  Zap,
-  X,
-  CheckCircle2,
-  Loader2,
-  FileText,
-  HelpCircle,
-  BookOpen,
-  Layout,
-  Video,
-  ShieldCheck,
+    ArrowLeft,
+    Zap,
+    X,
+    CheckCircle2,
+    Loader2,
+    FileText,
+    HelpCircle,
+    BookOpen,
+    Layout,
+    Video,
+    ShieldCheck,
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -22,13 +22,13 @@ import { Input } from "@/components/ui/input";
 import { CourseCheckoutData } from "@/dto/course.ui.dto";
 
 declare global {
-  interface Window {
-    Razorpay: any;
-  }
+    interface Window {
+        Razorpay: any;
+    }
 }
 
 export default function CheckoutClient({ course }: { course: CourseCheckoutData }) {
-  const router = useRouter();
+    const router = useRouter();
     const { name, slug, price, isFree } = course;
     const features = [
         { icon: <BookOpen className="h-5 w-5 text-blue-500" />, label: "Full Subject Coverage", desc: "All core modules included" },
@@ -38,16 +38,16 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
     ];
     const type = isFree ? 'enroll' : 'buy';
 
-  const [showCouponAlert, setShowCouponAlert] = useState(true);
+    const [showCouponAlert, setShowCouponAlert] = useState(true);
     const [loading, setLoading] = useState(false);
     const [coupon, setCoupon] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(false);
     const [discountAmount, setDiscountAmount] = useState(0);
     const [couponMessage, setCouponMessage] = useState<string | null>(null);
     const [verifyingCoupon, setVerifyingCoupon] = useState(false);
-  const [orderData, setOrderData] = useState<any>(null);
+    const [orderData, setOrderData] = useState<any>(null);
 
-  // load razorpay script once
+    // load razorpay script once
     const handleApplyCoupon = async () => {
         if (!coupon.trim()) return;
         setVerifyingCoupon(true);
@@ -67,7 +67,7 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                 setDiscountAmount(data.data.discountAmount);
                 setCouponMessage(data.message || "Coupon applied successfully");
             } else {
-                                setCouponMessage(data.message || "Invalid coupon code");
+                setCouponMessage(data.message || "Invalid coupon code");
             }
         } catch (error) {
             console.error(error);
@@ -75,94 +75,94 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
             setVerifyingCoupon(false);
         }
     };
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const effectivePrice = isFree ? 0 : Math.max(0, price - (appliedCoupon ? discountAmount : 0));
-
-  const handleAction = async () => {
-    setLoading(true);
-    try {
-      // step‑1: ask server for order (unless free/enroll)
-      if (effectivePrice > 0) {
-        const resp = await fetch("/api/dashboard/courses/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            slug: slug,
-            coupon: appliedCoupon ? coupon : null,
-          }),
-        });
-        const json = await resp.json();
-        if (!resp.ok) throw new Error(json.message || "Order creation failed");
-        
-        if (json.success && !json.order) {
-             router.push(`/dashboard/courses`);
-             return;
-        }
-
-        setOrderData(json.order);
-        // open razorpay checkout
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: json.order.amount,
-          currency: json.order.currency,
-          order_id: json.order.id,
-          name,
-          description: "Course purchase",
-          handler: async (paymentResp: any) => {
-            // confirm payment
-            const confirmResp = await fetch("/api/dashboard/courses/checkout", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                slug: slug,
-                coupon: appliedCoupon ? coupon : null,
-                razorpayPaymentId: paymentResp.razorpay_payment_id,
-                razorpayOrderId: paymentResp.razorpay_order_id,
-                razorpaySignature: paymentResp.razorpay_signature,
-              }),
-            });
-            const confirmJson = await confirmResp.json();
-            if (!confirmResp.ok) throw new Error(confirmJson.message);
-            router.push(`/dashboard/courses`);
-          },
-          prefill: {
-            // optionally fill from session
-          },
-          theme: { color: "#3399cc" },
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
         };
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } else {
-        // free/coupon case – just call server directly and enroll
-        const response = await fetch("/api/dashboard/courses/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            slug: slug,
-            coupon: appliedCoupon ? coupon : null,
-          }),
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        router.push(`/dashboard/courses`);
-      }
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }, []);
 
-  const getIcon = (label: string) => {
+    const effectivePrice = isFree ? 0 : Math.max(0, price - (appliedCoupon ? discountAmount : 0));
+
+    const handleAction = async () => {
+        setLoading(true);
+        try {
+            // step‑1: ask server for order (unless free/enroll)
+            if (effectivePrice > 0) {
+                const resp = await fetch("/api/dashboard/courses/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        slug: slug,
+                        coupon: appliedCoupon ? coupon : null,
+                    }),
+                });
+                const json = await resp.json();
+                if (!resp.ok) throw new Error(json.message || "Order creation failed");
+
+                if (json.success && !json.order) {
+                    router.push(`/dashboard/courses`);
+                    return;
+                }
+
+                setOrderData(json.order);
+                // open razorpay checkout
+                const options = {
+                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                    amount: json.order.amount,
+                    currency: json.order.currency,
+                    order_id: json.order.id,
+                    name,
+                    description: "Course purchase",
+                    handler: async (paymentResp: any) => {
+                        // confirm payment
+                        const confirmResp = await fetch("/api/dashboard/courses/checkout", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                slug: slug,
+                                coupon: appliedCoupon ? coupon : null,
+                                razorpayPaymentId: paymentResp.razorpay_payment_id,
+                                razorpayOrderId: paymentResp.razorpay_order_id,
+                                razorpaySignature: paymentResp.razorpay_signature,
+                            }),
+                        });
+                        const confirmJson = await confirmResp.json();
+                        if (!confirmResp.ok) throw new Error(confirmJson.message);
+                        router.push(`/dashboard/courses`);
+                    },
+                    prefill: {
+                        // optionally fill from session
+                    },
+                    theme: { color: "#3399cc" },
+                };
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            } else {
+                // free/coupon case – just call server directly and enroll
+                const response = await fetch("/api/dashboard/courses/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        slug: slug,
+                        coupon: appliedCoupon ? coupon : null,
+                    }),
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                router.push(`/dashboard/courses`);
+            }
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getIcon = (label: string) => {
         if (label.includes("Subject")) return <BookOpen className="h-5 w-5 text-blue-500" />;
         if (label.includes("PDF")) return <FileText className="h-5 w-5 text-emerald-500" />;
         if (label.includes("Question")) return <HelpCircle className="h-5 w-5 text-purple-500" />;
@@ -173,17 +173,30 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
     return (
         <div className="mx-auto max-w-5xl px-4 py-6 md:px-8">
             {showCouponAlert && (
-                <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-2">
-                    <div className="flex items-center gap-3">
-                        <Zap className="h-5 w-5 fill-emerald-500" />
-                        <p className="text-sm font-bold">
-                            Flash Deal: Use <span className="underline decoration-2">FREE2026</span> for 100% Off!
-                        </p>
+                <>
+                    <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-3">
+                            <Zap className="h-5 w-5 fill-emerald-500" />
+                            <p className="text-sm font-bold">
+                                Flash Deal: Use <span className="underline decoration-2">FREE2026</span> for 99% Off Applicable on selected Course!
+                            </p>
+                        </div>
+                        <button onClick={() => setShowCouponAlert(false)} className="hover:opacity-70">
+                            <X className="h-5 w-5" />
+                        </button>
                     </div>
-                    <button onClick={() => setShowCouponAlert(false)} className="hover:opacity-70">
-                        <X className="h-5 w-5" />
-                    </button>
-                </div>
+                    <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-3">
+                            <Zap className="h-5 w-5 fill-emerald-500" />
+                            <p className="text-sm font-bold">
+                                Flash Deal: Use <span className="underline decoration-2">FLAT50</span> for 50% Off Applicable on selected Course!
+                            </p>
+                        </div>
+                        <button onClick={() => setShowCouponAlert(false)} className="hover:opacity-70">
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+                </>
             )}
 
             <button
@@ -200,33 +213,33 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                     </h1>
 
                     <GlassCard className="mt-6 rounded-2xl p-6">
-                      <div className="flex flex-col gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
-                                <Video className="h-7 w-7" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 capitalize leading-tight">
-                                    {name}
-                                </h2>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">English • All Levels • 2026 Updated</p>
-                            </div>
-                        </div>
-
-                        <div className="h-px bg-slate-100 dark:bg-slate-800 w-full" />
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {features.map((feature, idx) => (
-                                <div key={idx} className="flex gap-3">
-                                    <div className="mt-1">{getIcon(feature.label)}</div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{feature.label}</h4>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">{feature.desc}</p>
-                                    </div>
+                        <div className="flex flex-col gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+                                    <Video className="h-7 w-7" />
                                 </div>
-                            ))}
+                                <div>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 capitalize leading-tight">
+                                        {name}
+                                    </h2>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">English • All Levels • 2026 Updated</p>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-slate-100 dark:bg-slate-800 w-full" />
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {features.map((feature, idx) => (
+                                    <div key={idx} className="flex gap-3">
+                                        <div className="mt-1">{getIcon(feature.label)}</div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{feature.label}</h4>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">{feature.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                      </div>
                     </GlassCard>
 
                     <div className="mt-6 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-4 border border-blue-100 dark:border-blue-900/30">
@@ -265,11 +278,10 @@ export default function CheckoutClient({ course }: { course: CourseCheckoutData 
                             </div>
 
                             {couponMessage && (
-                                <p className={`text-xs font-bold flex items-center gap-1 animate-in ${
-                                    appliedCoupon
-                                        ? "text-emerald-500"
-                                        : "text-red-500 shake-in"
-                                }`}>
+                                <p className={`text-xs font-bold flex items-center gap-1 animate-in ${appliedCoupon
+                                    ? "text-emerald-500"
+                                    : "text-red-500 shake-in"
+                                    }`}>
                                     {appliedCoupon ? (
                                         <CheckCircle2 className="h-3 w-3" />
                                     ) : (
