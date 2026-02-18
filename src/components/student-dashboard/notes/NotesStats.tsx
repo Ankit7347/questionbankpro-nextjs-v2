@@ -1,32 +1,67 @@
-import React from 'react';
-import { Library, Clock, Trophy } from 'lucide-react';
+// src/components/student-dashboard/notes/NotesStats.tsx
+import { Library, Clock, CheckCircle2, Bookmark } from 'lucide-react';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface NotesStatsProps {
   totalNotes: number;
+  totalStudyHours?: number;
+  completedNotes?: number;
+  bookmarkedNotes?: number;
 }
 
-export const NotesStats = ({ totalNotes }: NotesStatsProps) => (
-  <section className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-    <div className="min-w-36 flex-1 p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none flex flex-col gap-2">
-      <div className="p-2 w-fit rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400"><Library className="w-5 h-5" /></div>
-      <div>
-        <div className="text-2xl font-bold text-slate-900 dark:text-white">{totalNotes}</div>
-        <div className="text-xs text-slate-500">Total Notes</div>
+export const NotesStats = ({ 
+  totalNotes, 
+  totalStudyHours = 0,
+  completedNotes = 0,
+  bookmarkedNotes = 0
+}: NotesStatsProps) => (
+  <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <GlassCard className="p-4 flex flex-col gap-2 from-blue-500 to-cyan-500">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+          <Library className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Notes</span>
       </div>
-    </div>
-    <div className="min-w-36 flex-1 p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none flex flex-col gap-2">
-      <div className="p-2 w-fit rounded-lg bg-purple-500/10 text-purple-500 dark:text-purple-400"><Clock className="w-5 h-5" /></div>
-      <div>
-        <div className="text-2xl font-bold text-slate-900 dark:text-white">12.5h</div>
-        <div className="text-xs text-slate-500">Study Time</div>
+      <div className="text-xl font-bold text-slate-900 dark:text-white pl-1">
+        {totalNotes}
       </div>
-    </div>
-    <div className="min-w-36 flex-1 p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none flex flex-col gap-2">
-      <div className="p-2 w-fit rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400"><Trophy className="w-5 h-5" /></div>
-      <div>
-        <div className="text-2xl font-bold text-slate-900 dark:text-white">85%</div>
-        <div className="text-xs text-slate-500">Avg. Score</div>
+    </GlassCard>
+
+    <GlassCard className="p-4 flex flex-col gap-2 from-purple-500 to-pink-500">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">
+          <Clock className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Study Time</span>
       </div>
-    </div>
+      <div className="text-xl font-bold text-slate-900 dark:text-white pl-1">
+        {totalStudyHours}h
+      </div>
+    </GlassCard>
+
+    <GlassCard className="p-4 flex flex-col gap-2d from-emerald-500 to-teal-500">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Completed</span>
+      </div>
+      <div className="text-xl font-bold text-slate-900 dark:text-white pl-1">
+        {completedNotes}
+      </div>
+    </GlassCard>
+
+    <GlassCard className="p-4 flex flex-col gap-2d from-amber-500 to-orange-500">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          <Bookmark className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Saved</span>
+      </div>
+      <div className="text-xl font-bold text-slate-900 dark:text-white pl-1">
+        {bookmarkedNotes}
+      </div>
+    </GlassCard>
   </section>
 );

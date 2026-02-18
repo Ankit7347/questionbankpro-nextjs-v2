@@ -1,11 +1,12 @@
 // src/models/mongoose/Bookmark.schema.ts
-import { Schema, model, models } from "mongoose";
+import { Schema, Types, model, models } from "mongoose";
 import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const BookmarkSchema = new Schema(
   {
     userId: {
-      type: String, // uuid of the user
+      type: Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },

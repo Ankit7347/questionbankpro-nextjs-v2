@@ -1,3 +1,4 @@
+// src/components/student-dashboard/notes/SubjectGrid.tsx
 import React from 'react';
 import Link from 'next/link';
 import { MoreVertical, TrendingUp, ChevronRight } from 'lucide-react';

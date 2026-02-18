@@ -1,11 +1,12 @@
 // src/models/mongoose/Progress.schema.ts
-import { Schema, model, models } from "mongoose";
+import { Schema, Types, model, models } from "mongoose";
 import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const ProgressSchema = new Schema(
   {
     userId: {
-      type: String,
+      type: Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },

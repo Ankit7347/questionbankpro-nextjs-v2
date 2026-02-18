@@ -1,11 +1,12 @@
 // src/models/mongoose/ActivityLog.schema.ts
-import { Schema, model, models } from "mongoose";
+import { Schema, Types, model, models } from "mongoose";
 import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const ActivityLogSchema = new Schema(
   {
     userId: {
-      type: String,
+      type: Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },

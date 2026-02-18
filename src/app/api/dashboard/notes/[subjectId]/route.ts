@@ -1,28 +1,31 @@
 // src/app/api/dashboard/notes/[subjectId]/route.ts
-import { NextRequest,NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { getNotesBySubject } from '@/services/server/notes.server';
+import { ok, fail } from '@/lib/response.util';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ subjectId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ subjectId: string }> }
+) {
   try {
     const { subjectId } = await params;
 
-    // Validate subjectId
-    if (!['physics', 'chemistry', 'maths'].includes(subjectId)) {
-      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
+    // Authenticate user
+    const session = await auth();
+    const headerUuid = request.headers.get('x-user-id') || undefined;
+    const userUuid = session?.user?.id || headerUuid;
+
+    if (!userUuid) {
+      return NextResponse.json(fail({ message: 'Unauthorized' }), { status: 401 });
     }
 
-    // Mock Data
-    const chapters = [
-      { id: 'thermodynamics', title: 'Thermodynamics', description: 'Heat, work, and energy.', progress: 60, totalTopics: 10, completedTopics: 6 },
-      { id: 'kinematics', title: 'Kinematics', description: 'Motion of objects.', progress: 20, totalTopics: 15, completedTopics: 3 },
-    ];
+    // Fetch notes by subject
+    const data = await getNotesBySubject(userUuid, subjectId);
 
-    return NextResponse.json({
-      subject: subjectId,
-      chapters
-    });
+    return NextResponse.json(ok(data), { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' }, { status: 500 }
-    );
+    console.error('API Error:', error);
+    return NextResponse.json(fail(error), { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 // src/models/mongoose/QuizSubmission.schema.ts
-import { Schema, model, models } from "mongoose";
+import { Schema, Types, model, models } from "mongoose";
 import { BaseSchemaFields, BaseSchemaOptions } from "./base.schema";
 
 const QuizSubmissionSchema = new Schema(
@@ -8,7 +8,8 @@ const QuizSubmissionSchema = new Schema(
        User & Quiz Reference
     ========================================== */
     userId: {
-      type: String,
+      type: Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },

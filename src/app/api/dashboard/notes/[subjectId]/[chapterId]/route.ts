@@ -1,21 +1,28 @@
 // src/app/api/dashboard/notes/[subjectId]/[chapterId]/route.ts
-import { NextRequest,NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { getNotesByChapter } from '@/services/server/notes.server';
+import { ok, fail } from '@/lib/response.util';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ subjectId: string; chapterId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ subjectId: string; chapterId: string }> }
+) {
   try {
-    const { chapterId } = await params;
+    const { subjectId, chapterId } = await params;
 
-    // Mock Data
-    const topics = [
-      { id: 'intro', title: 'Introduction to Thermodynamics', difficulty: 'Easy', readTime: '5 min', isCompleted: true },
-      { id: 'laws', title: 'Laws of Thermodynamics', difficulty: 'Moderate', readTime: '12 min', isCompleted: false },
-    ];
+    // Authenticate user
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(fail({ message: 'Unauthorized' }), { status: 401 });
+    }
 
-    return NextResponse.json({
-      chapter: chapterId,
-      topics
-    });
+    // Fetch notes by chapter
+    const data = await getNotesByChapter(session.user.id, subjectId, chapterId);
+
+    return NextResponse.json(ok(data), { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('API Error:', error);
+    return NextResponse.json(fail(error), { status: 500 });
   }
 }
