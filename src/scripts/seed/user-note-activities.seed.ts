@@ -19,7 +19,7 @@ interface UserActivityData {
 
 const activitiesData: UserActivityData[] = [
   {
-    userEmail: "qrnotes2020@gmailc.com",
+    userEmail: "qrnotes2020@gmail.com",
     noteTitle: "Process States Explained",
     readCount: 5,
     timeSpent: 1200, // 20 minutes
@@ -27,7 +27,7 @@ const activitiesData: UserActivityData[] = [
     rating: 5,
   },
   {
-    userEmail: "qrnotes2020@gmailc.com",
+    userEmail: "qrnotes2020@gmail.com",
     noteTitle: "PCB Structure and Usage",
     readCount: 3,
     timeSpent: 900, // 15 minutes
@@ -35,7 +35,7 @@ const activitiesData: UserActivityData[] = [
     rating: 4,
   },
   {
-    userEmail: "qrnotes2020@gmailc.com",
+    userEmail: "qrnotes2020@gmail.com",
     noteTitle: "Database Keys Types",
     readCount: 4,
     timeSpent: 1500, // 25 minutes

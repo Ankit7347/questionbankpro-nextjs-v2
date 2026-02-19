@@ -20,6 +20,10 @@ import Chapter from "@/models/mongoose/Chapter.schema";
 import Topic from "@/models/mongoose/Topic.schema";
 import UserNoteActivity from "@/models/mongoose/UserNoteActivity.schema";
 import { mapNoteToDTO } from "@/models/dto/note.mapper";
+import { mapSubject } from "@/models/dto/subject.mapper";
+import { mapChapter } from "@/models/dto/chapter.mapper";
+import { mapTopic } from "@/models/dto/topic.mapper";
+import { getCurrentLang } from "@/lib/i18n";
 import { NotFound } from "@/lib/apiError";
 import { Types } from "mongoose";
 
@@ -42,6 +46,7 @@ async function getUserIdFromSession(userUuid: string) {
  */
 export async function getNotesOverview(userUuidFromSession: string) {
   await dbConnect();
+  const lang = getCurrentLang();
   const userId = await getUserIdFromSession(userUuidFromSession);
 
   // Get user's note activities with populated note data
@@ -85,10 +90,11 @@ export async function getNotesOverview(userUuidFromSession: string) {
     );
     // Progress: (totalNotes / 50) * 100, capped at 100
     const progress = Math.min((activity.totalNotes / 50) * 100, 100);
+    const subjectDTO = subjectDoc ? mapSubject(subjectDoc, lang) : null;
 
     return {
       id: activity._id.toString(),
-      name: subjectDoc?.name?.en || subjectDoc?.name || "Unknown",
+      name: subjectDTO?.name || "Unknown",
       totalNotes: activity.totalNotes,
       progress: Math.round(progress),
     };
@@ -101,9 +107,9 @@ export async function getNotesOverview(userUuidFromSession: string) {
       path: "noteId",
       select: "title subjectId chapterId topicId",
       populate: [
-        { path: "subjectId", select: "name" },
-        { path: "chapterId", select: "name" },
-        { path: "topicId", select: "name" },
+        { path: "subjectId", select: "name isDeleted" },
+        { path: "chapterId", select: "name isDeleted" },
+        { path: "topicId", select: "name isDeleted" },
       ],
     })
     .lean();
@@ -113,19 +119,26 @@ export async function getNotesOverview(userUuidFromSession: string) {
     totalSubjects: subjectsWithProgress.length,
   };
 
+  let recentNoteData = undefined;
+  if (recentActivity?.noteId) {
+    const topicDTO = recentActivity.noteId.topicId ? mapTopic(recentActivity.noteId.topicId, lang) : null;
+    const chapterDTO = recentActivity.noteId.chapterId ? mapChapter(recentActivity.noteId.chapterId, lang) : null;
+    const subjectDTO = recentActivity.noteId.subjectId ? mapSubject(recentActivity.noteId.subjectId, lang) : null;
+
+    recentNoteData = {
+      topicId: topicDTO?.id || "",
+      topicName: topicDTO?.name || "No Topic",
+      chapterName: chapterDTO?.name || "No Chapter",
+      subjectName: subjectDTO?.name || "Unknown",
+      progress: Math.min((recentActivity.readCount / 10) * 100, 100),
+      lastAccessed: getTimeAgo(recentActivity.lastActive),
+    };
+  }
+
   return {
     subjects: subjectsWithProgress,
     stats,
-    recentNote: recentActivity
-      ? {
-          topicId: recentActivity.noteId?.topicId?.toString() || "",
-          topicName: recentActivity.noteId?.topicId?.name || "No Topic",
-          chapterName: recentActivity.noteId?.chapterId?.name || "No Chapter",
-          subjectName: recentActivity.noteId?.subjectId?.name || "Unknown",
-          progress: Math.min((recentActivity.readCount / 10) * 100, 100),
-          lastAccessed: getTimeAgo(recentActivity.lastActive),
-        }
-      : undefined,
+    recentNote: recentNoteData,
   };
 }
 
@@ -138,6 +151,7 @@ export async function getNotesBySubject(
   subjectId: string
 ) {
   await dbConnect();
+  const lang = getCurrentLang();
   const userId = await getUserIdFromSession(userUuidFromSession);
 
   // Verify subject exists
@@ -191,11 +205,12 @@ export async function getNotesBySubject(
       (c) => c._id.toString() === chapterData._id?.toString()
     );
     const progress = Math.min((chapterData.totalNotes / 30) * 100, 100);
+    const chapterDTO = chapter ? mapChapter(chapter, lang) : null;
 
     return {
       id: chapterData._id?.toString() || "",
-      title: chapter?.name?.en || chapter?.name || "Unknown",
-      description: chapter?.description || "",
+      title: chapterDTO?.name || "Unknown",
+      description: chapterDTO?.description || "",
       totalNotes: chapterData.totalNotes,
       totalTopics: 0,
       completedTopics: chapterData.totalNotes,
@@ -208,10 +223,12 @@ export async function getNotesBySubject(
     0
   );
 
+  const subjectDTO = mapSubject(subject, lang);
+
   return {
     subject: {
-      id: subject._id.toString(),
-      name: subject.name?.en || subject.name || "Unknown",
+      id: subjectDTO.id,
+      name: subjectDTO.name,
     },
     chapters: chaptersWithProgress,
     stats: {
@@ -231,6 +248,7 @@ export async function getNotesByChapter(
   chapterId: string
 ) {
   await dbConnect();
+  const lang = getCurrentLang();
   const userId = await getUserIdFromSession(userUuidFromSession);
 
   const chapter = await Chapter.findOne({
@@ -284,10 +302,11 @@ export async function getNotesByChapter(
     const topic = topics.find(
       (t) => t._id.toString() === topicData._id?.toString()
     );
+    const topicDTO = topic ? mapTopic(topic, lang) : null;
 
     return {
       id: topicData._id?.toString() || "",
-      title: topic?.name?.en || topic?.name || "Unknown",
+      title: topicDTO?.name || "Unknown",
       notesCount: topicData.totalNotes,
       progress: topicData.totalNotes > 0 ? 100 : 0,
       lastNoteTime: topicData.lastActive
@@ -296,10 +315,12 @@ export async function getNotesByChapter(
     };
   });
 
+  const chapterDTO = mapChapter(chapter, lang);
+
   return {
     chapter: {
-      id: chapter._id.toString(),
-      title: chapter.name?.en || chapter.name || "Unknown",
+      id: chapterDTO.id,
+      title: chapterDTO.name,
     },
     topics: topicsWithNotes,
     stats: {

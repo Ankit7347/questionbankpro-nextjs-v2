@@ -2,6 +2,8 @@
 
 import { BaseDTO } from "./base.dto";
 import { mapBaseFields } from "./base.mapper";
+import { resolveI18nField } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 
 export interface TopicDTO extends BaseDTO {
   name: string;
@@ -10,12 +12,12 @@ export interface TopicDTO extends BaseDTO {
   difficulty: "easy" | "medium" | "hard";
 }
 
-export function mapTopic(doc: any): TopicDTO {
+export function mapTopic(doc: any, lang: Lang = "en"): TopicDTO {
   return {
     ...mapBaseFields(doc),
-    name: doc.name,
+    name: resolveI18nField(doc.name, lang),
     slug: doc.slug,
-    description: doc.description ?? "",
+    description: resolveI18nField(doc.description, lang) ?? "",
     difficulty: doc.difficulty ?? "medium",
   };
 }
