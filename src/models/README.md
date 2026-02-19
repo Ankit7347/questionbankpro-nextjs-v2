@@ -1,678 +1,599 @@
-Perfect. Below is a **single, well-structured `README.md`** you can place **inside `src/models/`**.
-It contains:
-
-* Clear explanation of **each model**
-* **Metadata fields**
-* **One consolidated model-linkage diagram**
-* Design decisions (MongoDB + TS)
-* Ready for long-term maintenance
-
-You can copy-paste this **as-is**.
-
----
-
-# 📘 `src/models/README.md`
-
-```md
 # Data Models – Academic Structure
 
 This directory contains all core **TypeScript domain models** used in the platform.
 
 The models are designed to support:
-- Class 9–12 (School)
-- Graduation (BSc)
-- Post-Graduation (MSc)
-- Competitive Exams (JEE, NEET, CUET, GATE, etc.)
+- School: Class 9–12 (CBSE, ICSE, State Board)
+- Graduation: BSc courses
+- Post-Graduation: MSc courses
+- Competitive Exams: JEE, NEET, CUET, GATE, CAT, etc.
 
-The system is **syllabus-first**, **topic-centric**, and **MongoDB-backed**.
+The system is **exam-first**, **topic-centric**, and **MongoDB-backed**.
 
 ---
 
 ## 🔹 Design Principles
 
-1. Topic is the smallest academic unit
-2. Same topic can be reused across multiple exams
-3. All deletes are **soft deletes**
-4. MongoDB `_id` is mapped to `id: string` at app level
-5. Models are independent of authentication
-6. Strict hierarchy is enforced
+1. **Exam-first hierarchy:** Exam → SubExam → Course → User access
+2. **Topic is atomic:** Reusable across exams, questions, and quizzes
+3. **Multilingual core:** en/hi support on name/description fields
+4. **Soft deletes only:** Data preservation, no hard deletes
+5. **Service layer pattern:** All DB access controlled via services
+6. **DTO mappers:** Clean API responses with language resolution
+7. **Strict indexes:** Foreign keys and unique constraints enforced
+8. **Activity auditing:** Track who changed what, when
 
 ---
 
-## 🔁 Model Linkage Diagram
+## 🔁 Complete Model Hierarchy
 
 ```
+EducationLevel (top-level academic classification)
+│
+▼
+Exam (board/competitive exam)
+├────────────────────────────────────────┐
+│                                        │
+▼                                        ▼
+SubExam (yearly variant)          OfficialSyllabus
+│                                  (curriculum for year)
+├─────────────────┐                │
+▼                 ▼                ▼
+Course    UserCourseAccess   Subject
+(product)  (purchase/access)    │
+                                ▼
+                           (SubjectMap)
+                                │
+                                ▼
+                           Chapter
+                           (ChapterMap)
+                                │
+                                ▼
+                              Topic
+                        (atomic unit)
+                    ┌─────────┬────────┬──────────────┐
+                    ▼         ▼        ▼              ▼
+                 Question   Quiz    Note      CompetitiveTopicMap
+                 (content)  (group) (material) (importance)
+                    │         │
+                    ├─▶ QuizSubmission
+                    │   (user attempt)
+                    │
+                    ▼
+            PreviousPaper ◀─── SolvedPaper
+            (past papers)      (solutions)
 
-EducationLevel
-│
-▼
-Course / Class
-│
-▼
-Exam
-│
-▼
-Syllabus
-│
-▼
-Subject
-│
-▼
-Chapter
-│
-▼
-Topic
-│
-├───────────────┐
-▼               ▼
-Question     CompetitiveTopicMap
-│               │
-▼               ▼
-Quiz          Competitive Exam
+User
+├──▶ UserCourseAccess (course license)
+├──▶ UserNoteActivity (engagement)
+├──▶ Progress (learning stats)
+├──▶ Bookmark (saved items)
+└──▶ QuizSubmission (attempts)
 
+Support Models:
+├──▶ ActivityLog (audit trail)
+├──▶ BestBook (book recommendations)
+├──▶ Coupon & CourseCouponMap (discounts)
+├──▶ GeolocationState & District (location)
+├──▶ ResetToken (password reset)
+└──▶ ContactUs (support tickets)
 ```
 
 ---
 
 ## 🔹 BaseEntity (Shared by All Models)
 
-All models extend `BaseEntity`.
-
-### Common Fields
+All models inherit common fields via base.schema.ts.
 
 | Field | Type | Description |
-|------|-----|------------|
-| id | string | MongoDB `_id` mapped to string |
-| isDeleted | boolean | Soft delete flag |
+|-------|------|------------|
+| _id | ObjectId | MongoDB auto ID (mapped to `id: string` in DTOs) |
+| isDeleted | boolean | Soft delete flag (default: false) |
 | createdAt | Date | Creation timestamp |
 | updatedAt | Date | Last update timestamp |
-| updatedBy | string? | UUID of user/admin |
+| updatedBy | string? | UUID of user/admin who updated |
 
 ---
 
-## 📚 Model Descriptions
+## 📚 CORE ACADEMIC HIERARCHY
 
 ### 1. EducationLevel
 Top-level academic grouping.
 
-**Examples**
-- Class 9
-- Class 12
-- Graduation
-- Post-Graduation
-- Competitive
+**Schema:** `name` (en/hi), `slug` (unique), `description` (en/hi), `icon`, `order`, `isActive`
 
-**Links to:** Course
-
----
-
-### 2. Course / Class
-Represents a class or degree.
-
-**Examples**
-- Class 10
-- Class 12 Science
-- BSc Physics
-- MSc Mathematics
+**Examples:** Class 9, Class 10, Class 12, UG, PG, JEE, NEET
 
 **Links to:** Exam
 
 ---
 
-### 3. Exam
-Board, university, or competitive exam.
+### 2. Exam
+Represents a board, university, or competitive exam.
 
-**Examples**
-- CBSE
-- ICSE
-- JEE Main
-- NEET
-- GATE
+**Schema:** `name` (en/hi), `shortName` (en/hi), `slug` (unique), `educationLevelId` (ref), `description` (en/hi), `icon`, `bannerImage`, `order`, `isActive`
 
-**Links to:** Syllabus
+**Examples:** CBSE Board, JEE Main, NEET, GATE, ICSE
+
+**Links to:** EducationLevel, SubExam, OfficialSyllabus, CompetitiveTopicMap, PreviousPaper
 
 ---
 
-### 4. Syllabus
-Defines syllabus for a specific exam and course.
+### 3. SubExam
+Yearly variant or sub-category of an exam.
 
-**Example**
-- CBSE + Class 10 + 2024–25
+**Schema:** `name` (en/hi), `slug` (unique), `examId` (ref), `year` (optional)
 
-**Links to:** Subject
+**Purpose:** Track exam variants by year (JEE Main 2024 vs 2025)
+
+**Examples:** JEE Main 2025, NEET UG 2025, CBSE Class 12 2024-25
+
+**Links to:** Exam, Course, UserCourseAccess, OfficialSyllabus, PreviousPaper
+
+---
+
+### 4. OfficialSyllabus
+Official curriculum specification for an exam variant.
+
+**Schema:** `subExamId` (ref), `year`, `version` (default: 1), `validFrom`, `validTo`, `isActive`, `unique: (subExamId, version)`
+
+**Purpose:** Track syllabus versions over time with validity periods
+
+**Example:** CBSE + 2025 + Version 1 (validFrom: 2025-01-01, validTo: 2025-12-31)
+
+**Links to:** SubExam, SubjectMap
 
 ---
 
 ### 5. Subject
-Academic subject under a syllabus.
+Academic subject within a curriculum.
 
-**Examples**
-- Physics
-- Chemistry
-- Mathematics
+**Schema:** `name` (en/hi), `slug` (unique), `description` (plain string, non-i18n)
 
-**Links to:** Chapter
+**Examples:** Physics, Chemistry, Mathematics, Biology, English
+
+**Links to:** SubjectMap, Question, CourseSubjectAccessMap, Bookmark
 
 ---
 
 ### 6. Chapter
-Chapter inside a subject.
+Chapter/Unit within a subject.
 
-**Examples**
-- Laws of Motion
-- Trigonometry
-- Electrochemistry
+**Schema:** `name` (en/hi), `slug` (unique), `description` (plain string, non-i18n)
 
-**Links to:** Topic
+**Examples:** Laws of Motion, Trigonometry, Electrochemistry, Photosynthesis
 
----
-
-### 7. Topic (Atomic Unit)
-Smallest reusable academic unit.
-
-**Examples**
-- Newton’s First Law
-- Pythagoras Theorem
-- Oxidation Number
-
-**Used by**
-- Questions
-- Quizzes
-- Competitive exam mapping
+**Links to:** ChapterMap, Question, Bookmark
 
 ---
 
-### 8. CompetitiveTopicMap
-Maps topics to competitive exams.
+### 7. Topic ⭐ (Atomic Unit - CORE)
+Smallest reusable academic unit in the system.
 
-**Purpose**
-- Avoid topic duplication
-- Allow different weightage per exam
+**Schema:** `name` (en/hi), `slug` (unique), `description` (plain string, non-i18n), `difficulty` (easy|medium|hard, default: medium)
 
-**Links:** Topic ⇄ Exam
+**Key Property:** Standalone in schema — linked to hierarchy via SubjectMap → ChapterMap → TopicMap
 
----
+**Examples:** Newton's First Law, Pythagoras Theorem, Oxidation Numbers
 
-### 9. Question
-Individual question linked strictly to a topic.
+**Used by:** Question, Quiz (references), CompetitiveTopicMap, TopicMap
 
-**Types**
-- MCQ
-- Numerical
-- True/False
-
-**Rule**
-A question must belong to exactly one topic.
+**Links to:** TopicMap, CompetitiveTopicMap, Question
 
 ---
 
-### 10. Quiz
-Logical grouping of questions.
+## 📚 MAPPING MODELS (Curriculum Structure)
 
-**Quiz Types**
-- Topic-wise
-- Chapter-wise
-- Subject-wise
-- Full syllabus
-- Mock test
+These models define versioned curriculum structure with temporal validity.
 
-**Links to**
-- Topic / Chapter / Subject / Syllabus
+### 8. SubjectMap
+Maps subjects to official syllabus.
 
----
+**Schema:** `syllabusId` (ref OfficialSyllabus), `subjectId` (ref), `order`, `isOptional`, `isRemoved`, `validFrom`, `validTo`, `unique: (syllabusId, subjectId)`
 
-## 🧠 Architectural Notes
+**Purpose:** Define which subjects are in a specific syllabus version
 
-- MongoDB stores `_id` as `ObjectId`
-- Application uses `id: string`
-- All relations are stored as string IDs
-- No hard deletes anywhere in the system
-- Structure supports future additions:
-  - Notes
-  - Videos
-  - AI recommendations
-  - Analytics
+**Links to:** OfficialSyllabus, Subject, ChapterMap
 
 ---
 
-## ✅ Summary
+### 9. ChapterMap
+Maps chapters to subject within syllabus.
 
-This model system is:
-- Scalable
-- Clean
-- Future-proof
-- Competitive-exam ready
-- Easy to reason about
+**Schema:** `subjectMapId` (ref), `chapterId` (ref), `order`, `isOptional`, `isRemoved`, `validFrom`, `validTo`
 
-Any new feature **must align with this hierarchy**.
+**Purpose:** Define chapter sequence and optionality within syllabus
+
+**Links to:** SubjectMap, Chapter, TopicMap
+
+---
+
+### 10. TopicMap
+Maps topics to chapter within syllabus.
+
+**Schema:** `chapterMapId` (ref), `topicId` (ref), `order`, `isOptional`, `isRemoved`, `validFrom`, `validTo`
+
+**Purpose:** Define topic sequence and optionality within syllabus
+
+**Links to:** ChapterMap, Topic
+
+---
+
+### 11. CompetitiveTopicMap
+Maps topics to competitive exams with weightage and importance.
+
+**Schema:** `examId` (ref), `topicId` (ref), `weightage` (%), `priority` (low|medium|high), `unique: (examId, topicId)`
+
+**Purpose:** Track topic importance for competitive exams without duplicating topics
+
+**Example:** "Newton's First Law = HIGH priority, 10% weightage for JEE Main"
+
+**Links to:** Exam, Topic
+
+---
+
+## 📚 COURSE & COMMERCE MODELS
+
+### 12. Course
+Purchasable/enrollable course product.
+
+**Schema:** `subExamId` (ref), `type` (FULL|CRASH|TEST_SERIES), `name` (en/hi), `slug` (unique), `basePrice`, `salePrice`, `currency` (INR|USD), `validFrom`, `validTo`, `isActive`, `visibility`
+
+**Types:**
+- FULL: Complete course with all subjects/chapters
+- CRASH: Quick revision course (1-2 months)
+- TEST_SERIES: Only mock tests/papers
+
+**Links to:** SubExam, UserCourseAccess, CourseSubjectAccessMap, CourseCouponMap
+
+---
+
+### 13. UserCourseAccess
+Source of truth for course purchase & user access rights.
+
+**Schema:** `userId` (ref), `courseId` (ref), `subExamId` (ref), `accessType` (FREE|PAID), `pricePaid`, `couponId` (ref, nullable), `enrolledAt`, `accessValidTill`, `status` (ACTIVE|EXPIRED|REVOKED), `unique: (userId, courseId)`
+
+**Purpose:** Track who can access what course and until when
+
+**Links to:** User, Course, SubExam, Coupon
+
+---
+
+### 14. CourseSubjectAccessMap
+Maps which subjects are included in a course.
+
+**Schema:** `courseId` (ref), `subjectId` (ref), `isIncluded` (boolean), `unique: (courseId, subjectId)`
+
+**Purpose:** Define course curriculum (which subjects included)
+
+**Links to:** Course, Subject
+
+---
+
+### 15. Coupon
+Discount codes for courses.
+
+**Schema:** `code` (unique uppercase), `discountType` (FLAT|PERCENT), `discountValue`, `maxDiscount` (for PERCENT), `minOrderAmount`, `validFrom`, `validTo`, `usageLimit`, `perUserLimit` (default: 1), `isActive`
+
+**Examples:** SUMMER50 (50% off, max ₹2000), NEWUSER500 (₹500 flat, min ₹1000)
+
+**Links to:** CourseCouponMap, UserCourseAccess
+
+---
+
+### 16. CourseCouponMap
+Associates coupons with courses.
+
+**Schema:** `courseId` (ref), `couponId` (ref), `isActive`, `unique: (courseId, couponId)`
+
+**Purpose:** Define which coupons apply to which courses
+
+**Links to:** Course, Coupon
+
+---
+
+## 📚 ASSESSMENT & CONTENT MODELS
+
+### 17. Question
+Individual assessment item.
+
+**Schema:** `content` (en/hi), `type` (MCQ|SUBJECTIVE|TRUE_FALSE), `options` (array: {text (en/hi), isCorrect}), `explanation` (en/hi), `marks`, `difficulty` (Easy|Medium|Hard), `displayOrder`, `subjectId` (ref), `chapterId` (ref), `topicId` (ref), `images` (array: URLs)
+
+**Rule:** Always belongs to exactly one topic
+
+**Links to:** Topic, Chapter, Subject, Question, Bookmark
+
+---
+
+### 18. Quiz
+Logical grouping and assessment of questions.
+
+**Schema:** `title` (en/hi), `description` (en/hi), `quizType` (topic|chapter|subject|full_syllabus|mock_test), `examId` (ref), `subExamId` (ref), `subjectId` (ref, optional), `chapterId` (ref, optional), `topicId` (ref, optional), `questionCount`, `timeLimit` (minutes), `shuffleQuestions`, `passingScore` (%), `isPublished`, `index: (examId, quizType)`
+
+**Quiz Types:**
+- topic: Single topic practice
+- chapter: Entire chapter assessment
+- subject: Full subject exam
+- full_syllabus: Complete mock
+- mock_test: Full exam simulation
+
+**Links to:** Exam, SubExam, Subject, Chapter, Topic, QuizSubmission
+
+---
+
+### 19. QuizSubmission
+Tracks user's quiz attempt and performance.
+
+**Schema:** `userId` (ref), `quizId` (ref), `attemptNumber`, `startedAt`, `submittedAt`, `score`, `totalMarks`, `answers` (array: {questionId, selectedAnswer, isCorrect}), `timeSpent` (seconds)
+
+**Purpose:** Analytics, progress tracking, leaderboards
+
+**Links to:** User, Quiz
+
+---
+
+### 20. Note
+Supplementary study material for topics.
+
+**Schema:** `title`, `description`, `content`, `subject`, `chapter`, `topic`, `isPinned`, `isPublic`, `views`, `tags`, `attachments`, `createdBy`, `updatedBy`
+
+**Purpose:** Admin-created or user-created study notes
+
+**Examples:** "Tricks for quadratic equations", "NEET Biology photosynthesis summary"
+
+**Links to:** Topic, UserNoteActivity, Bookmark
+
+---
+
+### 21. UserNoteActivity
+Tracks user engagement with notes.
+
+**Schema:** `userId` (ref), `noteId` (ref), `readCount`, `timeSpent` (seconds), `isBookmarked`, `lastActive`
+
+**Purpose:** Understand engagement and recommend content
+
+**Links to:** User, Note
+
+---
+
+### 22. PreviousPaper
+Previous year exam papers.
+
+**Schema:** `title` (en/hi), `slug` (unique), `paperCode` (unique uppercase), `examId` (ref), `subExamId` (ref), `subjectId` (ref), `year`, `session` (semester1|semester2|annual), `contentType` (PDF|DIGITAL|BOTH), `paperUrl`, `questions` (ref array), `displayOrder`, `isPremium`, `isVerified`, `status` (DRAFT|PUBLISHED|ARCHIVED), `views`, `downloads`, `prints`, `shares`, `totalRatings`, `relatedPaperIds` (ref array), `metaTitle`, `metaDescription`, `keywords`, `tags`, `createdBy`, `index: (examId, year, subjectId)`
+
+**Purpose:** Practice with actual past papers
+
+**Links to:** Exam, SubExam, Subject, Question, SolvedPaper, Bookmark
+
+---
+
+### 23. SolvedPaper
+Detailed solution for a previous paper.
+
+**Schema:** `previousPaperId` (ref, unique), `fullExplanation` (en/hi), `solutionPdfUrl`, `videoSolutionUrl`, `isPremium`, `solutionQuality` (BASIC|EXPERT_VERIFIED), `views`, `totalLikes`, `averageRating` (0-5), `totalRatings`
+
+**Purpose:** Provide detailed solutions with video explanations
+
+**Links to:** PreviousPaper
+
+---
+
+## 📚 USER & ENGAGEMENT MODELS
+
+### 24. User
+Application user account.
+
+**Schema:** `uuid` (unique), `name`, `email` (unique lowercase), `phone`, `passwordHash`, `role` (student|contentadmin|superadmin), `uiMode` (light|dark), `preferences` ({theme, notifications, language}), `dashboard` ({notes, bookmarks, history, performance}), `stateName`, `districtName`, `geolocationStateId` (ref)
+
+**Links to:** UserCourseAccess, UserNoteActivity, Progress, Bookmark, QuizSubmission, ActivityLog, ResetToken
+
+---
+
+### 25. Progress
+Track user's learning progress.
+
+**Schema:** `userId` (ref), `subjectId` (string), `chapterId` (string), `topicId` (string), `progress` (percentage), `lastAccessed`
+
+**Purpose:** Learning analytics and progress visualization
+
+**Links to:** User
+
+---
+
+### 26. Bookmark
+User bookmarks for quick access.
+
+**Schema:** `userId` (ref), `itemType` (topic|chapter|subject|paper|note|other), `itemId` (string)
+
+**Purpose:** Personal collections for revision
+
+**Links to:** User, Topic/Chapter/Subject/PreviousPaper/Note
+
+---
+
+### 27. ActivityLog
+Audit trail of system activities.
+
+**Schema:** `userId` (ref), `type` (string: e.g., 'note_view', 'quiz_attempt', 'page_visit'), `payload` (mixed object), `index: (userId, type)`
+
+**Purpose:** Security audit and usage analytics
+
+**Links to:** User
+
+---
+
+## 📚 REFERENCE & SUPPORT MODELS
+
+### 28. BestBook
+Curated textbook recommendations.
+
+**Schema:** `title`, `author`, `subject`, `className` (e.g., "Class 10", "BSc Physics"), `board` (CBSE|ICSE|JEE), `competitive` (boolean), `imageUrl`, `description`, `tags`, `rating`, `isbn`, `amazonUrl`
+
+**Purpose:** Book recommendations for deeper learning
+
+**Examples:** "NCERT Physics Class 12", "IIT JEE Solutions by Arihant"
+
+---
+
+### 29. GeolocationState
+Indian states.
+
+**Schema:** `stateName` (unique), `stateCode` (e.g., UP, MH)
+
+---
+
+### 30. GeolocationDistrict
+Districts within states.
+
+**Schema:** `districtName`, `geolocationStateId` (ref), `unique: (districtName, geolocationStateId)`
+
+**Links to:** GeolocationState
+
+---
+
+### 31. ResetToken
+Password reset tokens.
+
+**Schema:** `email` (lowercase, index), `token` (unique), `createdAt` (expires: 30 minutes)
+
+**Purpose:** Secure password reset flow
+
+---
+
+### 32. ContactUs
+Support/enquiry submissions.
+
+**Schema:** `name`, `email` (lowercase), `phone`, `message`
+
+**Purpose:** Collect user feedback and support requests
+
+---
+
+## 🧠 Multilingual Support
+
+**Pattern:** Fields with multilingual content use:
+
+```typescript
+name: {
+  en: string;  // English (required)
+  hi?: string; // Hindi (optional)
+}
 ```
 
-```
-src/
-├── lib/
-│   └── mongodb.ts
-│       └── MongoDB connection (Mongoose, cached)
-│
-├── models/
-│   ├── BaseEntity.ts
-│   │   └── TypeScript base interface (id, timestamps, soft delete)
-│   │
-│   ├── mongoose/
-│   │   ├── base.schema.ts
-│   │   │   └── Shared Mongoose fields (isDeleted, updatedBy, timestamps)
-│   │   │
-│   │   ├── EducationLevel.schema.ts
-│   │   ├── Course.schema.ts
-│   │   ├── Exam.schema.ts
-│   │   ├── Syllabus.schema.ts
-│   │   ├── Subject.schema.ts
-│   │   ├── Chapter.schema.ts
-│   │   ├── Topic.schema.ts
-│   │   ├── CompetitiveTopicMap.schema.ts
-│   │   ├── Question.schema.ts
-│   │   ├── Quiz.schema.ts
-│   │   │
-│   │   ├── BestBook.schema.ts
-│   │   ├── ContactUs.schema.ts
-│   │   ├── GeolocationState.schema.ts
-│   │   ├── GeolocationDistrict.schema.ts
-│   │   ├── ResetToken.schema.ts
-│   │   └── User.schema.ts
-│   │
-│   ├── dto/
-│   │   ├── base.mapper.ts
-│   │   │   └── Maps Mongo `_id` → `id`
-│   │   │
-│   │   ├── educationLevel.mapper.ts
-│   │   ├── course.mapper.ts
-│   │   ├── exam.mapper.ts
-│   │   ├── syllabus.mapper.ts
-│   │   ├── subject.mapper.ts
-│   │   ├── chapter.mapper.ts
-│   │   ├── topic.mapper.ts
-│   │   ├── competitiveTopicMap.mapper.ts
-│   │   ├── question.mapper.ts
-│   │   ├── quiz.mapper.ts
-│   │   │
-│   │   ├── bestBook.mapper.ts
-│   │   ├── contactUs.mapper.ts
-│   │   ├── geolocation.mapper.ts
-│   │   └── user.mapper.ts
-│   │
-│   └── index.ts
-│       └── (optional) re-exports for models
-│
-├── validation/
-│   ├── base.schema.ts
-│   │   └── Common Zod fields
-│   │
-│   ├── educationLevel.schema.ts
-│   ├── course.schema.ts
-│   ├── exam.schema.ts
-│   ├── syllabus.schema.ts
-│   ├── subject.schema.ts
-│   ├── chapter.schema.ts
-│   ├── topic.schema.ts
-│   ├── competitiveTopicMap.schema.ts
-│   ├── question.schema.ts
-│   ├── quiz.schema.ts
-│   │
-│   ├── bestBook.schema.ts
-│   ├── contactUs.schema.ts
-│   ├── geolocation.schema.ts
-│   └── user.schema.ts
-│
-├── services/
-│   ├── educationLevel.service.ts
-│   ├── course.service.ts
-│   ├── exam.service.ts
-│   ├── syllabus.service.ts
-│   ├── subject.service.ts
-│   ├── chapter.service.ts
-│   ├── topic.service.ts
-│   ├── question.service.ts
-│   ├── quiz.service.ts
-│   │
-│   ├── bestBook.service.ts
-│   ├── contactUs.service.ts
-│   └── user.service.ts
-│
-├── scripts/
-│   ├── init-db.ts
-│   │   └── TEMP: forces collection creation
-│   │
-│   └── seed/
-│       ├── geolocation.seed.ts
-│       ├── education.seed.ts
-│       └── syllabus.seed.ts
-│
-└── app/ or pages/
-    └── api/
-        └── (routes use services + validation)
+**Applied to models:**
+- EducationLevel, Exam, SubExam
+- Subject, Chapter, Topic
+- Course, Quiz, Note, PreviousPaper, SolvedPaper
+- Question, BestBook
+- User (name only)
+- GeolocationState, GeolocationDistrict (no i18n, actual names)
+
+**Resolution:** Via `resolveI18nField(value, lang)` helper in mappers that returns `value[lang]` or falls back to `value.en`.
+
+---
+
+## 🔗 Actual File Structure
 
 ```
-
-Understood. Below is a **clean, one-by-one explanation of every folder and file**, **excluding `app/` and `pages/`**, exactly aligned with a **Next.js + TypeScript + MongoDB (Mongoose)** architecture suitable for **QuestionBankPro**.
-
-I will go **top-down**, **directory by directory**, and explain **purpose, responsibility, and typical contents**.
-
----
-
-## 1. `src/lib/`
-
-### `src/lib/mongodb.ts`
-
-**Purpose:**
-Centralized MongoDB connection using **Mongoose** with **connection caching** (critical for Next.js hot reload and serverless).
-
-**Responsibilities:**
-
-* Read `MONGODB_URI` from env
-* Create a single reusable connection
-* Prevent multiple connections in dev / API routes
-
-**Contains:**
-
-* Mongoose `connect`
-* Global cache (`globalThis.mongoose`)
-* No schemas or models
-
-**Used by:**
-
-* All services
-* All API routes
-* Scripts (`init-db.ts`, seeders)
-
----
-
-## 2. `src/models/`
-
-This folder defines **domain structure**, split into:
-
-* **Pure TypeScript interfaces**
-* **Mongoose schemas**
-* **DTO mappers**
-
----
-
-### 2.1 `src/models/BaseEntity.ts`
-
-**Purpose:**
-Base TypeScript interface shared by all entities.
-
-**Defines common fields:**
-
-* `id: string`
-* `createdAt: Date`
-* `updatedAt: Date`
-* `isDeleted: boolean`
-* `updatedBy?: string`
-
-**Why it exists:**
-
-* Ensures consistent typing across frontend & backend
-* Mongo `_id` never leaks outside
-
----
-
-### 2.2 `src/models/mongoose/`
-
-This folder contains **ONLY MongoDB schemas** (no business logic).
-
----
-
-#### 2.2.1 `base.schema.ts`
-
-**Purpose:**
-Reusable base fields for all schemas.
-
-**Includes:**
-
-* `isDeleted`
-* `updatedBy`
-* `timestamps: true`
-
-**Used by:**
-
-* Every other schema via `Schema.add()` or spread
-
----
-
-#### 2.2.2 Academic hierarchy schemas
-
-Each file = **1 Mongo collection**
-
-| File                       | Responsibility                          |
-| -------------------------- | --------------------------------------- |
-| `EducationLevel.schema.ts` | Class / Grade (e.g. Class 9, Class 10)  |
-| `Course.schema.ts`         | Board or Stream (ICSE, CBSE, JEE, NEET) |
-| `Exam.schema.ts`           | Exam type (ICSE Class 9, JEE Main)      |
-| `Syllabus.schema.ts`       | Exam syllabus version                   |
-| `Subject.schema.ts`        | Physics, Chemistry, Maths               |
-| `Chapter.schema.ts`        | Chapters inside a subject               |
-| `Topic.schema.ts`          | Topics inside chapters                  |
-
-Each schema:
-
-* References parent via `ObjectId`
-* Uses `base.schema.ts`
-* Has proper indexes
-
----
-
-#### 2.2.3 Mapping & content schemas
-
-| File                            | Purpose                                  |
-| ------------------------------- | ---------------------------------------- |
-| `CompetitiveTopicMap.schema.ts` | Maps school topics ↔ competitive exams   |
-| `Question.schema.ts`            | Actual questions (MCQ, subjective, etc.) |
-| `Quiz.schema.ts`                | Quiz metadata (not questions themselves) |
-
----
-
-#### 2.2.4 Other schemas
-
-| File                            | Purpose                            |
-| ------------------------------- | ---------------------------------- |
-| `BestBook.schema.ts`            | Recommended books per topic/exam   |
-| `ContactUs.schema.ts`           | User contact / enquiry submissions |
-| `GeolocationState.schema.ts`    | Indian states                      |
-| `GeolocationDistrict.schema.ts` | Districts linked to states         |
-| `ResetToken.schema.ts`          | Password reset tokens              |
-| `User.schema.ts`                | Application users                  |
-
----
-
-### 2.3 `src/models/dto/`
-
-**Purpose:**
-Convert **Mongo documents → clean API response objects**.
-
-Mongo uses `_id`, frontend uses `id`. DTOs fix that.
-
----
-
-#### 2.3.1 `base.mapper.ts`
-
-**Responsibility:**
-
-* Convert `_id` → `id`
-* Remove `__v`
-* Normalize timestamps
-
-Used by **all other mappers**.
-
----
-
-#### 2.3.2 Entity-specific mappers
-
-Each mapper:
-
-* Takes a Mongoose document
-* Returns a clean typed object
-
-| Mapper                          | Maps             |
-| ------------------------------- | ---------------- |
-| `educationLevel.mapper.ts`      | EducationLevel   |
-| `course.mapper.ts`              | Course           |
-| `exam.mapper.ts`                | Exam             |
-| `syllabus.mapper.ts`            | Syllabus         |
-| `subject.mapper.ts`             | Subject          |
-| `chapter.mapper.ts`             | Chapter          |
-| `topic.mapper.ts`               | Topic            |
-| `competitiveTopicMap.mapper.ts` | Topic mappings   |
-| `question.mapper.ts`            | Questions        |
-| `quiz.mapper.ts`                | Quiz             |
-| `bestBook.mapper.ts`            | BestBook         |
-| `contactUs.mapper.ts`           | Contact          |
-| `geolocation.mapper.ts`         | State & District |
-| `user.mapper.ts`                | User             |
-
----
-
-### 2.4 `src/models/index.ts`
-
-**Purpose (Optional):**
-
-* Central export file
-* Cleaner imports
-
-Example:
-
-```ts
-export * from "./mongoose/Question.schema";
-export * from "./dto/question.mapper";
+src/models/
+├── README.md (this file)
+├── BaseEntity.ts
+│
+├── mongoose/ (32 collections)
+│   ├── base.schema.ts (shared fields)
+│   ├── EducationLevel.schema.ts
+│   ├── Exam.schema.ts
+│   ├── SubExam.schema.ts
+│   ├── OfficialSyllabus.schema.ts
+│   ├── Subject.schema.ts
+│   ├── Chapter.schema.ts
+│   ├── Topic.schema.ts
+│   ├── SubjectMap.schema.ts
+│   ├── ChapterMap.schema.ts
+│   ├── TopicMap.schema.ts
+│   ├── CompetitiveTopicMap.schema.ts
+│   ├── Course.schema.ts
+│   ├── UserCourseAccess.schema.ts
+│   ├── CourseSubjectAccessMap.schema.ts
+│   ├── Coupon.schema.ts
+│   ├── CourseCouponMap.schema.ts
+│   ├── Question.schema.ts
+│   ├── Quiz.schema.ts
+│   ├── QuizSubmission.schema.ts
+│   ├── Note.schema.ts
+│   ├── UserNoteActivity.schema.ts
+│   ├── PreviousPaper.schema.ts
+│   ├── SolvedPaper.schema.ts
+│   ├── User.schema.ts
+│   ├── Progress.schema.ts
+│   ├── Bookmark.schema.ts
+│   ├── ActivityLog.schema.ts
+│   ├── BestBook.schema.ts
+│   ├── GeolocationState.schema.ts
+│   ├── GeolocationDistrict.schema.ts
+│   ├── ResetToken.schema.ts
+│   └── ContactUs.schema.ts
+│
+├── dto/ (Data Transfer Objects)
+│   ├── base.mapper.ts (ObjectId → id, timestamps)
+│   ├── *.mapper.ts (one per model)
+│   └── *.dto.ts (TypeScript interfaces)
+│
+└── index.ts (optional re-exports)
 ```
 
 ---
 
-## 3. `src/validation/`
+## 📋 Quick Reference
 
-**Purpose:**
-Request validation using **Zod**.
-
-Ensures:
-
-* API safety
-* No invalid DB writes
-* Shared validation between API & services
-
----
-
-### 3.1 `base.schema.ts`
-
-**Defines:**
-
-* `id`
-* pagination
-* soft delete flags
-* common optional fields
-
-Used by all entity schemas.
+- **32 MongoDB collections** matching actual mongoose folder
+- **Multilingual support:** English + Hindi on all name/description fields
+- **Soft deletes:** All models support `isDeleted` flag
+- **Timestamps:** `createdAt`, `updatedAt` on all models
+- **Audit trail:** `updatedBy` on all models
+- **Indexes:** Foreign keys and unique constraints properly indexed
+- **Service layer:** Every model has dedicated service functions
+- **DTOs:** Clean API contracts via mappers
+- **Versioning:** OfficialSyllabus tracks curriculum versions with validFrom/validTo
 
 ---
 
-### 3.2 Entity validation schemas
+## ✅ Architecture Strengths
 
-Each file validates **request payloads**, not DB schema.
-
-| File                            | Validates                     |
-| ------------------------------- | ----------------------------- |
-| `educationLevel.schema.ts`      | Create/update education level |
-| `course.schema.ts`              | Course payload                |
-| `exam.schema.ts`                | Exam payload                  |
-| `syllabus.schema.ts`            | Syllabus payload              |
-| `subject.schema.ts`             | Subject payload               |
-| `chapter.schema.ts`             | Chapter payload               |
-| `topic.schema.ts`               | Topic payload                 |
-| `competitiveTopicMap.schema.ts` | Topic mapping                 |
-| `question.schema.ts`            | Question creation             |
-| `quiz.schema.ts`                | Quiz creation                 |
-| `bestBook.schema.ts`            | Book recommendations          |
-| `contactUs.schema.ts`           | Contact form                  |
-| `geolocation.schema.ts`         | State/District                |
-| `user.schema.ts`                | User input                    |
+- ✅ **Topic reuse:** No duplication across exams via CompetitiveTopicMap
+- ✅ **Syllabus versioning:** Track curriculum changes with OfficialSyllabus
+- ✅ **Validity periods:** validFrom/validTo on maps allow temporal queries
+- ✅ **Optional content:** Mark chapters/topics as optional per syllabus
+- ✅ **Soft deletes:** No data loss, full audit trail
+- ✅ **Commerce:** Course, pricing, coupons, access control fully supported
+- ✅ **Analytics:** Activity logging, progress tracking, engagement metrics
+- ✅ **Future-proof:** Extensible for videos, assignments, AI recommendations
 
 ---
 
-## 4. `src/services/`
+## 🎯 Key Design Decisions
 
-**Purpose:**
-Business logic layer (NO HTTP, NO validation).
-
-Services:
-
-* Talk to MongoDB
-* Use schemas + mappers
-* Return clean DTOs
-
----
-
-### Core academic services
-
-| Service                     | Responsibility        |
-| --------------------------- | --------------------- |
-| `educationLevel.service.ts` | CRUD education levels |
-| `course.service.ts`         | CRUD courses          |
-| `exam.service.ts`           | CRUD exams            |
-| `syllabus.service.ts`       | Manage syllabus       |
-| `subject.service.ts`        | Subject logic         |
-| `chapter.service.ts`        | Chapter logic         |
-| `topic.service.ts`          | Topic logic           |
-| `question.service.ts`       | Question CRUD         |
-| `quiz.service.ts`           | Quiz creation & fetch |
+| Decision | Rationale |
+|----------|-----------|
+| Exam-first hierarchy | Most queries start from exam selection |
+| Topic independence | Topics reusable without duplication across exams |
+| Mapping tables | Allows versioning and temporal queries |
+| Soft deletes only | Audit trail and data recovery |
+| Multilingual core | Not bolted-on later |
+| Service layer | Centralized business logic |
+| DTOs with mappers | Clean API contracts |
+| Activity logging | Full audit trail required |
+| UUID for users | Privacy-compliant identifiers |
+| Question always has topicId | Ensures proper classification |
+| SubjectMap → ChapterMap → TopicMap | Enforces strict hierarchy |
+| validFrom/validTo on maps | Curriculum changes traceable |
 
 ---
 
-### Utility services
+## 📞 Documentation Guidelines
 
-| Service                | Purpose               |
-| ---------------------- | --------------------- |
-| `bestBook.service.ts`  | Recommended books     |
-| `contactUs.service.ts` | Save contact requests |
-| `user.service.ts`      | User management       |
-
----
-
-## 5. `src/scripts/`
-
-Scripts are **NOT part of runtime**.
-
----
-
-### 5.1 `init-db.ts`
-
-**Purpose:**
-
-* Force MongoDB to create collections
-* Ensure indexes exist
-* Used during setup or CI
-
-Runs manually:
-
-```bash
-npx ts-node src/scripts/init-db.ts
-```
-
----
-
-### 5.2 `src/scripts/seed/`
-
-**Purpose:**
-Insert initial reference data.
-
-| File                  | Seeds              |
-| --------------------- | ------------------ |
-| `geolocation.seed.ts` | States & districts |
-| `education.seed.ts`   | Class 6–12         |
-| `syllabus.seed.ts`    | Initial syllabus   |
-
----
-
-## Final Architecture Principle
-
-* **lib** → infrastructure
-* **models** → structure
-* **validation** → safety
-* **services** → business logic
-* **scripts** → setup only
+1. All schema files include comments explaining relationships
+2. Each model has a corresponding DTO and mapper
+3. Service layer wraps all model access
+4. API routes validate with Zod schemas
+5. Updates to models must maintain backward compatibility
