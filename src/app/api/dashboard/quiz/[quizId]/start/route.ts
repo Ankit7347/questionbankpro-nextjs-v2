@@ -9,10 +9,10 @@ import { startQuizAttempt } from "@/services/server/quizSubmission.service";
 async function resolveUser(req?: Request) {
   await dbConnect();
   const session = await auth();
-  const headerUuid = req?.headers.get("x-user-id") || undefined;
-  const userUuid = session?.user?.id || headerUuid;
+  const userUuid = session?.user?.id;
   if (!userUuid) return null;
-  return userUuid;
+  const user = await User.findOne({ uuid: userUuid, isDeleted: false }).lean();
+  return user?._id || null;
 }
 
 export async function POST(

@@ -8,8 +8,7 @@ import { getUserSubmissions } from "@/services/server/quizSubmission.service";
 async function resolveUser(req?: Request) {
   await dbConnect();
   const session = await auth();
-  const headerUuid = req?.headers.get("x-user-id") || undefined;
-  const userUuid = session?.user?.id || headerUuid;
+  const userUuid = session?.user?.id;
   if (!userUuid) return null;
   const user = await User.findOne({ uuid: userUuid, isDeleted: false }).lean();
   return user || null;
@@ -21,7 +20,7 @@ export async function GET(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const quizzes = await getQuizzesBySubExam(user.subExamId?.toString() || "");
-    const submissions = await getUserSubmissions(user.uuid);
+    const submissions = await getUserSubmissions(user._id.toString());
 
     const evaluatedSubmissions = submissions.filter((s: any) => s.status === "evaluated");
     const avgScore =

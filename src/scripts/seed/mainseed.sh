@@ -9,7 +9,7 @@ export MONGODB_URI="mongodb://root:root@localhost:27017/questionbankpro?authSour
 # npx tsx coupon-gate-2026-cs-it-seed.ts
 # npx tsx geolocationstatesdistricts.seed.ts
 # npx tsx previousPaper.seed.ts
-# npx tsx quiz.seed.ts
+npx tsx quiz.seed.ts
 # npx tsx solvedPaper.seed.ts
 npx tsx notes.seed.ts
 npx tsx user-note-activities.seed.ts
