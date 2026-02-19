@@ -20,10 +20,7 @@ import Chapter from "@/models/mongoose/Chapter.schema";
 import Topic from "@/models/mongoose/Topic.schema";
 import UserNoteActivity from "@/models/mongoose/UserNoteActivity.schema";
 import { mapNoteToDTO } from "@/models/dto/note.mapper";
-import { mapSubject } from "@/models/dto/subject.mapper";
-import { mapChapter } from "@/models/dto/chapter.mapper";
-import { mapTopic } from "@/models/dto/topic.mapper";
-import { getCurrentLang } from "@/lib/i18n";
+import { getCurrentLang, resolveI18nField } from "@/lib/i18n";
 import { NotFound } from "@/lib/apiError";
 import { Types } from "mongoose";
 
@@ -90,11 +87,10 @@ export async function getNotesOverview(userUuidFromSession: string) {
     );
     // Progress: (totalNotes / 50) * 100, capped at 100
     const progress = Math.min((activity.totalNotes / 50) * 100, 100);
-    const subjectDTO = subjectDoc ? mapSubject(subjectDoc, lang) : null;
 
     return {
-      id: activity._id.toString(),
-      name: subjectDTO?.name || "Unknown",
+      slug: subjectDoc?.slug || "",
+      name: resolveI18nField(subjectDoc?.name, lang) || "Unknown",
       totalNotes: activity.totalNotes,
       progress: Math.round(progress),
     };
@@ -107,9 +103,9 @@ export async function getNotesOverview(userUuidFromSession: string) {
       path: "noteId",
       select: "title subjectId chapterId topicId",
       populate: [
-        { path: "subjectId", select: "name isDeleted" },
-        { path: "chapterId", select: "name isDeleted" },
-        { path: "topicId", select: "name isDeleted" },
+        { path: "subjectId", select: "name slug isDeleted" },
+        { path: "chapterId", select: "name slug isDeleted" },
+        { path: "topicId", select: "name slug isDeleted" },
       ],
     })
     .lean();
@@ -121,15 +117,18 @@ export async function getNotesOverview(userUuidFromSession: string) {
 
   let recentNoteData = undefined;
   if (recentActivity?.noteId) {
-    const topicDTO = recentActivity.noteId.topicId ? mapTopic(recentActivity.noteId.topicId, lang) : null;
-    const chapterDTO = recentActivity.noteId.chapterId ? mapChapter(recentActivity.noteId.chapterId, lang) : null;
-    const subjectDTO = recentActivity.noteId.subjectId ? mapSubject(recentActivity.noteId.subjectId, lang) : null;
+    const note: any = recentActivity.noteId;
+    const subject = note.subjectId;
+    const chapter = note.chapterId;
+    const topic = note.topicId;
 
     recentNoteData = {
-      topicId: topicDTO?.id || "",
-      topicName: topicDTO?.name || "No Topic",
-      chapterName: chapterDTO?.name || "No Chapter",
-      subjectName: subjectDTO?.name || "Unknown",
+      topicSlug: topic?.slug || "",
+      chapterSlug: chapter?.slug || "",
+      subjectSlug: subject?.slug || "",
+      topicName: resolveI18nField(topic?.name, lang) || "No Topic",
+      chapterName: resolveI18nField(chapter?.name, lang) || "No Chapter",
+      subjectName: resolveI18nField(subject?.name, lang) || "Unknown",
       progress: Math.min((recentActivity.readCount / 10) * 100, 100),
       lastAccessed: getTimeAgo(recentActivity.lastActive),
     };
@@ -148,7 +147,7 @@ export async function getNotesOverview(userUuidFromSession: string) {
  */
 export async function getNotesBySubject(
   userUuidFromSession: string,
-  subjectId: string
+  subjectSlug: string
 ) {
   await dbConnect();
   const lang = getCurrentLang();
@@ -156,10 +155,9 @@ export async function getNotesBySubject(
 
   // Verify subject exists
   const subject = await Subject.findOne({
-    _id: subjectId,
+    slug: subjectSlug,
     isDeleted: false,
   }).lean();
-
   if (!subject) {
     throw NotFound("Subject not found");
   }
@@ -178,7 +176,7 @@ export async function getNotesBySubject(
     { $unwind: "$note" },
     {
       $match: {
-        "note.subjectId": new Types.ObjectId(subjectId),
+        "note.subjectId": new Types.ObjectId(subject._id),
         "note.isDeleted": false,
       },
     },
@@ -205,12 +203,11 @@ export async function getNotesBySubject(
       (c) => c._id.toString() === chapterData._id?.toString()
     );
     const progress = Math.min((chapterData.totalNotes / 30) * 100, 100);
-    const chapterDTO = chapter ? mapChapter(chapter, lang) : null;
 
     return {
-      id: chapterData._id?.toString() || "",
-      title: chapterDTO?.name || "Unknown",
-      description: chapterDTO?.description || "",
+      slug: chapter?.slug || "",
+      title: resolveI18nField(chapter?.name, lang) || "Unknown",
+      description: chapter?.description || "",
       totalNotes: chapterData.totalNotes,
       totalTopics: 0,
       completedTopics: chapterData.totalNotes,
@@ -223,12 +220,10 @@ export async function getNotesBySubject(
     0
   );
 
-  const subjectDTO = mapSubject(subject, lang);
-
   return {
     subject: {
-      id: subjectDTO.id,
-      name: subjectDTO.name,
+      slug: subject.slug,
+      name: resolveI18nField(subject.name, lang),
     },
     chapters: chaptersWithProgress,
     stats: {
@@ -244,20 +239,31 @@ export async function getNotesBySubject(
  */
 export async function getNotesByChapter(
   userUuidFromSession: string,
-  subjectId: string,
-  chapterId: string
+  subjectSlug: string,
+  chapterSlug: string
 ) {
   await dbConnect();
   const lang = getCurrentLang();
   const userId = await getUserIdFromSession(userUuidFromSession);
 
+  // Lookup chapter by slug
   const chapter = await Chapter.findOne({
-    _id: chapterId,
+    slug: chapterSlug,
     isDeleted: false,
   }).lean();
 
   if (!chapter) {
     throw NotFound("Chapter not found");
+  }
+
+  // Lookup subject by slug to get its ID for filtering
+  const subject = await Subject.findOne({
+    slug: subjectSlug,
+    isDeleted: false,
+  }).lean();
+
+  if (!subject) {
+    throw NotFound("Subject not found");
   }
 
   // Get user's activities for notes in this chapter
@@ -274,8 +280,8 @@ export async function getNotesByChapter(
     { $unwind: "$note" },
     {
       $match: {
-        "note.chapterId": new Types.ObjectId(chapterId),
-        "note.subjectId": new Types.ObjectId(subjectId),
+        "note.chapterId": new Types.ObjectId(chapter._id),
+        "note.subjectId": new Types.ObjectId(subject._id),
         "note.isDeleted": false,
       },
     },
@@ -302,11 +308,10 @@ export async function getNotesByChapter(
     const topic = topics.find(
       (t) => t._id.toString() === topicData._id?.toString()
     );
-    const topicDTO = topic ? mapTopic(topic, lang) : null;
 
     return {
-      id: topicData._id?.toString() || "",
-      title: topicDTO?.name || "Unknown",
+      slug: topic?.slug || "",
+      title: resolveI18nField(topic?.name, lang) || "Unknown",
       notesCount: topicData.totalNotes,
       progress: topicData.totalNotes > 0 ? 100 : 0,
       lastNoteTime: topicData.lastActive
@@ -315,12 +320,10 @@ export async function getNotesByChapter(
     };
   });
 
-  const chapterDTO = mapChapter(chapter, lang);
-
   return {
     chapter: {
-      id: chapterDTO.id,
-      title: chapterDTO.name,
+      slug: chapter.slug,
+      title: resolveI18nField(chapter.name, lang),
     },
     topics: topicsWithNotes,
     stats: {
@@ -336,18 +339,26 @@ export async function getNotesByChapter(
  */
 export async function getNotesByTopic(
   userUuidFromSession: string,
-  subjectId: string,
-  chapterId: string,
-  topicId: string
+  subjectSlug: string,
+  chapterSlug: string,
+  topicSlug: string
 ) {
   await dbConnect();
   const userId = await getUserIdFromSession(userUuidFromSession);
 
+  // Lookup topic by slug
+  const topic = await Topic.findOne({
+    slug: topicSlug,
+    isDeleted: false,
+  }).lean();
+
+  if (!topic) {
+    throw NotFound("Topic not found");
+  }
+
   // Get notes for this topic
   const notes = await Note.find({
-    subjectId: new Types.ObjectId(subjectId),
-    chapterId: new Types.ObjectId(chapterId),
-    topicId: new Types.ObjectId(topicId),
+    topicId: new Types.ObjectId(topic._id),
     isDeleted: false,
   })
     .sort({ isPinned: -1, createdAt: -1 })

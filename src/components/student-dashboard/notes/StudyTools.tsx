@@ -17,12 +17,18 @@ export const StudyTools = () => (
         { name: 'Saved', icon: <Bookmark className="w-4 h-4" />, color: 'text-pink-500', bg: 'bg-pink-500/10', href: '/dashboard/notes/saved', gradient: 'from-pink-500 to-rose-500' },
       ].map((tool) => (
         <Link key={tool.name} href={tool.href} className="block group">
-          <GlassCard className={`flex items-center gap-3 p-3 hover:border-slate-300 dark:hover:border-slate-700 transition-all active:scale-95 h-full ${tool.gradient}`}>
-            <div className={`p-2 rounded-lg ${tool.bg} ${tool.color}`}>
-              {tool.icon}
+          <GlassCard className="h-full">
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className={`w-8 h-8 flex items-center justify-center rounded-lg ${tool.bg} ${tool.color}`}>
+                {tool.icon}
+              </div>
+
+              <span className="text-sm font-medium text-center text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                {tool.name}
+              </span>
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{tool.name}</span>
           </GlassCard>
+
         </Link>
       ))}
     </div>

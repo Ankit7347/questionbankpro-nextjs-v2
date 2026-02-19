@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { Sparkles, Clock, ChevronRight, BookOpen } from 'lucide-react';
 
 export interface QuickResumeData {
-  topicId: string;
+  topicSlug: string;
+  chapterSlug: string;
+  subjectSlug: string;
   topicName: string;
   chapterName: string;
   subjectName: string;
@@ -48,7 +50,7 @@ export const QuickResume = ({ data }: QuickResumeProps) => {
         <Link href="#" className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 font-medium">View History</Link>
       </div>
 
-      <Link href={`/dashboard/notes/${data.subjectName.toLowerCase()}/${data.chapterName.toLowerCase()}/${data.topicId}`}>
+      <Link href={`/dashboard/notes/${data.subjectSlug}/${data.chapterSlug}/${data.topicSlug}`}>
         <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 hover:border-cyan-500/30 transition-all cursor-pointer active:scale-[0.99] shadow-sm dark:shadow-none">
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative bg-slate-50/50 dark:bg-slate-950/50 rounded-xl p-5 backdrop-blur-sm">

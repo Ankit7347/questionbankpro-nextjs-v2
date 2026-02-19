@@ -26,7 +26,7 @@ export interface NotesOverviewData {
  * Info about notes in a subject
  */
 export interface SubjectNotes {
-  id: string;
+  slug: string;
   name: string;
   totalNotes: number;
   progress: number;
@@ -38,7 +38,9 @@ export interface SubjectNotes {
  * For the "Continue Learning" section
  */
 export interface RecentNoteData {
-  topicId: string;
+  topicSlug: string;
+  chapterSlug: string;
+  subjectSlug: string;
   topicName: string;
   chapterName: string;
   subjectName: string;
@@ -53,7 +55,7 @@ export interface RecentNoteData {
  */
 export interface SubjectChaptersData {
   subject: {
-    id: string;
+    slug: string;
     name: string;
   };
   chapters: ChapterData[];
@@ -68,7 +70,7 @@ export interface SubjectChaptersData {
  * ============
  */
 export interface ChapterData {
-  id: string;
+  slug: string;
   title: string;
   description?: string;
   totalNotes: number;
@@ -82,8 +84,59 @@ export interface ChapterData {
  * ==========
  */
 export interface TopicData {
-  id: string;
+  slug: string;
   title: string;
   notesCount: number;
   progress: number;
+}
+/**
+ * Chapter Topics Data
+ * ===================
+ * Returned by /api/dashboard/notes/[subjectId]/[chapterId]
+ */
+export interface ChapterTopicsData {
+  chapter: {
+    slug: string;
+    title: string;
+    description?: string;
+  };
+  topics: TopicData[];
+  stats: {
+    totalNotes: number;
+    totalTopics: number;
+    completedTopics: number;
+  };
+}
+
+/**
+ * Topic Notes Data
+ * ================
+ * Returned by /api/dashboard/notes/[subjectId]/[chapterId]/[topicId]
+ */
+export interface TopicNotesData {
+  topic: {
+    slug: string;
+    title: string;
+    difficulty?: string;
+  };
+  chapter: {
+    slug: string;
+    title: string;
+  };
+  notes: NoteItem[];
+  stats: {
+    totalNotes: number;
+  };
+}
+
+/**
+ * Note Item
+ * =========
+ */
+export interface NoteItem {
+  id: string;
+  title: string;
+  content: string;
+  type: "text" | "image" | "link";
+  createdDate: string;
 }

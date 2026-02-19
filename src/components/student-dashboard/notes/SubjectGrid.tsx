@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MoreVertical, TrendingUp, ChevronRight } from 'lucide-react';
 
 export interface Subject {
-  id: string;
+  slug: string;
   name: string;
   icon: React.ReactNode;
   totalNotes: number;
@@ -29,7 +29,7 @@ export const SubjectGrid = ({ subjects }: SubjectGridProps) => (
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {subjects.map((subject) => (
-        <Link key={subject.id} href={`/dashboard/notes/${subject.id}`}>
+        <Link key={subject.slug} href={`/dashboard/notes/${subject.slug}`}>
           <div className="group relative h-full">
             <div className={`absolute inset-0 bg-gradient-to-br ${subject.gradient} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
             <div className="relative h-full rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-5 hover:border-slate-300 dark:hover:border-slate-700/50 transition-all cursor-pointer flex flex-col justify-between backdrop-blur-sm active:scale-[0.99] shadow-sm dark:shadow-none">

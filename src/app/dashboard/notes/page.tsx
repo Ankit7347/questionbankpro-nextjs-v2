@@ -100,7 +100,7 @@ export default async function NotesPage() {
 
   // Map subjects to Subject type with configs
   const subjects: Subject[] = data.subjects.map((s) => ({
-    id: s.id,
+    slug: s.slug,
     name: s.name,
     totalNotes: s.totalNotes,
     progress: s.progress,
@@ -111,7 +111,9 @@ export default async function NotesPage() {
   let quickResumeData: QuickResumeData | undefined;
   if (data.recentNote) {
     quickResumeData = {
-      topicId: data.recentNote.topicId,
+      topicSlug: data.recentNote.topicSlug,
+      chapterSlug: data.recentNote.chapterSlug,
+      subjectSlug: data.recentNote.subjectSlug,
       topicName: data.recentNote.topicName,
       chapterName: data.recentNote.chapterName,
       subjectName: data.recentNote.subjectName,
