@@ -1,104 +1,154 @@
-// # Quiz System Architecture
+# Quiz System Architecture
 
 ## Overview
 
-The Quiz system has been completely redesigned to support a hierarchical structure:
+The Quiz system supports multilevel assessment grouped by hierarchy:
 
 ```
 Exam → SubExam → Subject → Chapter → Topic
-              ↓
-           Quiz
-             ↓
-       QuizSubmission (user attempts)
+                    ↓
+                 Quiz (quizType determines level)
+                    ↓
+            QuizSubmission (user attempts)
 ```
+
+**Quiz Types:**
+- `topic` - Single topic practice
+- `chapter` - Full chapter assessment
+- `subject` - Complete subject exam
+- `full_syllabus` - Entire syllabus mock
+- `mock_test` - Full exam simulation
 
 ## Schemas
 
 ### 1. Quiz.schema.ts
 
-**Purpose**: Core quiz definition linked at all levels (Exam to Topic)
+**Purpose**: Core quiz definition - tracks assessment metadata and hierarchy
 
 **Key Fields**:
-- `examId`, `subExamId`:  Parent exam/subexam
-- `subjectId`, `chapterId`, `topicId`: Optional, depends on quiz type
-- `quizType`: "topic" | "chapter" | "subject" | "full_syllabus" | "mock_test"
-- `questionIds`: Array of question ObjectIds
-- `totalQuestions`, `durationMinutes`, `totalMarks`: Metadata
-- `marksPerQuestion`, `negativeMarking`: Scoring config
-- `isPublished`, `publishedAt`, `startDate`, `endDate`: Availability control
-- `allowMultipleAttempts`: Whether user can retry
+- `title` (en/hi): Quiz title
+- `description` (en/hi): Quiz description
+- `quizType`: Type of quiz (topic|chapter|subject|full_syllabus|mock_test)
+- `examId` (ref): Parent exam
+- `subExamId` (ref): Parent subexam (required)
+- `subjectId` (ref, optional): Subject (required if topic/chapter/subject quiz)
+- `chapterId` (ref, optional): Chapter (required if topic/chapter quiz)
+- `topicId` (ref, optional): Topic (required if topic quiz)
+- `questionCount`: Number of questions in quiz
+- `timeLimit` (minutes): Time allowed to complete
+- `shuffleQuestions` (boolean): Whether to randomize question order
+- `passingScore` (%): Minimum percentage to pass
+- `isPublished` (boolean): Whether quiz is live
+- `isDeleted` (boolean): Soft delete flag
+- `createdBy` (optional): User UUID who created
+- `updatedBy` (optional): User UUID who updated
 
 **Indexes**:
-```
-{ examId: 1, subExamId: 1 }
-{ subExamId: 1, subjectId: 1, chapterId: 1, topicId: 1 }
-{ isPublished: 1, publishedAt: -1 }
+```typescript
+{ examId: 1, quizType: 1 }              // List quizzes by exam
+{ subExamId: 1 }                        // Find all quizzes for subexam
+{ isPublished: 1 }                      // Find published quizzes
 ```
 
-### 2. QuizSubmission.schema.ts
+### 2. Question.schema.ts
 
-**Purpose**: Track user quiz attempts and scores
+**Purpose**: Individual assessment items linked to topics
 
 **Key Fields**:
-- `userId`, `quizId`: User + Quiz reference
-- `attemptNumber`: Which attempt (1st, 2nd, etc.)
-- `startedAt`, `submittedAt`: Timestamps
-- `timeSpentSeconds`: Duration spent
-- `answers[]`: Array of answered questions with marks
-- `totalMarksObtained`, `totalMarksMaximum`: Final score
-- `percentageScore`: Calculated percentage (0-100)
-- `correctAnswersCount`, `wrongAnswersCount`, `unattemptedCount`: Breakdown
-- `status`: "in_progress" | "submitted" | "evaluated"
+- `content` (en/hi): Question text (HTML)
+- `type` (MCQ|SUBJECTIVE|TRUE_FALSE): Question format
+- `options` (array): For MCQ - [{text (en/hi), isCorrect}]
+- `explanation` (en/hi): Explanation for answer
+- `marks`: Points for this question
+- `difficulty` (Easy|Medium|Hard): Difficulty level
+- `displayOrder`: Position in quiz
+- `subjectId` (ref): Subject
+- `chapterId` (ref): Chapter
+- `topicId` (ref): Topic (required - rule: one topic per question)
+- `images` (array): URLs to images
+
+**Key Rule:** Each question belongs to exactly ONE topic.
+
+---
+
+### 3. QuizSubmission.schema.ts
+
+**Purpose**: Track user quiz attempts and performance
+
+**Key Fields**:
+- `userId` (ref): User taking quiz
+- `quizId` (ref): Quiz being taken
+- `attemptNumber` (integer): Attempt number (1st, 2nd, 3rd...)
+- `startedAt` (Date): When user started
+- `submittedAt` (Date): When user submitted
+- `score` (number): Points obtained
+- `totalMarks` (number): Total possible points
+- `answers` (array): [{questionId, selectedAnswer, isCorrect}]
+- `timeSpent` (seconds): Duration from start to submit
+- `isDeleted`, `createdAt`, `updatedAt`: Base fields
+
+**Calculation Fields** (derived on submit):
+- `percentageScore = (score / totalMarks) * 100`
+- `passStatus = percentageScore >= quiz.passingScore`
 
 **Indexes**:
-```
-{ userId: 1, quizId: 1 }
-{ userId: 1, status: 1 }
-{ quizId: 1, status: 1 }
-{ submittedAt: -1 }
+```typescript
+{ userId: 1, quizId: 1 }    // Find user's submissions for a quiz
+{ userId: 1 }               // All submissions by user
+{ quizId: 1 }               // All submissions for a quiz
+{ submittedAt: -1 }         // Recent submissions
 ```
 
 ## Services
 
 ### quiz.service.ts
 
-Functions:
+Typical functions (add via services/server/quiz.server.ts):
 ```typescript
-getQuizzesBySubExam(subExamId)        // Get all published quizzes
-getQuizzesByType(subExamId, type, filterIds)  // Get by level
-getQuizById(quizId)                   // Fetch single quiz with questions
-createQuiz(payload)                   // Admin: create
-updateQuiz(quizId, updates)           // Admin: update
+listQuizzesByExam(examId, lang)         // Get all published quizzes for exam
+listQuizzesBySubExam(subExamId, lang)   // Get quizzes by subexam
+listQuizzesByType(subExamId, type, lang) // Filter by quizType
+getQuizById(quizId, lang)                // Fetch quiz details
+createQuiz(payload)                      // Admin: create
+updateQuiz(quizId, payload)              // Admin: update
 ```
 
 ### quizSubmission.service.ts
 
-Functions:
+Typical functions (add via services/server/quizSubmission.server.ts):
 ```typescript
-startQuizAttempt(userId, quizId, totalMarks)
-submitQuizAnswers(submissionId, answers)
-evaluateSubmission(submissionId)     // Auto-grade MCQs
-getUserSubmissions(userId)            // All user's submissions
-getQuizSubmissions(quizId)            // All submissions for a quiz
-getSubmission(submissionId)           // Fetch one submission
+startQuiz(userUuid, quizId)              // Create new QuizSubmission with status in_progress
+submitQuiz(submissionId, answers)        // Submit answers + auto-evaluate MCQs
+getSubmission(submissionId, userUuid)    // Fetch one submission (security check)
+getUserSubmissions(userUuid)              // All submissions for user
+getQuizSubmissions(quizId)               // All submissions for a quiz
+getUserQuizStats(userUuid, quizId)       // Stats for user on specific quiz
 ```
 
-## API Endpoints
+**Note:** Mappers apply language resolution (resolveI18nField) via getCurrentLang()
+
+## API Endpoints (Typical)
 
 ### GET /api/dashboard/quiz
-**Description**: List all quizzes for user's subexam + their submissions
-**Auth**: Required (session/header)
+**Description**: List available quizzes and user's submission history
+**Auth**: Required (session UUID)
+**Query Params:**
+- `quizType` (optional): Filter by type (topic|chapter|subject|full_syllabus|mock_test)
+- `subExamId` (optional): Filter by subexam
+
 **Response**:
 ```json
 {
-  "quizzes": [...],
-  "submissions": [...],
+  "availableQuizzes": [
+    { "id": "quiz123", "title": "Newton's Laws", "quizType": "topic", "timeLimit": 15, "isPublished": true }
+  ],
+  "submissions": [
+    { "id": "submission456", "quizId": "quiz123", "score": 8, "totalMarks": 10, "percentageScore": 80 }
+  ],
   "stats": {
-    "totalQuizzes": 15,
-    "totalAttempts": 8,
-    "averageScore": 72.5,
-    "lastAttempt": "2025-02-14T10:30:00Z",
-    "totalEvaluated": 8
+    "totalAttempts": 5,
+    "averageScore": 75,
+    "bestScore": 90
   }
 }
 ```
@@ -106,7 +156,16 @@ getSubmission(submissionId)           // Fetch one submission
 ### POST /api/dashboard/quiz/[quizId]/start
 **Description**: Start a new quiz attempt
 **Auth**: Required
-**Response**: QuizSubmission DTO with `status: "in_progress"`
+**Response**: QuizSubmissionDTO
+```json
+{
+  "id": "submission789",
+  "quizId": "quiz123",
+  "attemptNumber": 1,
+  "startedAt": "2025-02-19T10:00:00Z",
+  "timeLimit": 15
+}
+```
 
 ### POST /api/dashboard/quiz/submission/[submissionId]/submit
 **Description**: Submit answers and auto-evaluate
@@ -115,122 +174,248 @@ getSubmission(submissionId)           // Fetch one submission
 ```json
 {
   "answers": [
-    { "questionId": "...", "selectedOptionId": "..." },
-    { "questionId": "...", "answerText": "..." }
+    { "questionId": "q1", "selectedOption": "A" },
+    { "questionId": "q2", "selectedOption": "C" },
+    { "questionId": "q3", "answerText": "Sample answer" }
   ]
 }
 ```
-**Response**: Evaluated QuizSubmission with scores
+**Response**: Evaluated QuizSubmissionDTO
+```json
+{
+  "id": "submission789",
+  "score": 7,
+  "totalMarks": 10,
+  "percentageScore": 70,
+  "passingScore": 60,
+  "passed": true,
+  "submittedAt": "2025-02-19T10:15:00Z",
+  "timeSpent": 900
+}
+```
 
 ### GET /api/dashboard/quiz/submission/[submissionId]
-**Description**: Fetch a specific submission result
+**Description**: Fetch submission details with answers and explanation
 **Auth**: Required
-**Response**: QuizSubmission DTO
+**Response**: QuizSubmissionDTO with detailed answers
 
 ## DTOs
 
 ### QuizDTO
-Maps Quiz.schema → client format
-- All fields camelCase
-- ObjectIds converted to strings
-- Dates as ISO strings
+**Mapper:** `src/models/dto/quiz.mapper.ts`
 
-### QuizSubmissionDTO  
-Maps QuizSubmission.schema → client format
-- Answers array with proper formatting
-- Score calculations included
-- Status and timestamps
+Maps Quiz.schema → client format:
+```typescript
+interface QuizDTO {
+  id: string;
+  title: string;                    // Resolved via resolveI18nField(quiz.title, lang)
+  description: string;              // Resolved
+  quizType: string;
+  questionCount: number;
+  timeLimit: number;
+  passingScore: number;
+  shuffleQuestions: boolean;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### QuizSubmissionDTO
+**Mapper:** `src/models/dto/quizSubmission.mapper.ts`
+
+Maps QuizSubmission.schema → client format:
+```typescript
+interface QuizSubmissionDTO {
+  id: string;
+  quizId: string;
+  userId: string;
+  attemptNumber: number;
+  startedAt: Date;
+  submittedAt: Date | null;
+  score: number;
+  totalMarks: number;
+  percentageScore: number;          // Calculated: (score/totalMarks)*100
+  passingScore: number;             // From quiz
+  passed: boolean;                  // percentageScore >= passingScore
+  timeSpent: number;                // In seconds
+  answers: Array<{                  // Detailed answer breakdown
+    questionId: string;
+    selectedAnswer: string;
+    isCorrect: boolean;
+    marksObtained: number;
+  }>;
+}
+```
 
 ## Usage Flow
 
-### 1. User Starts a Quiz
-```javascript
-// Fetch available quizzes
-GET /api/dashboard/quiz
+### 1. User Views Available Quizzes
+```typescript
+// Frontend calls:
+GET /api/dashboard/quiz?quizType=topic
 
-// Start quiz attempt
-POST /api/dashboard/quiz/63abc123/start
-// Response: { id: "submissionId", status: "in_progress", ... }
+// Response contains:
+// - availableQuizzes: List of published quizzes
+// - submissions: User's previous submission history
+// - stats: Average score, total attempts, etc.
 ```
 
-### 2. User Answers Questions
-```javascript
-// UI tracks selected options/answers in memory
-// On time limit or manual submit, send:
-POST /api/dashboard/quiz/submission/submissionId/submit
-Body: { answers: [...] }
+### 2. User Starts a Quiz
+```typescript
+// Frontend calls:
+POST /api/dashboard/quiz/[quizId]/start
 
-// Response: { status: "evaluated", percentageScore: 75, ... }
+// Backend:
+// - Creates QuizSubmission with status "in_progress"
+// - Returns submission ID and time limit
+// - Frontend starts timer
 ```
 
-### 3. User Reviews Results
-```javascript
-GET /api/dashboard/quiz/submission/submissionId
-// Shows full breakdown: correct, wrong, unattempted, marks
+### 3. User Answers Questions
+```typescript
+// Frontend:
+// - Displays questions from quiz (fetched separately or embedded)
+// - Tracks selected answers in memory
+// - Shows time remaining
+
+// On submit (manual or time limit):
+POST /api/dashboard/quiz/submission/[submissionId]/submit
+Body: {
+  answers: [
+    { questionId: "q1", selectedOption: "A", answerText: "" },
+    { questionId: "q2", selectedOption: "", answerText: "Answer here" }
+  ]
+}
+
+// Backend:
+// - Auto-evaluates MCQs
+// - Stores answers in QuizSubmission
+// - Returns score, percentage, pass status
+```
+
+### 4. User Reviews Results
+```typescript
+// Frontend calls:
+GET /api/dashboard/quiz/submission/[submissionId]
+
+// Response shows:
+// - Detailed scores
+// - Correct/incorrect answers with explanations
+// - Performance breakdown
 ```
 
 ## Dashboard Integration
 
-The `/dashboard/quiz` page now displays:
-- **Available Quizzes** (by type: topic, chapter, subject, full)
-- **Recent Submissions** (with scores and dates)
-- **Performance Stats** (total, average, last attempt)
+The `/dashboard` page quiz section displays:
+- **Available Quizzes** (filtered by type: topic, chapter, subject, full_syllabus, mock_test)
+- **Recent Submissions** (with scores, dates, and pass status)
+- **Performance Stats** (total attempts, average score, best score)
+- **Next Quiz to Attempt** (suggested based on learning progress)
 
-## Admin Operations (Future)
+## Admin Operations
 
+**Create Quiz:**
 ```typescript
-// Create topic-level quiz
 POST /api/admin/quiz
 Body: {
-  title: { en: "Thermodynamics Basics" },
-  quizType: "topic",
-  subExamId: "...",
-  subjectId: "...",
-  chapterId: "...",
-  topicId: "...",
-  questionIds: ["...", "...", "..."],
-  totalMarks: 10,
-  durationMinutes: 15
+  title: { en: "Thermodynamics Basics", hi: "थर्मोडायनामिक्स ..." },
+  description: { en: "... " },
+  quizType: "topic",           // topic | chapter | subject | full_syllabus | mock_test
+  examId: "exam123",
+  subExamId: "subexam456",
+  subjectId: "subject789",      // Required for topic/chapter/subject quiz
+  chapterId: "chapter101",      // Required for topic/chapter quiz
+  topicId: "topic202",          // Required for topic quiz
+  questionCount: 10,
+  timeLimit: 15,                // Minutes
+  passingScore: 60,             // Percentage
+  shuffleQuestions: true,
+  isPublished: false
 }
-
-// Publish quiz
-PATCH /api/admin/quiz/quizId
-Body: { isPublished: true, publishedAt: "2025-02-14T..." }
 ```
 
-## Key Details
+**Publish Quiz:**
+```typescript
+PATCH /api/admin/quiz/quizId
+Body: { isPublished: true }
+```
 
-### Negative Marking
-If `negativeMarking.enabled = true`:
-- Wrong answer deducts `marksPerWrongAnswer`
-- Only applies during evaluation in `evaluateSubmission()`
+**Note:** Questions are created separately via question.service.ts and linked via questionId references during quiz submission evaluation.
 
-### Multiple Attempts
-- If `allowMultipleAttempts = false` → Only 1 attempt per user
-- If `true` → Unlimited; `attemptNumber` increments
-- Dashboard shows best score or all attempts
+## Key Implementation Details
+
+### Multilingual Support
+- `title` and `description` fields are `{ en: string; hi?: string }`
+- In DTOs, resolved via `resolveI18nField(quiz.title, lang)` where `lang = getCurrentLang()`
+- Mappers apply this transformation automatically
+
+### Quiz Types & Levels
+- **topic:** Single topic quiz — must have `topicId`
+- **chapter:** Chapter assessment — must have `chapterId`
+- **subject:** Subject exam — must have `subjectId`
+- **full_syllabus:** Complete syllabus mock — covers all subjects
+- **mock_test:** Full exam simulation — same structure as full_syllabus
+
+### Scoring
+```typescript
+// During submission evaluation:
+let totalScore = 0;
+for (const questionId of submittedAnswers) {
+  const question = await Question.findById(questionId);
+  if (isCorrectAnswer(submittedAnswer, question)) {
+    totalScore += question.marks;  // Default: 1 if not set
+  }
+}
+
+quizSubmission.score = totalScore;
+quizSubmission.percentageScore = (totalScore / totalMarks) * 100;
+quizSubmission.passed = percentageScore >= quiz.passingScore;
+```
 
 ### Time Tracking
-`timeSpentSeconds` = submittedAt - startedAt (in seconds)
-- Useful for analytics and identifying speed vs accuracy
+```typescript
+timeSpent = (submittedAt - startedAt) / 1000  // Convert ms to seconds
+```
+Useful for analytics: identify speed vs accuracy correlations
 
-### Question Population
-Quiz.questionIds are referenced via populate()
-- During evaluation, question.marks are used per answer
-- Missing question marks default to 1
+### Multilevel Querying
+```typescript
+// Get all topic quizzes for a subject:
+Quiz.find({ 
+  isPublished: true, 
+  quizType: 'topic',
+  subjectId: subjectId
+})
 
-## Performance Considerations
+// Get all quizzes for a subexam (any level):
+Quiz.find({ 
+  isPublished: true, 
+  subExamId: subExamId 
+}).sort({ createdAt: -1 })
+```
 
-1. **Quizzes are published separately** → Unpublished quizzes ignored in queries
-2. **Answers are evaluated on-demand** → No batch background jobs needed (yet)
-3. **Indexes on userId + status** → Fast submission lookup per user
-4. **No denormalization**: All data source of truth in database
+### Question Relationship
+- Questions are independent documents linked by ID
+- Quiz stores `questionCount` (metadata only)
+- Actual question list fetched on quiz view
+- During submission, question.marks used for evaluation
+
+## Performance Notes
+
+1. **Indexing:** `{ examId: 1, quizType: 1 }` speeds up filtered queries
+2. **Soft deletes:** `isDeleted` flag ensures data preservation
+3. **On-demand evaluation:** No batch jobs; answers evaluated on submit
+4. **Language resolution:** Applied in mappers, not in queries
+5. **Activity audit:** `createdBy`, `updatedBy` track ownership
 
 ## Future Enhancements
 
-- [ ] Batch evaluation for large quizzes
-- [ ] Leaderboards via aggregation pipeline
+- [ ] Negative marking for wrong answers
+- [ ] Allow multiple attempts with best score tracking
+- [ ] Randomized question order per attempt
 - [ ] Timed auto-submit (timer expires)
 - [ ] Partial credit for subjective questions
 - [ ] Analytics: most-missed questions, time averages
-- [ ] Randomized question order per attempt
+- [ ] Leaderboards via aggregation pipeline
+- [ ] Question bank management UI
