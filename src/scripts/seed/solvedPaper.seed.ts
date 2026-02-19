@@ -1,6 +1,8 @@
 import { initSeed, closeSeed } from "./_helpers";
 import SolvedPaper from "../../models/mongoose/SolvedPaper.schema";
+import PreviousPaper from "../../models/mongoose/PreviousPaper.schema";
 import Exam from "../../models/mongoose/Exam.schema";
+import SubExam from "../../models/mongoose/SubExam.schema";
 import Subject from "../../models/mongoose/Subject.schema";
 
 // GATE CS/IT Solved Papers
@@ -194,6 +196,15 @@ async function seedSolvedPapers() {
 
     console.log(`✅ Found GATE Exam: ${gateExam.name?.en || gateExam.slug}`);
 
+    // Fetch SubExam (GATE 2026 CS/IT) - needed for PreviousPaper creation
+    const subExam = await SubExam.findOne({
+      slug: "gate-2026-cs-it",
+      isDeleted: false,
+    });
+    if (subExam) {
+      console.log(`✅ Found SubExam: ${subExam.name?.en || subExam.slug}`);
+    }
+
     // Find Computer Science subject
     let csSubject: any = null;
     
@@ -238,7 +249,52 @@ async function seedSolvedPapers() {
         continue;
       }
 
+      // Find or Create PreviousPaper
+      let previousPaper = await PreviousPaper.findOne({
+        year: paper.year,
+        subjectId: csSubject._id,
+        examId: gateExam._id,
+        isDeleted: false
+      });
+
+      if (!previousPaper) {
+        if (!subExam) {
+          console.warn(`⚠️  Skipping ${paper.paperCode} - Parent PreviousPaper not found and cannot create (missing SubExam).`);
+          continue;
+        }
+
+        const ppSlug = `gate-cs-${paper.year}-auto-seeded`;
+        previousPaper = await PreviousPaper.findOneAndUpdate(
+          { slug: ppSlug },
+          {
+            title: { en: `GATE ${paper.year} CS Question Paper`, hi: `GATE ${paper.year} CS प्रश्न पत्र` },
+            slug: ppSlug,
+            paperCode: `GATE-CS-${paper.year}-AUTO`,
+            examId: gateExam._id,
+            subExamId: subExam._id,
+            subjectId: csSubject._id,
+            year: paper.year,
+            contentType: "PDF",
+            status: "PUBLISHED",
+            isVerified: true,
+            createdBy: "seed-admin"
+          },
+          { upsert: true, new: true }
+        );
+        console.log(`   ↳ Created/Found parent PreviousPaper: ${previousPaper.paperCode}`);
+      }
+
+      const existingSolvedPaper = await SolvedPaper.findOne({
+        previousPaperId: previousPaper._id,
+      });
+
+      if (existingSolvedPaper) {
+        console.log(`⏭️  Skipped (SolvedPaper already exists for PreviousPaper): ${paper.paperCode}`);
+        continue;
+      }
+
       await SolvedPaper.create({
+        previousPaperId: previousPaper._id,
         title: paper.title,
         paperCode: paper.paperCode,
         slug,
