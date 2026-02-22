@@ -96,18 +96,22 @@ export default function BestBooksPage() {
     const fetchBooks = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (search) params.append("search", search);
+        const payload: any = {};
+        if (search) payload.search = search;
 
         if (activeTab === "recommended") {
-          params.append("recommended", "true");
+          payload.recommended = true;
         } else {
-          if (selectedExam && selectedExam !== "all") params.append("examSlug", selectedExam);
-          if (selectedSubExam && selectedSubExam !== "all") params.append("subExamSlug", selectedSubExam);
-          if (selectedSubject && selectedSubject !== "all") params.append("subjectSlug", selectedSubject);
+          if (selectedExam && selectedExam !== "all") payload.examSlug = selectedExam;
+          if (selectedSubExam && selectedSubExam !== "all") payload.subExamSlug = selectedSubExam;
+          if (selectedSubject && selectedSubject !== "all") payload.subjectSlug = selectedSubject;
         }
 
-        const res = await fetch(`/api/bestbook?${params.toString()}`);
+        const res = await fetch("/api/bestbook", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
         const json = await res.json();
         if (json.success) {
           setBooks(json.data);
@@ -217,7 +221,7 @@ export default function BestBooksPage() {
             </Select>
 
             <Select value={selectedSubject} onValueChange={(val) => { setSelectedSubject(val); setActiveTab("explore"); }}>
-              <SelectTrigger className="w-full" disabled={selectedSubExam === "all"}>
+              <SelectTrigger className="w-full" disabled={filteredSubjects.length === 0}>
                 <SelectValue placeholder="Select Subject" />
               </SelectTrigger>
               <SelectContent>

@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
-    const recommended = searchParams.get("recommended") === "true";
 
     // ---------------------------------------------------------
     // ACTION: METADATA (For Filters)
@@ -48,16 +47,32 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    return NextResponse.json({ success: false, message: "Invalid action" }, { status: 400 });
+  } catch (error: any) {
+    console.error("BestBook API Error:", error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+
     // ---------------------------------------------------------
     // ACTION: LIST BOOKS
     // ---------------------------------------------------------
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const search = searchParams.get("search") || "";
-    const examSlug = searchParams.get("examSlug");
-    const subExamSlug = searchParams.get("subExamSlug");
-    const subjectSlug = searchParams.get("subjectSlug");
-    const tags = searchParams.get("tags");
+    const page = parseInt(body.page || "1");
+    const limit = parseInt(body.limit || "20");
+    const search = body.search || "";
+    const examSlug = body.examSlug;
+    const subExamSlug = body.subExamSlug;
+    const subjectSlug = body.subjectSlug;
+    const tags = body.tags;
+    const recommended = body.recommended;
 
     const query: any = {
       isActive: true,
@@ -98,8 +113,8 @@ export async function GET(req: NextRequest) {
 
     // Tags
     if (tags) {
-      const tagList = tags.split(",").map((t) => t.trim());
-      if (tagList.length > 0) {
+      const tagList = typeof tags === "string" ? tags.split(",").map((t: string) => t.trim()) : tags;
+      if (Array.isArray(tagList) && tagList.length > 0) {
         query.tags = { $in: tagList };
       }
     }
