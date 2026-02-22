@@ -10,7 +10,7 @@ export interface GlassCardProps extends React.ComponentProps<typeof BaseCard> {}
  * background and some helper utilities.  Use this when you want a
  * frosted/glass effect without retyping the same Tailwind classes.
  *
- * The styles mimic the scheme used in `CourseCard` but can be used
+ * The styles mimic the scheme can be used
  * anywhere generic content is rendered.
  */
 export function GlassCard({ className, children, ...props }: GlassCardProps) {

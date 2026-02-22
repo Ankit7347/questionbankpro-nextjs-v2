@@ -69,7 +69,7 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<div className="px-4 py-10 md:px-10 max-w-8xl mx-auto">
+		<div className="md:px-10 max-w-8xl mx-auto">
 			{/* Header Section */}
 			<div className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/70 to-green-600/70 backdrop-blur-xl border border-white/20 p-6 md:p-8 shadow-xl">
 
@@ -112,10 +112,10 @@ export default function DashboardPage() {
 			<div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 				{features.map((feature) => (
 					<Link key={feature.href} href={feature.href} className="block h-full group" >
-						<Card className="h-full flex flex-col p-4 text-center items-center justify-between transition-all duration-300 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-500 hover:-translate-y-1 min-h-[160px] md:min-h-[180px]">
+						<Card className="h-full flex flex-col p-4 text-center items-center justify-between transition-all duration-300 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-500 hover:-translate-y-1 min-h-[160px] md:min-h-[180px] bg-white dark:bg-slate-900">
 							{/* Top Section: Icon and Title */}
 							<div className="flex flex-col items-center w-full">
-								<div className={`p-2.5 rounded-lg mb-3 bg-gray-50 dark:bg-gray-800 ${feature.color} group-hover:scale-110 transition-transform`}>
+								<div className={`p-2.5 rounded-lg mb-3 bg-gray-50 dark:bg-slate-900 ${feature.color} group-hover:scale-110 transition-transform`}>
 									<feature.icon size={24} />
 								</div>
 								<CardTitle className="text-sm md:text-base font-bold group-hover:text-blue-600 transition-colors line-clamp-1">
