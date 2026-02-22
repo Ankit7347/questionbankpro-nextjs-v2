@@ -131,5 +131,6 @@ npx shadcn@latest add sonner
 npx shadcn@latest add tooltip
 
 npx shadcn@latest add skeleton
+npx shadcn@latest add badge
 
 yarn add @fortawesome/fontawesome-free

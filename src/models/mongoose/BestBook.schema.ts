@@ -1,6 +1,6 @@
 // src/models/mongoose/BestBook.schema.ts
 
-import { Schema, model, models } from "mongoose";
+import { Schema, model, models, Types } from "mongoose";
 import {
   BaseSchemaFields,
   BaseSchemaOptions,
@@ -17,30 +17,33 @@ const BestBookSchema = new Schema(
     author: {
       type: String,
       required: true,
+      trim: true,
     },
 
-    subject: {
-      type: String,
+    examId: {
+      type: Types.ObjectId,
+      ref: "Exam",
       required: true,
+      index: true,
     },
 
-    className: {
-      type: String,
-      required: true, // "Class 10", "BSc Physics"
+    subExamId: {
+      type: Types.ObjectId,
+      ref: "SubExam",
+      required: true,
+      index: true,
     },
 
-    board: {
-      type: String,
-      required: true, // CBSE / ICSE / JEE etc
-    },
-
-    competitive: {
-      type: Boolean,
-      default: false,
+    subjectId: {
+      type: Types.ObjectId,
+      ref: "Subject",
+      required: true,
+      index: true,
     },
 
     imageUrl: {
       type: String,
+      default:'/images/sample-book.png'
     },
 
     description: {
@@ -50,12 +53,21 @@ const BestBookSchema = new Schema(
     tags: [
       {
         type: String,
+        trim: true,
       },
     ],
+
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
 
     ...BaseSchemaFields,
   },
   BaseSchemaOptions
 );
+
+BestBookSchema.index({ subExamId: 1, subjectId: 1 });
 
 export default models.BestBook || model("BestBook", BestBookSchema);
