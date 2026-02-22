@@ -110,21 +110,9 @@ export default function CoursesPage() {
               </>
             ) : (
               <>
-                <Section title="Active Now" items={data.myCourses.active} />
-                <Section
-                  title="Expiring Soon"
-                  items={data.myCourses.expiring}
-                />
-                <Section
-                  title="Course History"
-                  items={data.myCourses.expired}
-                />
-
-                {data.myCourses.active.length === 0 &&
-                  data.myCourses.expiring.length === 0 &&
-                  data.myCourses.expired.length === 0 && (
-                    <EmptyState message="You haven't enrolled in any courses yet." />
-                  )}
+                <Section title="Active Now" items={data.myCourses.active} count={data.myCourses.active.length} />
+                <Section title="Expiring Soon" items={data.myCourses.expiring} count={data.myCourses.expiring.length} />
+                <Section title="Course History" items={data.myCourses.expired} count={data.myCourses.expired.length} />
               </>
             )}
           </TabsContent>
@@ -138,14 +126,8 @@ export default function CoursesPage() {
               </>
             ) : (
               <>
-                <Section
-                  title="Featured Paid Courses"
-                  items={data.explore.paid}
-                />
-                <Section
-                  title="Free Resources"
-                  items={data.explore.free}
-                />
+                <Section title="Paid Courses" items={data.explore.paid} count={data.explore.paid.length} />
+                <Section title="Free Resources" items={data.explore.free} count={data.explore.free.length}/>
 
                 {data.explore.paid.length === 0 &&
                   data.explore.free.length === 0 && (
@@ -166,21 +148,22 @@ export default function CoursesPage() {
 function Section({
   title,
   items,
+  count
 }: {
   title: string;
   items: any[];
+  count: number;
 }) {
   if (items.length === 0) return null;
 
   return (
     <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center gap-3 mb-5"> {/* Changed to gap-3 */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-300">
           {title}
         </h2>
-
-        <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-          {items.length}
+        <span className="bg-blue-100 text-blue-600 dark:bg-gray-800 dark:text-gray-400 text-xs font-bold px-2 py-0.5 rounded-full border border-blue-200 dark:border-gray-700">
+          {count}
         </span>
       </div>
 
@@ -253,25 +236,25 @@ function CourseCard({
   loading?: boolean;
 }) {
   /* SKELETON MODE */
-if (loading) {
-  return (
-    // Added a light gray base so the white/gray highlights actually show up
-    <div className="h-[28vh] rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-900 shadow-xl flex flex-col p-3 space-y-3 animate-pulse">
+  if (loading) {
+    return (
+      // Added a light gray base so the white/gray highlights actually show up
+      <div className="h-[28vh] rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-900 shadow-xl flex flex-col p-3 space-y-3 animate-pulse">
 
-      {/* Thumbnail - Darker than the background */}
-      <div className="w-full h-32 rounded-lg bg-gray-200 dark:bg-white/20" />
+        {/* Thumbnail - Darker than the background */}
+        <div className="w-full h-32 rounded-lg bg-gray-200 dark:bg-white/20" />
 
-      {/* Title */}
-      <div className="h-4 w-3/4 bg-gray-200 dark:bg-white/15 rounded" />
+        {/* Title */}
+        <div className="h-4 w-3/4 bg-gray-200 dark:bg-white/15 rounded" />
 
-      {/* Subtitle */}
-      <div className="h-3 w-1/2 bg-gray-200 dark:bg-white/10 rounded" />
+        {/* Subtitle */}
+        <div className="h-3 w-1/2 bg-gray-200 dark:bg-white/10 rounded" />
 
-      {/* Button */}
-      <div className="mt-auto h-8 w-full bg-gray-200 dark:bg-white/5 rounded-lg" />
-    </div>
-  );
-}
+        {/* Button */}
+        <div className="mt-auto h-8 w-full bg-gray-200 dark:bg-white/5 rounded-lg" />
+      </div>
+    );
+  }
 
   /* REAL CARD */
   const { name, price, flags, access, examSlug, subExamSlug, slug } = data;
@@ -326,7 +309,13 @@ if (loading) {
 
   return (
     <div className="h-[28vh] rounded-xl border border-white/40 bg-white/20 dark:bg-white/10 backdrop-blur-xl shadow-xl flex flex-col p-3 space-y-3">
-      <div className="w-full h-32 rounded-lg bg-gradient-to-br from-blue-200 to-blue-500 shadow-inner" />
+      <div className="w-full h-32 rounded-lg overflow-hidden">
+        <img
+          src="/images/coursecard.png"
+          alt="Course Thumbnail"
+          className="w-full h-full object-cover"
+        />
+      </div>
 
       <h3 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
         {name}
